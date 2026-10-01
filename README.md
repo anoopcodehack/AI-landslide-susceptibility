@@ -3,12 +3,11 @@
 A machine learning and GIS framework for identifying and mapping landslide-prone terrain, with explainable factor analysis and an interactive risk-zone visualization interface.
 
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![Status](https://img.shields.io/badge/status-in%20development-orange)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.39%2B-FF4B4B?logo=streamlit&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?logo=scikit-learn&logoColor=white)
+![Status](https://img.shields.io/badge/status-active%20development-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
-
-Mini Project | V Semester, B.E. Computer Science & Engineering | Academic Year 2026-27
-Sahyadri College of Engineering & Management (An Autonomous Institution), Mangaluru
-Affiliated to Visvesvaraya Technological University (VTU), Belagavi
 
 ---
 
@@ -157,8 +156,8 @@ The backend and frontend prototype are now scaffolded. The geospatial pipeline a
 ### Installation
 
 ```bash
-git clone https://github.com/anoopcodehack/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/anoopcodehack/AI-landslide-susceptibility.git
+cd AI-landslide-susceptibility
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -166,24 +165,59 @@ pip install -r requirements.txt
 
 ### Usage
 
-```bash
-# 1. Preprocess and build the spatial modeling matrix
-python src/preprocess.py
+1. **Run Data Preprocessing**
+   ```bash
+   python src/preprocess.py
+   ```
 
-# 2. Train and benchmark the models
-python src/train.py
+2. **Train & Benchmark ML Models**
+   ```bash
+   python src/train.py
+   ```
 
-# 3. Generate SHAP explanations
-python src/explain.py
+3. **Generate Explainability Reports (SHAP)**
+   ```bash
+   python src/explain.py
+   ```
 
-# 4. Start the backend API (in a separate terminal)
-uvicorn backend.main:app --reload
+4. **Start the FastAPI Backend**
+   ```bash
+   uvicorn backend.main:app --reload
+   ```
+   * Interactive API documentation (Swagger UI): [http://localhost:8000/docs](http://localhost:8000/docs)
+   * Health check endpoint: [http://localhost:8000/health](http://localhost:8000/health)
 
-# 5. Launch the interactive dashboard (in another terminal)
-streamlit run frontend/app.py
+5. **Launch the Streamlit GIS Dashboard**
+   ```bash
+   streamlit run frontend/app.py
+   ```
+   * Web Application: [http://localhost:8501](http://localhost:8501)
+
+### API Reference
+
+#### `POST /api/v1/predict`
+Calculates susceptibility score and risk zone based on conditioning factor inputs.
+
+**Request Payload:**
+```json
+{
+  "slope": 28.5,
+  "elevation": 950.0,
+  "rainfall": 210.0,
+  "soil": 0.65,
+  "ndvi": 0.35
+}
 ```
 
-The current API uses a transparent prototype scoring formula so the end-to-end frontend/backend flow can be tested. It is not a validated landslide model; replace it with the trained Random Forest or XGBoost predictor once the spatial modeling matrix is available.
+**Response:**
+```json
+{
+  "susceptibility": 0.6125,
+  "zone": "Moderate"
+}
+```
+
+> **Note:** The current backend utilizes a transparent prototype scoring function for frontend-backend contract validation. It will be seamlessly hooked to the trained XGBoost / Random Forest inference engine upon dataset finalization.
 
 ## Results
 
@@ -219,7 +253,7 @@ The system is designed as a spatial decision-support tool for the following use 
 - Real-time satellite or radar integration
 - Automated government alert or siren systems
 
-**Disclaimer:** This is an academic project. Outputs are intended for research and preliminary planning only and must not be used as an official hazard warning or as a substitute for field investigation by qualified geotechnical professionals.
+**Disclaimer:** This project is an open-source research and decision-support prototype. Outputs are intended for regional risk screening and preliminary land-use planning, and must not be used as an official emergency hazard alert or as a substitute for on-site geotechnical field surveys.
 
 ## Societal Impact and Outcomes
 
@@ -253,16 +287,14 @@ This project aligns with the following United Nations Sustainable Development Go
 
 ## Team
 
-| Name | USN | GitHub |
+| Name | Role | GitHub |
 |---|---|---|
-| Ashith C | 4SF24CS027 | |
-| Anoop A | 4SF24CS021 | [@anoopcodehack](https://github.com/anoopcodehack) |
-| Dishant Jain | 4SF24CS057 | |
-| Dhruv Shetty | 4SF24CS055 | |
+| Anoop A | Lead & Machine Learning | [@anoopcodehack](https://github.com/anoopcodehack) |
+| Ashith C | Geospatial & Preprocessing | |
+| Dishant Jain | Backend & API Architecture | |
+| Dhruv Shetty | Frontend & GIS Visualization | |
 
-**Project Guide:** Dr. Joylin D'sa, Professor, Department of Computer Science & Engineering, Sahyadri College of Engineering & Management, Mangaluru.
-
-**Submitted in partial fulfillment of the requirements of the V Semester, Bachelor of Engineering in Computer Science & Engineering, Visvesvaraya Technological University, Belagavi, 2026-27.**
+**Project Mentor:** Dr. Joylin D'sa, Professor, Department of Computer Science & Engineering.
 
 ## License
 
