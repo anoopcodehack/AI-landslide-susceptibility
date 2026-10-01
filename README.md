@@ -134,15 +134,17 @@ NDVI                 ┘                                                 │
 │   ├── train.py            # Model training and benchmarking
 │   ├── explain.py          # SHAP analysis
 │   └── predict.py          # Susceptibility classification over the study grid
-├── app/
-│   └── app.py              # Streamlit + Folium dashboard
+├── backend/
+│   └── main.py             # FastAPI health and prediction API
+├── frontend/
+│   └── app.py              # Streamlit dashboard
 ├── docs/                   # Abstract, report, figures
 ├── requirements.txt
 ├── LICENSE
 └── README.md
 ```
 
-The structure above is the planned layout and will be updated as the repository develops.
+The backend and frontend prototype are now scaffolded. The geospatial pipeline and trained-model integration will be added after the input datasets are finalized.
 
 ## Getting Started
 
@@ -174,9 +176,14 @@ python src/train.py
 # 3. Generate SHAP explanations
 python src/explain.py
 
-# 4. Launch the interactive dashboard
-streamlit run app/app.py
+# 4. Start the backend API (in a separate terminal)
+uvicorn backend.main:app --reload
+
+# 5. Launch the interactive dashboard (in another terminal)
+streamlit run frontend/app.py
 ```
+
+The current API uses a transparent prototype scoring formula so the end-to-end frontend/backend flow can be tested. It is not a validated landslide model; replace it with the trained Random Forest or XGBoost predictor once the spatial modeling matrix is available.
 
 ## Results
 
