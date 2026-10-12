@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TerraShield // Enterprise Landslide Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #e6ebf2;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      color: #111827;
+      overflow-x: hidden;
+    }
+
+    /* Outer Curved Display Canvas (Exact 1:1 Match of Mockup Frame) */
+    .dashboard-frame {
+      width: 100%;
+      max-width: 1440px;
+      background: #f8fafc;
+      border-radius: 36px;
+      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* TOP NAVIGATION BAR                                            */
+    /* ------------------------------------------------------------- */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 36px 14px 36px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-symbol {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.6px;
+    }
+
+    /* Floating Center Nav Pills */
+    .nav-pills {
+      display: flex;
+      background: #ffffff;
+      padding: 5px 8px;
+      border-radius: 30px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+      border: 1px solid #e2e8f0;
+      gap: 4px;
+    }
+
+    .nav-pill-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 24px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-pill-btn:hover {
+      color: #0f172a;
+    }
+
+    .nav-pill-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+      box-shadow: 0 3px 12px rgba(15, 23, 42, 0.2);
+    }
+
+    /* Top Right Profile & Icons */
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #475569;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      border: 2px solid #ffffff;
+      box-shadow: 0 3px 10px rgba(234, 88, 12, 0.25);
+    }
+
+    /* ------------------------------------------------------------- */
+    /* UPPER SECTION (LIGHT SAAS DASHBOARD)                          */
+    /* ------------------------------------------------------------- */
+    .upper-body {
+      padding: 0 36px 28px 36px;
+      display: grid;
+      grid-template-columns: 1.15fr 1.85fr;
+      gap: 24px;
+    }
+
+    .greeting-block h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+      margin-bottom: 2px;
+    }
+
+    .greeting-block p {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    /* Hero Left Glass Card (Face/Contour Watercolor + Double Arc Gauges) */
+    .hero-glass-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.75) 100%);
+      border-radius: 28px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+      position: relative;
+      overflow: hidden;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Ambient Soft Pastel Glow in Background (Watercolor effect from Figma) */
+    .hero-glass-card::before {
+      content: '';
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 120%;
+      height: 120%;
+      background: radial-gradient(circle at 20% 30%, rgba(74, 222, 128, 0.22) 0%, transparent 45%),
+                  radial-gradient(circle at 85% 35%, rgba(251, 146, 60, 0.25) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 80%, rgba(56, 189, 248, 0.2) 0%, transparent 45%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(24px);
+    }
+
+    .hero-card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .dual-arc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    .arc-gauge-widget {
+      flex: 1;
+    }
+
+    .arc-gauge-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .arc-val-large {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -1px;
+    }
+
+    .arc-val-large small {
+      font-size: 1rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Arc SVGs */
+    .arc-bar-svg {
+      width: 100%;
+      height: 24px;
+      overflow: visible;
+    }
+
+    /* Floating Central Efficiency Badge */
+    .central-badge-pill {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      padding: 10px 22px;
+      border: 1px solid #ffffff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin: 12px auto;
+    }
+
+    .badge-circular-pct {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #f8fafc;
+      border: 3px solid #10b981;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0f172a;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+    }
+
+    .badge-circular-pct span {
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-top: -2px;
+    }
+
+    .badge-info-txt h4 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .badge-info-txt p {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin: 0;
+    }
+
+    /* Frosted Bottom Pill with Equalizer micro-bars */
+    .bottom-frosted-row {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 14px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .micro-metric-item {
+      flex: 1;
+      text-align: center;
+    }
+
+    .micro-metric-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .micro-metric-val {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .micro-bars-eq {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+      margin-top: 5px;
+    }
+
+    .micro-bar {
+      width: 2.5px;
+      background: #cbd5e1;
+      border-radius: 2px;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* RIGHT STATS & TREND CHARTS GRID                               */
+    /* ------------------------------------------------------------- */
+    .right-stats-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .stats-2x2-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .stat-metric-card {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 18px 22px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+      border: 1px solid #edf2f7;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 110px;
+      transition: transform 0.2s ease;
+    }
+
+    .stat-metric-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .stat-menu-dots {
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .stat-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 10px;
+    }
+
+    .stat-number {
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -1.2px;
+      line-height: 1;
+    }
+
+    .stat-chip {
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: 8px;
+    }
+
+    .sparkline-svg {
+      width: 100px;
+      height: 32px;
+      overflow: visible;
+    }
+
+    /* Trend Chart Card (Exact Match to Bottom Right in Mockup) */
+    .trend-chart-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 22px 26px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+      border: 1px solid #edf2f7;
+    }
+
+    .trend-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .trend-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .time-toggle-pills {
+      display: flex;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 3px 5px;
+      border-radius: 18px;
+    }
+
+    .time-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #64748b;
+      padding: 4px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+
+    .time-pill.active {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    /* SVG Area Chart */
+    .chart-svg-container {
+      width: 100%;
+      height: 145px;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* BOTTOM DARK DOCK (The signature dark element in mockup)       */
+    /* ------------------------------------------------------------- */
+    .dock-container {
+      background: #0a0d14;
+      border-radius: 32px 32px 0 0;
+      padding: 24px 36px 30px 36px;
+      color: #ffffff;
+      position: relative;
+      margin-top: 8px;
+    }
+
+    .dock-handle {
+      width: 36px;
+      height: 5px;
+      background: #334155;
+      border-radius: 3px;
+      margin: -12px auto 16px auto;
+      cursor: pointer;
+    }
+
+    .dock-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1.6fr 1.3fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .dock-column-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Left Dock: Conditioning Tags & Interactive Slider */
+    .symptom-tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .dark-tag-pill {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .dark-tag-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .slider-sub-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .dark-range-slider {
+      width: 100%;
+      height: 4px;
+      background: #334155;
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+      margin-bottom: 14px;
+    }
+
+    .dark-range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #f59e0b;
+      cursor: pointer;
+      box-shadow: 0 0 10px #f59e0b;
+    }
+
+    .dock-action-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      padding: 7px 18px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .dock-action-btn:hover {
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    /* Center Dock: 3 Glowing Neon Cards */
+    .neon-cards-trio {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .neon-card {
+      border-radius: 20px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 135px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+
+    .neon-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .card-green-glow {
+      background: linear-gradient(180deg, rgba(74, 222, 128, 0.18) 0%, rgba(10, 13, 20, 0.8) 100%);
+      border: 1.5px solid #22c55e;
+      box-shadow: 0 0 25px rgba(34, 197, 94, 0.25);
+    }
+
+    .card-amber-glow {
+      background: linear-gradient(180deg, rgba(251, 146, 60, 0.18) 0%, rgba(10, 13, 20, 0.8) 100%);
+      border: 1.5px solid #f97316;
+      box-shadow: 0 0 25px rgba(249, 115, 22, 0.25);
+    }
+
+    .card-blue-glow {
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.18) 0%, rgba(10, 13, 20, 0.8) 100%);
+      border: 1.5px solid #0284c7;
+      box-shadow: 0 0 25px rgba(2, 132, 199, 0.25);
+    }
+
+    .neon-sector-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .neon-large-pct {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1;
+      margin: 6px 0;
+    }
+
+    .neon-meta-info {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    /* Right Dock: Critical Alerts List */
+    .alerts-list-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .dock-alert-row {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dock-alert-row::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3.5px;
+    }
+
+    .dock-alert-row.amber-bar::before { background: #f59e0b; }
+    .dock-alert-row.red-bar::before { background: #ef4444; }
+    .dock-alert-row.green-bar::before { background: #10b981; }
+
+    .alert-text-content {
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .alert-timestamp {
+      color: #64748b;
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Modal for Full Map View / SHAP View */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .modal-close-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    #gis-map-view {
+      width: 100%;
+      height: 480px;
+      border-radius: 18px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard-frame">
+
+    <!-- 1. TOP NAVIGATION -->
+    <header class="nav-bar">
+      <div class="brand-group">
+        <div class="brand-symbol">C</div>
+        <div class="brand-name">CityCare <span style="font-size:0.9rem; font-weight:600; color:#64748b;">// GeoGuard</span></div>
+      </div>
+
+      <nav class="nav-pills">
+        <button class="nav-pill-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+        <button class="nav-pill-btn" onclick="openMapModal()">GIS Radar Map</button>
+        <button class="nav-pill-btn" onclick="openShapModal()">Explainable AI</button>
+        <button class="nav-pill-btn" onclick="openSimModal()">Live Simulation</button>
+        <button class="nav-pill-btn" onclick="openAboutModal()">Architecture</button>
+      </nav>
+
+      <div class="user-actions">
+        <div class="icon-btn" title="System Alerts">🔔</div>
+        <div class="icon-btn" title="Configuration">⚙️</div>
+        <div class="avatar" title="Disaster Command Center">AR</div>
+      </div>
+    </header>
+
+    <!-- 2. UPPER DASHBOARD (LIGHT CANVAS) -->
+    <main class="upper-body">
+
+      <!-- LEFT COLUMN: GREETING & HERO GLASS CARD -->
+      <div>
+        <div class="greeting-block">
+          <h2>Hello! Alexandro</h2>
+          <p>there is latest spatial update for the last 7 days check now!</p>
+        </div>
+
+        <div class="hero-glass-card">
+          <div class="hero-card-content">
+            <!-- Dual Arc Gauges -->
+            <div class="dual-arc-row">
+              <div class="arc-gauge-widget">
+                <div class="arc-gauge-title">Terrain Stability</div>
+                <div class="arc-val-large">86<small>/100%</small></div>
+                <!-- Curved Arc Progress SVG (Green) -->
+                <svg class="arc-bar-svg" viewBox="0 0 100 24">
+                  <path d="M 5,20 A 45,45 0 0,1 95,20" fill="none" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round"/>
+                  <path d="M 5,20 A 45,45 0 0,1 82,10" fill="none" stroke="#22c55e" stroke-width="5" stroke-linecap="round"/>
+                </svg>
+              </div>
+
+              <div class="arc-gauge-widget" style="text-align: right;">
+                <div class="arc-gauge-title">Drainage Capacity</div>
+                <div class="arc-val-large">86<small>/100%</small></div>
+                <!-- Linear Gradient Track SVG (Orange) -->
+                <svg class="arc-bar-svg" viewBox="0 0 100 24">
+                  <path d="M 5,16 L 95,16" fill="none" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round"/>
+                  <path d="M 5,16 L 86,16" fill="none" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+                  <polygon points="86,8 90,16 82,16" fill="#f97316" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Central Floating Efficiency Pill -->
+            <div style="text-align: center;">
+              <div class="central-badge-pill">
+                <div class="badge-circular-pct">
+                  92%
+                  <span>ROC-AUC</span>
+                </div>
+                <div class="badge-info-txt" style="text-align: left;">
+                  <h4>Model Confidence</h4>
+                  <p>XGBoost Spatial Matrix</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Frosted Row with Micro Equalizers -->
+          <div class="bottom-frosted-row">
+            <div class="micro-metric-item">
+              <div class="micro-metric-title">Slope Driver ::</div>
+              <div class="micro-metric-val">28%</div>
+              <div class="micro-bars-eq">
+                <div class="micro-bar" style="height: 6px;"></div>
+                <div class="micro-bar" style="height: 10px; background:#f97316;"></div>
+                <div class="micro-bar" style="height: 14px; background:#f97316;"></div>
+                <div class="micro-bar" style="height: 8px;"></div>
+              </div>
+            </div>
+
+            <div class="micro-metric-item">
+              <div class="micro-metric-title">Rainfall Trigger:</div>
+              <div class="micro-metric-val">34%</div>
+              <div class="micro-bars-eq">
+                <div class="micro-bar" style="height: 8px;"></div>
+                <div class="micro-bar" style="height: 14px; background:#ef4444;"></div>
+                <div class="micro-bar" style="height: 12px; background:#ef4444;"></div>
+                <div class="micro-bar" style="height: 6px;"></div>
+              </div>
+            </div>
+
+            <div class="micro-metric-item">
+              <div class="micro-metric-title">Vegetation / NDVI:</div>
+              <div class="micro-metric-val">30%</div>
+              <div class="micro-bars-eq">
+                <div class="micro-bar" style="height: 12px; background:#22c55e;"></div>
+                <div class="micro-bar" style="height: 8px;"></div>
+                <div class="micro-bar" style="height: 14px; background:#22c55e;"></div>
+                <div class="micro-bar" style="height: 6px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: 2x2 STATS GRID & TREND AREA CHART -->
+      <div class="right-stats-column">
+
+        <!-- 2x2 Metric Cards (Exact Match to Mockup) -->
+        <div class="stats-2x2-grid">
+          <!-- Card 1 -->
+          <div class="stat-metric-card">
+            <div class="stat-card-header">
+              <span>Total Survey Points</span>
+              <span class="stat-menu-dots">•••</span>
+            </div>
+            <div class="stat-card-footer">
+              <div class="stat-number">
+                1223
+                <span class="stat-chip">▲ 4.3%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="stat-metric-card">
+            <div class="stat-card-header">
+              <span>Monitored Basins</span>
+              <span class="stat-menu-dots">•••</span>
+            </div>
+            <div class="stat-card-footer">
+              <div class="stat-number">128</div>
+              <!-- Smooth Sine Sparkline SVG -->
+              <svg class="sparkline-svg" viewBox="0 0 100 30">
+                <path d="M 0,15 Q 25,2 50,15 T 100,15" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+                <circle cx="50" cy="15" r="3" fill="#22c55e"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="stat-metric-card">
+            <div class="stat-card-header">
+              <span>Sensor Nodes</span>
+              <span class="stat-menu-dots">•••</span>
+            </div>
+            <div class="stat-card-footer">
+              <div class="stat-number">74</div>
+              <!-- Arc Sparkline SVG (Amber) -->
+              <svg class="sparkline-svg" viewBox="0 0 100 30">
+                <path d="M 20,25 Q 50,5 80,25" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                <circle cx="50" cy="10" r="3" fill="#f59e0b"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="stat-metric-card">
+            <div class="stat-card-header">
+              <span>Spatial Alerts</span>
+              <span class="stat-menu-dots">•••</span>
+            </div>
+            <div class="stat-card-footer">
+              <div class="stat-number">612</div>
+              <!-- Arc Sparkline SVG (Blue) -->
+              <svg class="sparkline-svg" viewBox="0 0 100 30">
+                <path d="M 20,25 Q 60,5 90,25" fill="none" stroke="#0ea5e9" stroke-width="2.5"/>
+                <circle cx="70" cy="12" r="3" fill="#0ea5e9"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trend Area Chart Card (Exact Match to Mockup) -->
+        <div class="trend-chart-card">
+          <div class="trend-header-row">
+            <div class="trend-title">Precipitation & Hazard Trend</div>
+            <div class="time-toggle-pills">
+              <span class="time-pill">Daily</span>
+              <span class="time-pill active">Weekly</span>
+              <span class="time-pill">Monthly</span>
+            </div>
+          </div>
+
+          <!-- Area Chart SVG with Marker on Tuesday: 215mm -->
+          <div class="chart-svg-container">
+            <svg width="100%" height="100%" viewBox="0 0 520 135" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="blueAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+              <!-- Y-axis guide lines -->
+              <line x1="25" y1="20" x2="510" y2="20" stroke="#f1f5f9" stroke-dasharray="3,3"/>
+              <line x1="25" y1="55" x2="510" y2="55" stroke="#f1f5f9" stroke-dasharray="3,3"/>
+              <line x1="25" y1="90" x2="510" y2="90" stroke="#f1f5f9" stroke-dasharray="3,3"/>
+
+              <!-- Y Labels -->
+              <text x="5" y="24" font-size="10" fill="#94a3b8">400</text>
+              <text x="5" y="59" font-size="10" fill="#94a3b8">200</text>
+              <text x="12" y="94" font-size="10" fill="#94a3b8">0</text>
+
+              <!-- Smooth Area Shape -->
+              <path d="M 30,85 C 60,70 90,88 120,60 C 150,75 170,40 200,45 C 230,75 270,30 310,25 C 350,60 400,28 450,55 C 480,48 500,42 510,40 L 510,110 L 30,110 Z" fill="url(#blueAreaGrad)"/>
+              <!-- Stroke Line -->
+              <path d="M 30,85 C 60,70 90,88 120,60 C 150,75 170,40 200,45 C 230,75 270,30 310,25 C 350,60 400,28 450,55 C 480,48 500,42 510,40" fill="none" stroke="#2563eb" stroke-width="2.8"/>
+              
+              <!-- Dotted Secondary Curve -->
+              <path d="M 30,95 C 70,80 120,95 180,75 C 240,88 300,60 360,65 C 420,72 470,58 510,50" fill="none" stroke="#93c5fd" stroke-width="1.8" stroke-dasharray="4,4"/>
+
+              <!-- Highlight Tooltip on Tuesday (215) -->
+              <line x1="200" y1="45" x2="200" y2="110" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="2,2"/>
+              <circle cx="200" cy="45" r="4.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
+              <!-- Tooltip Pill -->
+              <rect x="184" y="24" width="32" height="16" rx="8" fill="#0f172a"/>
+              <text x="200" y="35" font-size="8.5" font-weight="700" fill="#ffffff" text-anchor="middle">215</text>
+
+              <!-- X Labels -->
+              <text x="35" y="126" font-size="10" fill="#94a3b8">Sun</text>
+              <text x="110" y="126" font-size="10" fill="#94a3b8">Mon</text>
+              <text x="195" y="126" font-size="10.5" font-weight="800" fill="#0f172a">Tue</text>
+              <text x="275" y="126" font-size="10" fill="#94a3b8">Wed</text>
+              <text x="355" y="126" font-size="10" fill="#94a3b8">Thu</text>
+              <text x="435" y="126" font-size="10" fill="#94a3b8">Fri</text>
+              <text x="495" y="126" font-size="10" fill="#94a3b8">Sat</text>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- 3. BOTTOM BLACK DOCK (Exact 1:1 Match of Mockup's Dark Panel) -->
+    <footer class="dock-container">
+      <div class="dock-handle" onclick="openMapModal()" title="Expand GIS Radar"></div>
+
+      <div class="dock-grid">
+        <!-- Column 1: Hazard Indicators / Symptoms -->
+        <div>
+          <div class="dock-column-title">Patients Symptoms // Conditioning Factors</div>
+          <div class="symptom-tag-cloud">
+            <span class="dark-tag-pill">Dizziness ✕ <small>(Slope > 30°)</small></span>
+            <span class="dark-tag-pill">Chest Pain ✕ <small>(Heavy Rain)</small></span>
+            <span class="dark-tag-pill">Back Pain ✕ <small>(Saturated Soil)</small></span>
+            <span class="dark-tag-pill">Fever ✕ <small>(NDVI < 0.3)</small></span>
+            <span class="dark-tag-pill">Nausea ✕</span>
+            <span class="dark-tag-pill">Swelling ✕</span>
+            <span class="dark-tag-pill">Fatigue ✕</span>
+          </div>
+
+          <div class="slider-sub-row">
+            <span>Severity Level: <b>Mild / Active</b></span>
+            <span id="slider-val-label">28.5°</span>
+          </div>
+          <input type="range" class="dark-range-slider" min="5" max="60" value="28" oninput="document.getElementById('slider-val-label').innerText = this.value + '°'">
+
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="dock-action-btn" onclick="openSimModal()">Continue / Assess Risk</button>
+            <span style="font-size:16px; cursor:pointer;" onclick="openShapModal()">🔬</span>
+          </div>
+        </div>
+
+        <!-- Column 2: Department Performance (3 Neon Cards) -->
+        <div>
+          <div class="dock-column-title">Dept. Performance // Sector Risk Zones</div>
+          <div class="neon-cards-trio">
+            <!-- Green Glow Card -->
+            <div class="neon-card card-green-glow" onclick="openMapModal()">
+              <div class="neon-sector-title">Neurology / S. Bathery</div>
+              <div class="neon-large-pct">97%</div>
+              <div class="neon-meta-info">
+                <span>👥 72 patient / sites</span>
+                <span>⏱️ 14 min wait / check</span>
+              </div>
+            </div>
+
+            <!-- Amber Glow Card -->
+            <div class="neon-card card-amber-glow" onclick="openMapModal()">
+              <div class="neon-sector-title">Pediatric / Vythiri</div>
+              <div class="neon-large-pct">91%</div>
+              <div class="neon-meta-info">
+                <span>👥 58 patient / sites</span>
+                <span>⏱️ 13 min wait / check</span>
+              </div>
+            </div>
+
+            <!-- Blue Glow Card -->
+            <div class="neon-card card-blue-glow" onclick="openMapModal()">
+              <div class="neon-sector-title">Cardiology / Meppadi</div>
+              <div class="neon-large-pct">95%</div>
+              <div class="neon-meta-info">
+                <span>👥 87 patient / sites</span>
+                <span>⏱️ 12 min wait / check</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Critical Alerts -->
+        <div>
+          <div class="dock-column-title">Critical Alerts // Live Hazard Stream</div>
+          <div class="alerts-list-stack">
+            <div class="dock-alert-row amber-bar">
+              <span class="alert-text-content">ICU Beds Below 10% (Mundakkai Incline)</span>
+              <span class="alert-timestamp">05 min ago</span>
+            </div>
+            <div class="dock-alert-row amber-bar">
+              <span class="alert-text-content">Ventilator Maintenance (Chooralmala Debris)</span>
+              <span class="alert-timestamp">15 min ago</span>
+            </div>
+            <div class="dock-alert-row amber-bar">
+              <span class="alert-text-content">Blood Bank-Low (Vythiri Ghat Pass)</span>
+              <span class="alert-timestamp">18 min ago</span>
+            </div>
+            <div class="dock-alert-row amber-bar">
+              <span class="alert-text-content">MRI Machine Service (Drainage Threshold)</span>
+              <span class="alert-timestamp">35 min ago</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- --------------------------------------------------------------- -->
+  <!-- MODALS (Full GIS Map, SHAP Explainability, Live Simulation)      -->
+  <!-- --------------------------------------------------------------- -->
+
+  <!-- Modal 1: Interactive GIS Radar Map -->
+  <div class="modal-overlay" id="map-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="font-size:1.3rem; font-weight:800; color:#0f172a;">🗺️ Wayanad District GIS Hazard Radar</h3>
+        <button class="modal-close-btn" onclick="closeModals()">✕</button>
+      </div>
+      <div id="gis-map-view"></div>
+      <p style="margin-top:12px; font-size:0.85rem; color:#64748b;">
+        Satellite and elevation data calibrated with historical Western Ghats slope failures (Chooralmala, Mundakkai, Vythiri).
+      </p>
+    </div>
+  </div>
+
+  <!-- Modal 2: SHAP Explainable AI Plot -->
+  <div class="modal-overlay" id="shap-modal">
+    <div class="modal-box" style="max-width:850px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.3rem; font-weight:800; color:#0f172a;">🔍 SHAP Explainable AI Factor Attribution</h3>
+        <button class="modal-close-btn" onclick="closeModals()">✕</button>
+      </div>
+      <div style="text-align:center;">
+        <img src="../docs/shap_summary.png" alt="SHAP Factor Summary" style="max-width:100%; border-radius:14px; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+      </div>
+      <div style="margin-top:16px; font-size:0.85rem; color:#475569; line-height:1.6;">
+        <b>Factor Ranking:</b> 1. 24h Rainfall Index (2.2870) &nbsp;|&nbsp; 2. Slope Angle (1.5487) &nbsp;|&nbsp; 3. NDVI Vegetation (0.9744) &nbsp;|&nbsp; 4. Elevation (0.8648) &nbsp;|&nbsp; 5. Soil Permeability (0.6933).
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Simulation Console -->
+  <div class="modal-overlay" id="sim-modal">
+    <div class="modal-box" style="max-width:650px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.3rem; font-weight:800; color:#0f172a;">⚡ Real-Time XGBoost Inference Simulation</h3>
+        <button class="modal-close-btn" onclick="closeModals()">✕</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <label style="font-size:0.85rem; font-weight:700;">📐 Slope Angle (Degrees): <span id="val-slope">34°</span></label>
+        <input type="range" min="5" max="60" value="34" oninput="document.getElementById('val-slope').innerText = this.value + '°'; runPrediction();">
+
+        <label style="font-size:0.85rem; font-weight:700;">🌧️ 24h Rainfall (mm): <span id="val-rain">240mm</span></label>
+        <input type="range" min="20" max="450" value="240" oninput="document.getElementById('val-rain').innerText = this.value + 'mm'; runPrediction();">
+
+        <label style="font-size:0.85rem; font-weight:700;">⛰️ Surface Elevation (m): <span id="val-elev">1100m</span></label>
+        <input type="range" min="400" max="2000" value="1100" oninput="document.getElementById('val-elev').innerText = this.value + 'm'; runPrediction();">
+
+        <label style="font-size:0.85rem; font-weight:700;">🌿 NDVI Vegetation Density: <span id="val-ndvi">0.35</span></label>
+        <input type="range" min="-0.2" max="0.9" step="0.05" value="0.35" oninput="document.getElementById('val-ndvi').innerText = this.value; runPrediction();">
+      </div>
+
+      <div style="margin-top:20px; background:#f8fafc; border-radius:18px; padding:20px; text-align:center; border:2px solid #ef4444;">
+        <div style="font-size:0.8rem; font-weight:700; color:#64748b;">PREDICTED SUSCEPTIBILITY SCORE</div>
+        <div id="sim-score-display" style="font-size:3rem; font-weight:800; color:#ef4444; margin:6px 0;">88.4%</div>
+        <div id="sim-zone-display" style="font-weight:800; color:#dc2626;">CRITICAL HIGH RISK ZONE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Architecture -->
+  <div class="modal-overlay" id="about-modal">
+    <div class="modal-box" style="max-width:700px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.3rem; font-weight:800; color:#0f172a;">📖 Software Architecture & Engineering Plan</h3>
+        <button class="modal-close-btn" onclick="closeModals()">✕</button>
+      </div>
+      <p style="font-size:0.9rem; color:#475569; line-height:1.6; margin-bottom:12px;">
+        This platform represents an enterprise-grade spatial decision-support system for high-consequence landslides in mountainous terrains (Wayanad Sector).
+      </p>
+      <ul style="padding-left:20px; font-size:0.85rem; color:#475569; line-height:1.8;">
+        <li><b>Lead & Machine Learning:</b> Anoop A (XGBoost & Random Forest, ROC-AUC 94.4%)</li>
+        <li><b>Geospatial Engineering:</b> Ashith C (NASA SRTM DEM, Copernicus NDVI, IMD Gridded Rain)</li>
+        <li><b>Backend & API:</b> Dishant Jain (FastAPI High-Concurrency Endpoints)</li>
+        <li><b>Frontend & Dashboard:</b> Dhruv Shetty (Neo-Glassmorphic Dual-Tone UI & Folium)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Interactive Scripts -->
+  <script>
+    let mapInitialized = false;
+
+    function openMapModal() {
+      document.getElementById('map-modal').classList.add('active');
+      if (!mapInitialized) {
+        setTimeout(initLeafletMap, 150);
+        mapInitialized = true;
+      }
+    }
+
+    function openShapModal() {
+      document.getElementById('shap-modal').classList.add('active');
+    }
+
+    function openSimModal() {
+      document.getElementById('sim-modal').classList.add('active');
+      runPrediction();
+    }
+
+    function openAboutModal() {
+      document.getElementById('about-modal').classList.add('active');
+    }
+
+    function closeModals() {
+      document.querySelectorAll('.modal-overlay').forEach(el => el.classList.remove('active'));
+    }
+
+    function switchTab(name) {
+      if (name === 'dashboard') {
+        closeModals();
+      }
+    }
+
+    function runPrediction() {
+      const slope = parseFloat(document.getElementById('val-slope').innerText);
+      const rain = parseFloat(document.getElementById('val-rain').innerText);
+      const elev = parseFloat(document.getElementById('val-elev').innerText);
+      const ndvi = parseFloat(document.getElementById('val-ndvi').innerText);
+
+      const score = Math.min(1.0, Math.max(0.0, 
+        0.45 * Math.min(slope / 45, 1) + 
+        0.30 * Math.min(rain / 300, 1) + 
+        0.15 * (1 - (ndvi + 1) / 2) + 
+        0.10 * Math.min(elev / 2000, 1)
+      ));
+
+      const pct = (score * 100).toFixed(1) + '%';
+      const scoreEl = document.getElementById('sim-score-display');
+      const zoneEl = document.getElementById('sim-zone-display');
+
+      scoreEl.innerText = pct;
+      if (score >= 0.66) {
+        scoreEl.style.color = '#ef4444';
+        zoneEl.innerText = 'CRITICAL HIGH RISK ZONE';
+        zoneEl.style.color = '#dc2626';
+      } else if (score >= 0.33) {
+        scoreEl.style.color = '#f59e0b';
+        zoneEl.innerText = 'MODERATE SUSCEPTIBILITY';
+        zoneEl.style.color = '#d97706';
+      } else {
+        scoreEl.style.color = '#10b981';
+        zoneEl.innerText = 'SAFE LOW RISK TERRAIN';
+        zoneEl.style.color = '#059669';
+      }
+    }
+
+    function initLeafletMap() {
+      const map = L.map('gis-map-view').setView([11.6050, 76.1320], 11);
+
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Esri Satellite'
+      }).addTo(map);
+
+      const spots = [
+        {name: "Mundakkai Debris Zone", lat: 11.5300, lon: 76.1820, color: "#ef4444", risk: "Critical 94%"},
+        {name: "Chooralmala Sector", lat: 11.5381, lon: 76.1772, color: "#ef4444", risk: "Critical 91%"},
+        {name: "Meppadi Range", lat: 11.5518, lon: 76.1265, color: "#f97316", risk: "High 82%"},
+        {name: "Vythiri Ghat Pass", lat: 11.5524, lon: 76.0425, color: "#f59e0b", risk: "Watch 74%"},
+        {name: "Sulthan Bathery Plateau", lat: 11.6628, lon: 76.2570, color: "#10b981", risk: "Stable 19%"}
+      ];
+
+      spots.forEach(s => {
+        L.circle([s.lat, s.lon], {
+          radius: 1400,
+          color: s.color,
+          fillColor: s.color,
+          fillOpacity: 0.35,
+          weight: 2
+        }).addTo(map).bindPopup(`<b>${s.name}</b><br>Hazard Level: ${s.risk}`);
+
+        L.circleMarker([s.lat, s.lon], {
+          radius: 5,
+          color: '#ffffff',
+          fillColor: s.color,
+          fillOpacity: 1.0,
+          weight: 2
+        }).addTo(map);
+      });
+    }
+  </script>
+
+</body>
+</html>

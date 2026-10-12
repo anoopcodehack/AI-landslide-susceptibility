@@ -6,6 +6,7 @@ import joblib
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 app = FastAPI(
@@ -25,6 +26,15 @@ app.add_middleware(
 
 MODEL_PATH = Path("models/landslide_model.joblib")
 _MODEL_BUNDLE: dict[str, Any] | None = None
+
+
+@app.get("/", response_class=HTMLResponse)
+def index() -> HTMLResponse:
+    """Serve the enterprise dashboard UI directly."""
+    html_path = Path("frontend/index.html")
+    if html_path.exists():
+        return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>TerraShield AI API Online</h1><p>Visit /docs for OpenAPI documentation.</p>")
 
 
 def get_model_bundle() -> dict[str, Any] | None:
