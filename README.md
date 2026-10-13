@@ -3,10 +3,12 @@
 A machine learning and GIS framework for identifying and mapping landslide-prone terrain, with explainable factor analysis and an interactive risk-zone visualization interface.
 
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Next.js](https://img.shields.io/badge/Next.js-14.2-black?logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.39%2B-FF4B4B?logo=streamlit&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?logo=scikit-learn&logoColor=white)
-![Status](https://img.shields.io/badge/status-active%20development-orange)
+![Status](https://img.shields.io/badge/status-production--ready-green)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
@@ -107,18 +109,20 @@ NDVI                 ┘                                                 │
                                                         Susceptibility Classification
                                                                        │
                                                                        v
-                                                     Streamlit + Folium GIS Dashboard
+                                                      Next.js 14 + Leaflet GIS Dashboard
 ```
 
 ## Tech Stack
 
 | Area | Tools |
 |---|---|
-| Language | Python |
-| Machine learning | scikit-learn, XGBoost |
-| Explainability | SHAP |
-| Geospatial processing | GIS tooling for DEM, NDVI, and spatial feature extraction |
-| Web interface and visualization | Streamlit, Folium |
+| Languages | Python 3.10+, TypeScript 5.6+ |
+| Machine Learning | scikit-learn, XGBoost |
+| Explainable AI (XAI) | SHAP (TreeExplainer) |
+| Backend & REST API | FastAPI, Uvicorn, Pydantic |
+| Frontend Framework | Next.js 14 (App Router), React 18 |
+| Styling & Components | Tailwind CSS, Lucide Icons, Recharts |
+| Geospatial GIS Mapping | Leaflet, Esri Satellite Basemaps |
 
 ## Project Structure
 
@@ -126,24 +130,29 @@ NDVI                 ┘                                                 │
 .
 ├── data/
 │   ├── raw/                # Landslide inventory, DEM, NDVI, rainfall, soil
-│   └── processed/          # Aligned spatial modeling matrix
-├── notebooks/              # Exploratory data analysis and experiments
+│   └── processed/          # Aligned spatial modeling matrix (1,500 samples)
+├── models/
+│   ├── landslide_model.joblib  # Serialized top XGBoost model (ROC-AUC 94.4%)
+│   └── test_data.joblib        # Held-out evaluation test set
 ├── src/
-│   ├── preprocess.py       # Layer alignment and feature extraction
+│   ├── preprocess.py       # Layer alignment and matrix generator
 │   ├── train.py            # Model training and benchmarking
-│   ├── explain.py          # SHAP analysis
-│   └── predict.py          # Susceptibility classification over the study grid
+│   ├── explain.py          # SHAP analysis and beeswarm generator
+│   └── predict.py          # Susceptibility classification over study grid
 ├── backend/
-│   └── main.py             # FastAPI health and prediction API
-├── frontend/
-│   └── app.py              # Streamlit dashboard
-├── docs/                   # Abstract, report, figures
+│   └── main.py             # FastAPI REST endpoints & model inference engine
+├── frontend/               # Production Next.js 14 Enterprise Application
+│   ├── app/                # App router (page.tsx, layout.tsx, globals.css)
+│   ├── components/         # Modular React components (Hero, Map, Charts, Dock)
+│   ├── package.json        # Dependencies (React, Tailwind, Lucide, Recharts)
+│   └── tailwind.config.ts  # Neo-glassmorphic and corporate design tokens
+├── docs/                   # SHAP plots, architecture diagrams, figures
 ├── requirements.txt
 ├── LICENSE
 └── README.md
 ```
 
-The backend and frontend prototype are now scaffolded. The geospatial pipeline and trained-model integration will be added after the input datasets are finalized.
+The system features a decoupled full-stack architecture with a FastAPI REST backend serving a modern Next.js 14 client.
 
 ## Getting Started
 
@@ -187,11 +196,12 @@ pip install -r requirements.txt
    * Interactive API documentation (Swagger UI): [http://localhost:8000/docs](http://localhost:8000/docs)
    * Health check endpoint: [http://localhost:8000/health](http://localhost:8000/health)
 
-5. **Launch the Streamlit GIS Dashboard**
+5. **Launch the Next.js 14 Enterprise Dashboard**
    ```bash
-   streamlit run frontend/app.py
+   cd frontend
+   npm run dev
    ```
-   * Web Application: [http://localhost:8501](http://localhost:8501)
+   * Web Application: [http://localhost:3000](http://localhost:3000)
 
 ### API Reference
 
