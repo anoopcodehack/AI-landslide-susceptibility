@@ -2,8 +2,28 @@
 
 import React, { useState } from "react";
 
-export const TrendChart: React.FC = () => {
+interface TrendData {
+  weekly: Array<{ day: string; rainfall_mm: number; hazard_idx: number; highlight?: boolean }>;
+  daily: Array<{ time: string; rainfall_mm: number }>;
+  monthly: Array<{ week: string; rainfall_mm: number }>;
+}
+
+interface TrendChartProps {
+  trendData?: TrendData;
+}
+
+export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
   const [timeframe, setTimeframe] = useState<"Daily" | "Weekly" | "Monthly">("Weekly");
+
+  const weeklyData = trendData?.weekly || [
+    { day: "Sun", rainfall_mm: 120, highlight: false },
+    { day: "Mon", rainfall_mm: 180, highlight: false },
+    { day: "Tue", rainfall_mm: 245, highlight: true },
+    { day: "Wed", rainfall_mm: 160, highlight: false },
+    { day: "Thu", rainfall_mm: 130, highlight: false },
+    { day: "Fri", rainfall_mm: 190, highlight: false },
+    { day: "Sat", rainfall_mm: 140, highlight: false },
+  ];
 
   return (
     <div className="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-sm mt-4">
@@ -29,7 +49,7 @@ export const TrendChart: React.FC = () => {
         </div>
       </div>
 
-      {/* Beautiful High-Resolution SVG Area Chart */}
+      {/* High-Resolution Dynamic SVG Area Chart */}
       <div className="w-full h-36">
         <svg width="100%" height="100%" viewBox="0 0 520 135" preserveAspectRatio="none">
           <defs>
@@ -102,28 +122,24 @@ export const TrendChart: React.FC = () => {
             245mm
           </text>
 
-          {/* X Axis Labels */}
-          <text x="35" y="126" fontSize="10" fill="#94a3b8" fontFamily="sans-serif">
-            Sun
-          </text>
-          <text x="115" y="126" fontSize="10" fill="#94a3b8" fontFamily="sans-serif">
-            Mon
-          </text>
-          <text x="200" y="126" fontSize="10.5" fontWeight="800" fill="#0f172a" fontFamily="sans-serif">
-            Tue
-          </text>
-          <text x="280" y="126" fontSize="10" fill="#94a3b8" fontFamily="sans-serif">
-            Wed
-          </text>
-          <text x="360" y="126" fontSize="10" fill="#94a3b8" fontFamily="sans-serif">
-            Thu
-          </text>
-          <text x="440" y="126" fontSize="10" fill="#94a3b8" fontFamily="sans-serif">
-            Fri
-          </text>
-          <text x="500" y="126" fontSize="10" fill="#94a3b8" fontFamily="sans-serif">
-            Sat
-          </text>
+          {/* Dynamic X Axis Labels */}
+          {weeklyData.map((d, idx) => {
+            const xPositions = [35, 115, 200, 280, 360, 440, 500];
+            const isHighlight = d.highlight;
+            return (
+              <text
+                key={d.day}
+                x={xPositions[idx] || 35 + idx * 75}
+                y="126"
+                fontSize={isHighlight ? "10.5" : "10"}
+                fontWeight={isHighlight ? "800" : "500"}
+                fill={isHighlight ? "#0f172a" : "#94a3b8"}
+                fontFamily="sans-serif"
+              >
+                {d.day}
+              </text>
+            );
+          })}
         </svg>
       </div>
     </div>

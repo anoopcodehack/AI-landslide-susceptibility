@@ -11,7 +11,6 @@ interface NavbarProps {
   onOpenSim: () => void;
   onOpenAbout: () => void;
   backendOnline: boolean;
-  modelName: string;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -22,7 +21,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSim,
   onOpenAbout,
   backendOnline,
-  modelName,
 }) => {
   return (
     <header className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 md:px-9 py-5 bg-white/90 backdrop-blur-md rounded-t-4xl border-b border-slate-100">
@@ -79,21 +77,21 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
       </nav>
 
-      {/* Right Telemetry Badge & Avatar */}
+      {/* Right Enterprise Telemetry Status Pill (Clean SaaS - No Ports!) */}
       <div className="flex items-center gap-3">
         <div
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold font-mono border ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold border ${
             backendOnline
               ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-              : "bg-amber-50 text-amber-800 border-amber-200"
+              : "bg-slate-100 text-slate-600 border-slate-200"
           }`}
         >
           <div
             className={`w-2 h-2 rounded-full ${
-              backendOnline ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-amber-500"
+              backendOnline ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-slate-400"
             }`}
           />
-          <span>{modelName} Live (Port 8000)</span>
+          <span>{backendOnline ? "System Operational" : "Telemetry Standby"}</span>
         </div>
 
         <button className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-all shadow-sm">

@@ -11,6 +11,48 @@ import { ShapModal } from "@/components/ShapModal";
 import { SimulationModal } from "@/components/SimulationModal";
 import { ArchitectureModal } from "@/components/ArchitectureModal";
 
+interface DashboardData {
+  status: string;
+  overview: {
+    terrain_stability_index: number;
+    pore_pressure_index: number;
+    model_confidence: string;
+    model_name: string;
+    dem_resolution: string;
+    slope_stress_pct: string;
+    rainfall_saturation_pct: string;
+    ndvi_cohesion_pct: string;
+  };
+  stats: {
+    total_survey_points: number;
+    monitored_basins: number;
+    sensor_nodes: number;
+    active_hotspot_alerts: number;
+    monitored_area_km2: number;
+  };
+  trend_chart: {
+    weekly: Array<{ day: string; rainfall_mm: number; hazard_idx: number; highlight?: boolean }>;
+    daily: Array<{ time: string; rainfall_mm: number }>;
+    monthly: Array<{ week: string; rainfall_mm: number }>;
+  };
+  sectors: Array<{
+    id: string;
+    name: string;
+    score_pct: string;
+    status_label: string;
+    variant: "green" | "amber" | "blue";
+    last_survey: string;
+    lat: number;
+    lon: number;
+  }>;
+  alerts: Array<{
+    id: number;
+    title: string;
+    timestamp: string;
+    severity: "danger" | "warning" | "stable";
+  }>;
+}
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<string>("dashboard");
 
@@ -20,36 +62,33 @@ export default function DashboardPage() {
   const [isSimOpen, setIsSimOpen] = useState<boolean>(false);
   const [isAboutOpen, setIsAboutOpen] = useState<boolean>(false);
 
-  // Live Backend Telemetry
-  const [backendOnline, setBackendOnline] = useState<boolean>(true);
-  const [totalPoints, setTotalPoints] = useState<number>(1500);
-  const [activeAlerts, setActiveAlerts] = useState<number>(14);
-  const [rocAuc, setRocAuc] = useState<string>("94.4%");
-  const [modelName, setModelName] = useState<string>("XGBoost");
+  // Dynamic Dashboard Data State from Backend
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [backendOnline, setBackendOnline] = useState<boolean>(false);
 
-  // Fetch live stats on component mount
+  // Fetch unified live telemetry from FastAPI backend on mount
   useEffect(() => {
-    const fetchLiveStats = async () => {
+    const fetchDashboard = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/v1/stats");
+        const res = await fetch("http://localhost:8000/api/v1/dashboard");
         if (res.ok) {
-          const data = await res.json();
-          setTotalPoints(data.total_survey_points || 1500);
-          setRocAuc(((data.model_roc_auc || 0.9439) * 100).toFixed(1) + "%");
-          setModelName(data.model_name || "XGBoost");
+          const data: DashboardData = await res.json();
+          setDashboardData(data);
           setBackendOnline(true);
+        } else {
+          setBackendOnline(false);
         }
       } catch (err) {
         setBackendOnline(false);
       }
     };
 
-    fetchLiveStats();
+    fetchDashboard();
   }, []);
 
   return (
     <div className="w-full max-w-[1440px] bg-slate-50/90 rounded-4xl shadow-2xl border border-white/80 overflow-hidden flex flex-col">
-      {/* 1. Top Navigation */}
+      {/* 1. Top Navigation Bar (Clean Enterprise - No Ports) */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -58,7 +97,6 @@ export default function DashboardPage() {
         onOpenSim={() => setIsSimOpen(true)}
         onOpenAbout={() => setIsAboutOpen(true)}
         backendOnline={backendOnline}
-        modelName={modelName}
       />
 
       {/* 2. Upper Light SaaS Body */}
@@ -74,13 +112,26 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <HeroGaugeCard rocAuc={rocAuc} modelName={modelName} />
+          <HeroGaugeCard
+            terrainStability={dashboardData?.overview?.terrain_stability_index ?? 86.4}
+            porePressure={dashboardData?.overview?.pore_pressure_index ?? 86.0}
+            rocAuc={dashboardData?.overview?.model_confidence ?? "94.4%"}
+            modelName={dashboardData?.overview?.model_name ?? "XGBoost Classifier"}
+            slopeStress={dashboardData?.overview?.slope_stress_pct ?? "28.4%"}
+            rainfallSaturation={dashboardData?.overview?.rainfall_saturation_pct ?? "34.2%"}
+            ndviCohesion={dashboardData?.overview?.ndvi_cohesion_pct ?? "30.1%"}
+          />
         </div>
 
         {/* Right Column: 2x2 Stats Grid & Trend Chart (span 7) */}
         <div className="lg:col-span-7 flex flex-col justify-between">
-          <StatsGrid totalPoints={totalPoints} activeAlerts={activeAlerts} />
-          <TrendChart />
+          <StatsGrid
+            totalPoints={dashboardData?.stats?.total_survey_points ?? 1500}
+            monitoredBasins={dashboardData?.stats?.monitored_basins ?? 128}
+            sensorNodes={dashboardData?.stats?.sensor_nodes ?? 74}
+            activeAlerts={dashboardData?.stats?.active_hotspot_alerts ?? 14}
+          />
+          <TrendChart trendData={dashboardData?.trend_chart} />
         </div>
       </main>
 
@@ -89,6 +140,8 @@ export default function DashboardPage() {
         onOpenMap={() => setIsMapOpen(true)}
         onOpenShap={() => setIsShapOpen(true)}
         onOpenSim={() => setIsSimOpen(true)}
+        sectors={dashboardData?.sectors}
+        alerts={dashboardData?.alerts}
       />
 
       {/* Modals */}

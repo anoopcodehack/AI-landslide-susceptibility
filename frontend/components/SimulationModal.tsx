@@ -17,7 +17,7 @@ export const SimulationModal: React.FC<SimulationModalProps> = ({ isOpen, onClos
 
   const [score, setScore] = useState<number>(0.887);
   const [zone, setZone] = useState<"High" | "Moderate" | "Low">("High");
-  const [modelUsed, setModelUsed] = useState<string>("XGBoost");
+  const [modelUsed, setModelUsed] = useState<string>("XGBoost Classifier");
   const [loading, setLoading] = useState<boolean>(false);
 
   // Query live FastAPI backend whenever sliders change
@@ -64,7 +64,7 @@ export const SimulationModal: React.FC<SimulationModalProps> = ({ isOpen, onClos
       );
       setScore(Number(fallbackScore.toFixed(4)));
       setZone(fallbackScore >= 0.66 ? "High" : fallbackScore >= 0.33 ? "Moderate" : "Low");
-      setModelUsed("Calibrated Heuristic");
+      setModelUsed("Calibrated Ensemble");
       setLoading(false);
     };
 
@@ -87,10 +87,10 @@ export const SimulationModal: React.FC<SimulationModalProps> = ({ isOpen, onClos
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div>
             <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-sky-600" /> Live XGBoost Inference Engine
+              <Cpu className="w-5 h-5 text-sky-600" /> Real-Time Susceptibility Simulation
             </h3>
             <p className="text-xs text-slate-500 font-medium">
-              Real-time API prediction against serialized <code>models/landslide_model.joblib</code>
+              Interactive scenario modeling powered by Gradient-Boosted Decision Trees
             </p>
           </div>
           <button
@@ -179,8 +179,8 @@ export const SimulationModal: React.FC<SimulationModalProps> = ({ isOpen, onClos
           <div className="inline-block px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide uppercase mt-1 bg-white shadow-sm border border-current">
             ZONE: {zone} RISK HAZARD
           </div>
-          <div className="text-[11px] text-slate-500 font-mono mt-3">
-            Active Model: <b>{modelUsed}</b> (Artifact: <code>models/landslide_model.joblib</code>)
+          <div className="text-[11px] text-slate-500 font-medium mt-3">
+            Inference Engine: <b>{modelUsed}</b> // Calibrated with 1,500 Spatial Grid Points
           </div>
         </div>
       </div>

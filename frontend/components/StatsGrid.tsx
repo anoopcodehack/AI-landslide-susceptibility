@@ -5,10 +5,17 @@ import { MoreHorizontal } from "lucide-react";
 
 interface StatsGridProps {
   totalPoints: number;
+  monitoredBasins: number;
+  sensorNodes: number;
   activeAlerts: number;
 }
 
-export const StatsGrid: React.FC<StatsGridProps> = ({ totalPoints, activeAlerts }) => {
+export const StatsGrid: React.FC<StatsGridProps> = ({
+  totalPoints,
+  monitoredBasins,
+  sensorNodes,
+  activeAlerts,
+}) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Card 1: Total Survey Points */}
@@ -34,7 +41,9 @@ export const StatsGrid: React.FC<StatsGridProps> = ({ totalPoints, activeAlerts 
           <MoreHorizontal className="w-4 h-4 text-slate-400 cursor-pointer" />
         </div>
         <div className="flex items-end justify-between mt-3">
-          <div className="text-3xl font-extrabold text-slate-900 tracking-tight">128</div>
+          <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            {monitoredBasins}
+          </div>
           {/* Green Sine Sparkline */}
           <svg className="w-24 h-7 overflow-visible" viewBox="0 0 100 30">
             <path
@@ -55,7 +64,9 @@ export const StatsGrid: React.FC<StatsGridProps> = ({ totalPoints, activeAlerts 
           <MoreHorizontal className="w-4 h-4 text-slate-400 cursor-pointer" />
         </div>
         <div className="flex items-end justify-between mt-3">
-          <div className="text-3xl font-extrabold text-slate-900 tracking-tight">74</div>
+          <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            {sensorNodes}
+          </div>
           {/* Amber Arc Sparkline */}
           <svg className="w-24 h-7 overflow-visible" viewBox="0 0 100 30">
             <path

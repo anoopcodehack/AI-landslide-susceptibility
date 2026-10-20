@@ -3,11 +3,24 @@
 import React from "react";
 
 interface HeroGaugeCardProps {
+  terrainStability: number;
+  porePressure: number;
   rocAuc: string;
   modelName: string;
+  slopeStress: string;
+  rainfallSaturation: string;
+  ndviCohesion: string;
 }
 
-export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({ rocAuc, modelName }) => {
+export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
+  terrainStability,
+  porePressure,
+  rocAuc,
+  modelName,
+  slopeStress,
+  rainfallSaturation,
+  ndviCohesion,
+}) => {
   return (
     <div className="relative rounded-3xl p-6 bg-gradient-to-br from-white/95 to-slate-100/80 border border-white/90 shadow-lg shadow-slate-900/5 overflow-hidden flex flex-col justify-between min-h-[380px]">
       {/* Ambient Watercolor Glow */}
@@ -23,7 +36,7 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({ rocAuc, modelName 
               Terrain Stability Index
             </h4>
             <div className="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-              86.4<span className="text-base font-bold text-slate-500">/100%</span>
+              {terrainStability.toFixed(1)}<span className="text-base font-bold text-slate-500">/100%</span>
             </div>
             {/* Curved Arc SVG */}
             <svg className="w-full h-6 mt-1 overflow-visible" viewBox="0 0 100 24">
@@ -50,7 +63,7 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({ rocAuc, modelName 
               Pore-Pressure Trigger
             </h4>
             <div className="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
-              86.0<span className="text-base font-bold text-slate-500">/100%</span>
+              {porePressure.toFixed(1)}<span className="text-base font-bold text-slate-500">/100%</span>
             </div>
             {/* Linear Track SVG with orange marker */}
             <svg className="w-full h-6 mt-1 overflow-visible" viewBox="0 0 100 24">
@@ -82,21 +95,21 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({ rocAuc, modelName 
             </div>
             <div className="text-left">
               <h5 className="text-sm font-extrabold text-slate-900 leading-tight">
-                Model Benchmark
+                Model Confidence
               </h5>
               <p className="text-xs font-semibold text-slate-500">
-                {modelName} Spatial Matrix
+                {modelName}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Frosted Pill with Micro Equalizers */}
+      {/* Bottom Frosted Pill with Dynamic Micro Equalizers */}
       <div className="relative z-10 bg-white/75 backdrop-blur-md rounded-2xl p-3.5 border border-white/90 shadow-sm flex items-center justify-between gap-3 text-center">
         <div className="flex-1">
           <div className="text-[11px] font-bold text-slate-500">Slope Stress ::</div>
-          <div className="text-sm font-extrabold text-slate-900">28.4%</div>
+          <div className="text-sm font-extrabold text-slate-900">{slopeStress}</div>
           <div className="flex justify-center items-end gap-0.5 h-3 mt-1">
             <div className="w-0.5 h-1.5 bg-slate-300 rounded" />
             <div className="w-0.5 h-2.5 bg-amber-500 rounded" />
@@ -109,7 +122,7 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({ rocAuc, modelName 
 
         <div className="flex-1">
           <div className="text-[11px] font-bold text-slate-500">Rainfall Saturation:</div>
-          <div className="text-sm font-extrabold text-slate-900">34.2%</div>
+          <div className="text-sm font-extrabold text-slate-900">{rainfallSaturation}</div>
           <div className="flex justify-center items-end gap-0.5 h-3 mt-1">
             <div className="w-0.5 h-2 bg-slate-300 rounded" />
             <div className="w-0.5 h-3.5 bg-rose-500 rounded" />
@@ -122,7 +135,7 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({ rocAuc, modelName 
 
         <div className="flex-1">
           <div className="text-[11px] font-bold text-slate-500">NDVI Cohesion:</div>
-          <div className="text-sm font-extrabold text-slate-900">30.1%</div>
+          <div className="text-sm font-extrabold text-slate-900">{ndviCohesion}</div>
           <div className="flex justify-center items-end gap-0.5 h-3 mt-1">
             <div className="w-0.5 h-3 bg-emerald-500 rounded" />
             <div className="w-0.5 h-2 bg-slate-300 rounded" />
