@@ -1,0 +1,45 @@
+{
+  "best_model": "XGBoost",
+  "rf_metrics": {
+    "model": "Random Forest",
+    "accuracy": 0.8466666666666667,
+    "precision": 0.8691099476439791,
+    "recall": 0.8877005347593583,
+    "specificity": 0.7787610619469026,
+    "f1_score": 0.8783068783068783,
+    "roc_auc": 0.936728029908665,
+    "confusion_matrix": [
+      [
+        88,
+        25
+      ],
+      [
+        21,
+        166
+      ]
+    ],
+    "cv_roc_auc_mean": 0.9369374983952165,
+    "cv_roc_auc_std": 0.01783874939900724
+  },
+  "xgb_metrics": {
+    "model": "XGBoost",
+    "accuracy": 0.8666666666666667,
+    "precision": 0.893048128342246,
+    "recall": 0.893048128342246,
+    "specificity": 0.8230088495575221,
+    "f1_score": 0.893048128342246,
+    "roc_auc": 0.942170271165586,
+    "confusion_matrix": [
+      [
+        93,
+        20
+      ],
+      [
+        20,
+        167
+      ]
+    ],
+    "cv_roc_auc_mean": 0.9408319776668769,
+    "cv_roc_auc_std": 0.015567815568057381
+  }
+}
