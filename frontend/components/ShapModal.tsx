@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { X } from "lucide-react";
+import React, { useState } from "react";
+import { X, FileText, ExternalLink } from "lucide-react";
 
 interface ShapModalProps {
   isOpen: boolean;
@@ -9,87 +9,127 @@ interface ShapModalProps {
 }
 
 export const ShapModal: React.FC<ShapModalProps> = ({ isOpen, onClose }) => {
+  const [activeTab, setActiveTab] = useState<
+    "beeswarm" | "bar" | "high_risk" | "low_risk" | "roc" | "confusion"
+  >("beeswarm");
+
   if (!isOpen) return null;
 
+  const tabs = [
+    { id: "beeswarm", label: "Global Beeswarm Summary", img: "http://localhost:8000/docs/shap_summary.png" },
+    { id: "bar", label: "Factor Attribution Bar", img: "http://localhost:8000/docs/shap_importance_bar.png" },
+    { id: "high_risk", label: "Local High-Risk Waterfall", img: "http://localhost:8000/docs/shap_local_high_risk.png" },
+    { id: "low_risk", label: "Local Safe Scenario Waterfall", img: "http://localhost:8000/docs/shap_local_low_risk.png" },
+    { id: "roc", label: "ROC Curves Comparison", img: "http://localhost:8000/docs/roc_curves.png" },
+    { id: "confusion", label: "Confusion Matrix", img: "http://localhost:8000/docs/confusion_matrix.png" },
+  ] as const;
+
+  const currentTab = tabs.find((t) => t.id === activeTab) || tabs[0];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-white w-full max-w-3xl rounded-3xl p-6 shadow-2xl border border-slate-100 flex flex-col max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-          <div>
-            <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-              <span>🔍</span> Explainable AI (SHAP) Factor Attribution
-            </h3>
-            <p className="text-xs text-slate-500 font-medium">
-              TreeExplainer analysis for the best-performing XGBoost model (ROC-AUC 94.4%)
-            </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+      <div className="bg-white w-full max-w-4xl rounded-2xl p-6 shadow-2xl border border-zinc-200 flex flex-col max-h-[92vh] overflow-hidden text-zinc-900">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-200">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-zinc-100 border border-zinc-300 flex items-center justify-center text-black">
+              <FileText className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-black">
+                Explainable AI Diagnostics (SHAP) & Model Benchmarking
+              </h3>
+              <p className="text-xs text-zinc-500">
+                TreeExplainer game-theoretic factor attributions for XGBoost (ROC-AUC 0.9422)
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors"
+            className="w-7 h-7 rounded-lg bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-700 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="mt-5 text-center">
-          <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm bg-slate-50 p-2">
+        {/* Tab Controls */}
+        <div className="flex items-center gap-1.5 py-3 overflow-x-auto border-b border-zinc-200 text-xs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-3 py-1.5 rounded-full font-medium whitespace-nowrap transition-all duration-200 ${
+                activeTab === tab.id
+                  ? "bg-black text-white font-semibold shadow-xs"
+                  : "bg-zinc-100 text-zinc-600 hover:text-black hover:bg-zinc-200"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Visual Content */}
+        <div className="my-4 flex-1 overflow-y-auto pr-1">
+          <div className="rounded-xl border border-zinc-200 overflow-hidden bg-zinc-50 p-4 flex flex-col items-center justify-center min-h-[360px]">
             <img
-              src="http://localhost:8000/docs/shap_summary.png"
-              alt="SHAP Factor Attribution Summary"
-              className="w-full h-auto rounded-xl object-contain"
+              src={currentTab.img}
+              alt={currentTab.label}
+              className="max-h-[460px] w-auto object-contain rounded-lg shadow-sm"
               onError={(e) => {
-                // Fallback indicator if backend isn't mounted
-                (e.target as HTMLElement).style.display = "none";
+                const target = e.target as HTMLElement;
+                target.style.display = "none";
               }}
             />
           </div>
-        </div>
 
-        {/* Factor Ranking Table */}
-        <div className="mt-5">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-            Global Factor Importance Ranking
-          </h4>
-          <div className="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+          {/* Factor Importance Table */}
+          <div className="mt-4 rounded-xl border border-zinc-200 overflow-hidden bg-white shadow-xs">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 uppercase font-bold">
+              <thead className="bg-zinc-50 text-zinc-600 uppercase font-mono font-semibold border-b border-zinc-200">
                 <tr>
                   <th className="px-4 py-2.5">Rank</th>
                   <th className="px-4 py-2.5">Conditioning Factor</th>
-                  <th className="px-4 py-2.5">Mean |SHAP| Value</th>
+                  <th className="px-4 py-2.5">Mean |SHAP| Attribution</th>
+                  <th className="px-4 py-2.5">Relative Share (%)</th>
                   <th className="px-4 py-2.5">Geotechnical Impact</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
-                <tr className="hover:bg-slate-50/50">
-                  <td className="px-4 py-2.5 font-bold text-slate-900">1</td>
-                  <td className="px-4 py-2.5 font-bold text-rose-600">24h Rainfall Index</td>
-                  <td className="px-4 py-2.5 font-mono font-bold">2.2870</td>
-                  <td className="px-4 py-2.5">Pore-water pressure trigger & saturation</td>
+              <tbody className="divide-y divide-zinc-100 text-zinc-700">
+                <tr className="hover:bg-zinc-50 transition-colors">
+                  <td className="px-4 py-2.5 font-bold font-mono text-black">1</td>
+                  <td className="px-4 py-2.5 font-semibold text-black">24h Rainfall Index</td>
+                  <td className="px-4 py-2.5 font-mono text-black">2.1409</td>
+                  <td className="px-4 py-2.5 font-mono font-bold text-black">36.3%</td>
+                  <td className="px-4 py-2.5 text-zinc-600">Pore-water pressure buildup and shear strength loss</td>
                 </tr>
-                <tr className="hover:bg-slate-50/50">
-                  <td className="px-4 py-2.5 font-bold text-slate-900">2</td>
-                  <td className="px-4 py-2.5 font-bold text-amber-600">Slope Angle (DEM)</td>
-                  <td className="px-4 py-2.5 font-mono font-bold">1.5487</td>
-                  <td className="px-4 py-2.5">Gravitational shear stress along steep incline</td>
+                <tr className="hover:bg-zinc-50 transition-colors">
+                  <td className="px-4 py-2.5 font-bold font-mono text-black">2</td>
+                  <td className="px-4 py-2.5 font-semibold text-black">DEM Slope Angle</td>
+                  <td className="px-4 py-2.5 font-mono text-black">1.4359</td>
+                  <td className="px-4 py-2.5 font-mono font-bold text-black">24.3%</td>
+                  <td className="px-4 py-2.5 text-zinc-600">Gravitational shear component along steep incline</td>
                 </tr>
-                <tr className="hover:bg-slate-50/50">
-                  <td className="px-4 py-2.5 font-bold text-slate-900">3</td>
-                  <td className="px-4 py-2.5 font-bold text-emerald-600">NDVI (Vegetation Index)</td>
-                  <td className="px-4 py-2.5 font-mono font-bold">0.9744</td>
-                  <td className="px-4 py-2.5">Root-cohesion deficit in deforested slopes</td>
+                <tr className="hover:bg-zinc-50 transition-colors">
+                  <td className="px-4 py-2.5 font-bold font-mono text-black">3</td>
+                  <td className="px-4 py-2.5 font-semibold text-black">NDVI (Vegetation Index)</td>
+                  <td className="px-4 py-2.5 font-mono text-black">0.8858</td>
+                  <td className="px-4 py-2.5 font-mono font-bold text-black">15.0%</td>
+                  <td className="px-4 py-2.5 text-zinc-600">Root-cohesion deficit in deforested/barren slopes</td>
                 </tr>
-                <tr className="hover:bg-slate-50/50">
-                  <td className="px-4 py-2.5 font-bold text-slate-900">4</td>
-                  <td className="px-4 py-2.5 font-bold text-sky-600">Elevation (SRTM)</td>
-                  <td className="px-4 py-2.5 font-mono font-bold">0.8648</td>
-                  <td className="px-4 py-2.5">Orographic precipitation & exposure</td>
+                <tr className="hover:bg-zinc-50 transition-colors">
+                  <td className="px-4 py-2.5 font-bold font-mono text-black">4</td>
+                  <td className="px-4 py-2.5 font-semibold text-black">DEM Elevation (m)</td>
+                  <td className="px-4 py-2.5 font-mono text-black">0.8024</td>
+                  <td className="px-4 py-2.5 font-mono font-bold text-black">13.6%</td>
+                  <td className="px-4 py-2.5 text-zinc-600">Orographic precipitation trapping in upper catchments</td>
                 </tr>
-                <tr className="hover:bg-slate-50/50">
-                  <td className="px-4 py-2.5 font-bold text-slate-900">5</td>
-                  <td className="px-4 py-2.5 font-bold text-purple-600">Soil Permeability</td>
-                  <td className="px-4 py-2.5 font-mono font-bold">0.6933</td>
-                  <td className="px-4 py-2.5">Subsurface drainage and shear strength</td>
+                <tr className="hover:bg-zinc-50 transition-colors">
+                  <td className="px-4 py-2.5 font-bold font-mono text-black">5</td>
+                  <td className="px-4 py-2.5 font-semibold text-black">Soil Permeability</td>
+                  <td className="px-4 py-2.5 font-mono text-black">0.6339</td>
+                  <td className="px-4 py-2.5 font-mono font-bold text-black">10.7%</td>
+                  <td className="px-4 py-2.5 text-zinc-600">Subsurface drainage infiltration and conductivity</td>
                 </tr>
               </tbody>
             </table>

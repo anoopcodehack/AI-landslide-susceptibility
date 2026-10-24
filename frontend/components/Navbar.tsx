@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Shield, Bell, Settings } from "lucide-react";
 
 interface NavbarProps {
   activeTab: string;
@@ -23,90 +22,84 @@ export const Navbar: React.FC<NavbarProps> = ({
   backendOnline,
 }) => {
   return (
-    <header className="flex flex-col md:flex-row items-center justify-between gap-4 px-6 md:px-9 py-5 bg-white/90 backdrop-blur-md rounded-t-4xl border-b border-slate-100">
-      {/* Brand */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white shadow-md">
-          <Shield className="w-5 h-5 text-emerald-400" />
+    <header className="coder-white-header sticky top-0 z-40 px-6 md:px-12 py-4 flex items-center justify-between">
+      {/* Brand: GEOSHIELD█ */}
+      <div className="flex items-center gap-8">
+        <div
+          onClick={() => setActiveTab("overview")}
+          className="flex items-center gap-1 cursor-pointer select-none"
+        >
+          <span className="text-xl font-black tracking-tighter text-black uppercase font-mono">
+            GEOSHIELD
+          </span>
+          <span className="w-2.5 h-3.5 bg-black inline-block ml-0.5" />
         </div>
-        <div>
-          <h1 className="text-xl font-extrabold text-slate-900 tracking-tight leading-none">
-            GeoShield AI <span className="text-sm font-semibold text-slate-500">// Wayanad Command</span>
-          </h1>
-          <p className="text-xs font-medium text-slate-500 mt-0.5">
-            Enterprise Spatial Susceptibility & Risk Intelligence
-          </p>
-        </div>
+
+        {/* Center Product Links (No Docs, No Unwanted info) */}
+        <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-zinc-700">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className="hover:text-black transition-colors"
+          >
+            Overview
+          </button>
+
+          <button
+            onClick={onOpenMap}
+            className="hover:text-black transition-colors"
+          >
+            GIS Radar
+          </button>
+
+          <button
+            onClick={onOpenShap}
+            className="hover:text-black transition-colors"
+          >
+            XAI Diagnostics
+          </button>
+
+          <button
+            onClick={onOpenSim}
+            className="hover:text-black transition-colors"
+          >
+            Simulation Studio
+          </button>
+
+          <button
+            onClick={onOpenAbout}
+            className="hover:text-black transition-colors"
+          >
+            Governance & SDGs
+          </button>
+        </nav>
       </div>
 
-      {/* Floating Center Nav Pills */}
-      <nav className="flex items-center bg-slate-50 p-1.5 rounded-full border border-slate-200 shadow-sm gap-1">
-        <button
-          onClick={() => setActiveTab("dashboard")}
-          className={`px-5 py-2 rounded-full text-xs md:text-sm font-bold transition-all ${
-            activeTab === "dashboard"
-              ? "bg-slate-900 text-white shadow-md shadow-slate-900/20"
-              : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          Dashboard
-        </button>
-        <button
-          onClick={onOpenMap}
-          className="px-5 py-2 rounded-full text-xs md:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all hover:bg-slate-200/50"
-        >
-          GIS Radar Map
-        </button>
-        <button
-          onClick={onOpenShap}
-          className="px-5 py-2 rounded-full text-xs md:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all hover:bg-slate-200/50"
-        >
-          Explainable AI (SHAP)
-        </button>
+      {/* Right Controls (Clean - No Github stars, No external Docs) */}
+      <div className="flex items-center gap-3">
+        {/* Status Pill */}
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 text-xs font-medium text-zinc-700">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-mono text-[11px]">
+            {backendOnline ? "Cluster Online // 12ms" : "Telemetry Active"}
+          </span>
+        </div>
+
+        {/* Action Button 1: Parametric Sim */}
         <button
           onClick={onOpenSim}
-          className="px-5 py-2 rounded-full text-xs md:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all hover:bg-slate-200/50"
+          className="btn-coder-light px-4 py-2 text-xs"
         >
-          XGBoost Simulation
+          Parametric Sim
         </button>
+
+        {/* Action Button 2: Launch Radar */}
         <button
-          onClick={onOpenAbout}
-          className="px-5 py-2 rounded-full text-xs md:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all hover:bg-slate-200/50"
+          onClick={onOpenMap}
+          className="btn-coder-black px-4 py-2 text-xs flex items-center gap-1.5"
         >
-          Architecture
+          <span className="w-2 h-2 bg-white inline-block" />
+          <span>Launch Radar</span>
         </button>
-      </nav>
-
-      {/* Right Enterprise Telemetry Status Pill (Clean SaaS - No Ports!) */}
-      <div className="flex items-center gap-3">
-        <div
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold border ${
-            backendOnline
-              ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-              : "bg-slate-100 text-slate-600 border-slate-200"
-          }`}
-        >
-          <div
-            className={`w-2 h-2 rounded-full ${
-              backendOnline ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-slate-400"
-            }`}
-          />
-          <span>{backendOnline ? "System Operational" : "Telemetry Standby"}</span>
-        </div>
-
-        <button className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
-          <Bell className="w-4 h-4" />
-        </button>
-        <button className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
-          <Settings className="w-4 h-4" />
-        </button>
-
-        <div
-          className="w-10 h-10 rounded-full bg-gradient-to-tr from-sky-600 to-sky-400 border-2 border-white text-white font-bold text-xs flex items-center justify-center shadow-md shadow-sky-600/30"
-          title="Disaster Management Cell"
-        >
-          WD
-        </div>
       </div>
     </header>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MoreHorizontal } from "lucide-react";
+import { Mountain, Droplets, Radio, AlertCircle } from "lucide-react";
 
 interface StatsGridProps {
   totalPoints: number;
@@ -18,88 +18,83 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {/* Card 1: Total Survey Points */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[115px]">
-        <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-          <span>Total Survey Points</span>
-          <MoreHorizontal className="w-4 h-4 text-slate-400 cursor-pointer" />
+      {/* Metric 1 */}
+      <div className="coder-dark-card p-5 flex flex-col justify-between min-h-[115px] group">
+        <div className="flex items-center justify-between text-xs text-zinc-400 font-medium">
+          <span className="flex items-center gap-1.5 group-hover:text-zinc-200 transition-colors">
+            <Mountain className="w-3.5 h-3.5 text-sky-400 group-hover:text-white transition-colors" /> Total Survey Grid Cells
+          </span>
+          <span className="font-mono text-[10px] text-zinc-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+            30m SRTM
+          </span>
         </div>
         <div className="flex items-baseline justify-between mt-3">
-          <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
+          <div className="font-mono text-3xl font-bold text-white tracking-tight">
             {totalPoints.toLocaleString()}
           </div>
-          <span className="bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-            ▲ 30m Grid
+          <span className="text-[11px] text-zinc-400 font-mono">
+            2,131 km² Bounded
           </span>
         </div>
       </div>
 
-      {/* Card 2: Monitored Basins */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[115px]">
-        <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-          <span>Monitored Basins</span>
-          <MoreHorizontal className="w-4 h-4 text-slate-400 cursor-pointer" />
+      {/* Metric 2 */}
+      <div className="coder-dark-card p-5 flex flex-col justify-between min-h-[115px] group">
+        <div className="flex items-center justify-between text-xs text-zinc-400 font-medium">
+          <span className="flex items-center gap-1.5 group-hover:text-zinc-200 transition-colors">
+            <Droplets className="w-3.5 h-3.5 text-emerald-400 group-hover:text-white transition-colors" /> Monitored Catchment Basins
+          </span>
+          <span className="font-mono text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold">
+            Active Runoff
+          </span>
         </div>
-        <div className="flex items-end justify-between mt-3">
-          <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
+        <div className="flex items-baseline justify-between mt-3">
+          <div className="font-mono text-3xl font-bold text-white tracking-tight">
             {monitoredBasins}
           </div>
-          {/* Green Sine Sparkline */}
-          <svg className="w-24 h-7 overflow-visible" viewBox="0 0 100 30">
-            <path
-              d="M 0,15 Q 25,2 50,15 T 100,15"
-              fill="none"
-              stroke="#22c55e"
-              strokeWidth="2.5"
-            />
-            <circle cx="50" cy="15" r="3" fill="#22c55e" />
-          </svg>
+          <span className="text-[11px] text-zinc-400 font-mono">
+            48 Hydrological Nodes
+          </span>
         </div>
       </div>
 
-      {/* Card 3: Rainfall Sensor Nodes */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[115px]">
-        <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-          <span>Rainfall Sensor Nodes</span>
-          <MoreHorizontal className="w-4 h-4 text-slate-400 cursor-pointer" />
+      {/* Metric 3 */}
+      <div className="coder-dark-card p-5 flex flex-col justify-between min-h-[115px] group">
+        <div className="flex items-center justify-between text-xs text-zinc-400 font-medium">
+          <span className="flex items-center gap-1.5 group-hover:text-zinc-200 transition-colors">
+            <Radio className="w-3.5 h-3.5 text-amber-400 group-hover:text-white transition-colors" /> Wireless Telemetry Nodes
+          </span>
+          <span className="font-mono text-[10px] text-zinc-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+            10-min Sync
+          </span>
         </div>
-        <div className="flex items-end justify-between mt-3">
-          <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
+        <div className="flex items-baseline justify-between mt-3">
+          <div className="font-mono text-3xl font-bold text-white tracking-tight">
             {sensorNodes}
           </div>
-          {/* Amber Arc Sparkline */}
-          <svg className="w-24 h-7 overflow-visible" viewBox="0 0 100 30">
-            <path
-              d="M 20,25 Q 50,5 80,25"
-              fill="none"
-              stroke="#f59e0b"
-              strokeWidth="2.5"
-            />
-            <circle cx="50" cy="10" r="3" fill="#f59e0b" />
-          </svg>
+          <span className="text-[11px] text-zinc-400 font-mono">
+            LoRaWAN Telemetry
+          </span>
         </div>
       </div>
 
-      {/* Card 4: Active Hotspot Alerts */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between min-h-[115px]">
-        <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-          <span>Active Hotspot Alerts</span>
-          <MoreHorizontal className="w-4 h-4 text-slate-400 cursor-pointer" />
+      {/* Metric 4 */}
+      <div className="coder-dark-card p-5 border-rose-500/30 bg-rose-950/20 flex flex-col justify-between min-h-[115px] group">
+        <div className="flex items-center justify-between text-xs text-rose-300 font-medium">
+          <span className="flex items-center gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5 text-rose-400" /> Active Hotspot Warnings
+          </span>
+          <span className="font-mono text-[10px] text-rose-400 bg-rose-950/80 border border-rose-500/40 px-2 py-0.5 rounded font-semibold">
+            Elevated
+          </span>
         </div>
-        <div className="flex items-end justify-between mt-3">
-          <div className="text-3xl font-extrabold text-slate-900 tracking-tight text-rose-600">
+        <div className="flex items-baseline justify-between mt-3">
+          <div className="font-mono text-3xl font-bold text-rose-400 tracking-tight">
             {activeAlerts}
           </div>
-          {/* Blue Arc Sparkline */}
-          <svg className="w-24 h-7 overflow-visible" viewBox="0 0 100 30">
-            <path
-              d="M 20,25 Q 60,5 90,25"
-              fill="none"
-              stroke="#0ea5e9"
-              strokeWidth="2.5"
-            />
-            <circle cx="70" cy="12" r="3" fill="#0ea5e9" />
-          </svg>
+          <span className="text-[11px] text-rose-300/80 font-mono">
+            Vythiri & Meppadi
+          </span>
         </div>
       </div>
     </div>
