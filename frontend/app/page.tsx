@@ -68,6 +68,33 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [backendOnline, setBackendOnline] = useState<boolean>(false);
 
+  // Global Hotkeys for Instant Viva Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName)) {
+        return;
+      }
+      if (e.key === "m" || e.key === "M") {
+        e.preventDefault();
+        setIsMapOpen((prev) => !prev);
+      } else if (e.key === "s" || e.key === "S") {
+        e.preventDefault();
+        setIsSimOpen((prev) => !prev);
+      } else if (e.key === "x" || e.key === "X") {
+        e.preventDefault();
+        setIsShapOpen((prev) => !prev);
+      } else if (e.key === "Escape") {
+        setIsMapOpen(false);
+        setIsSimOpen(false);
+        setIsShapOpen(false);
+        setIsAboutOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
@@ -149,6 +176,19 @@ export default function DashboardPage() {
                 >
                   Parametric Simulation
                 </button>
+              </div>
+
+              {/* Hotkeys Viva Pro Tip */}
+              <div className="flex items-center gap-2.5 text-[11px] font-mono text-zinc-500 mt-5">
+                <span className="text-zinc-400">Quick keys:</span>
+                <kbd className="px-1.5 py-0.5 rounded border border-zinc-300 bg-white text-black font-bold shadow-2xs">M</kbd>
+                <span>Radar</span>
+                <span className="text-zinc-300">•</span>
+                <kbd className="px-1.5 py-0.5 rounded border border-zinc-300 bg-white text-black font-bold shadow-2xs">S</kbd>
+                <span>Sim</span>
+                <span className="text-zinc-300">•</span>
+                <kbd className="px-1.5 py-0.5 rounded border border-zinc-300 bg-white text-black font-bold shadow-2xs">X</kbd>
+                <span>XAI</span>
               </div>
             </div>
 
