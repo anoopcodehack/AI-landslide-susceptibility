@@ -1,0 +1,6 @@
+Conditioning Factor,Mean |SHAP| Attribution,Relative Importance (%)
+rainfall,0.2197,40.5
+slope,0.1399,25.8
+ndvi,0.0721,13.3
+elevation,0.0693,12.8
+soil,0.0413,7.6
