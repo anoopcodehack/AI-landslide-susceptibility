@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Sliders, GitBranch } from "lucide-react";
 
 interface SectorItem {
@@ -20,9 +21,9 @@ interface AlertItem {
 }
 
 interface TacticalDockProps {
-  onOpenMap: () => void;
-  onOpenShap: () => void;
-  onOpenSim: () => void;
+  onOpenMap?: () => void;
+  onOpenShap?: () => void;
+  onOpenSim?: () => void;
   onOpenArchitecture?: () => void;
   sectors?: SectorItem[];
   alerts?: AlertItem[];
@@ -307,34 +308,34 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
               </button>
             </li>
             <li>
-              <button
-                onClick={onOpenSim}
+              <Link
+                href="/simulation"
                 className="group flex items-center gap-1 hover:text-black transition-all duration-200"
               >
                 <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
                   Slope Stability Engine
                 </span>
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={onOpenMap}
+              <Link
+                href="/simulation"
                 className="group flex items-center gap-1 hover:text-black transition-all duration-200"
               >
                 <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
                   In-Situ Pore Pressure
                 </span>
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={onOpenMap}
+              <Link
+                href="/radar"
                 className="group flex items-center gap-1 hover:text-black transition-all duration-200"
               >
                 <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
                   Municipal Hazard Zoning
                 </span>
-              </button>
+              </Link>
             </li>
           </ul>
         </div>
@@ -347,34 +348,34 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
           </h5>
           <ul className="space-y-2.5 text-xs">
             <li>
-              <button
-                onClick={onOpenShap}
+              <Link
+                href="/diagnostics"
                 className="group flex items-center gap-1 hover:text-black transition-all duration-200"
               >
                 <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
                   XAI Attribution Whitepaper
                 </span>
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={onOpenArchitecture}
+              <Link
+                href="/governance"
                 className="group flex items-center gap-1 hover:text-black transition-all duration-200"
               >
                 <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
                   System Architecture Plan
                 </span>
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={onOpenMap}
+              <Link
+                href="/radar"
                 className="group flex items-center gap-1 hover:text-black transition-all duration-200"
               >
                 <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
                   NASA SRTM 30m Matrix
                 </span>
-              </button>
+              </Link>
             </li>
           </ul>
         </div>

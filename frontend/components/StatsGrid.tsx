@@ -4,10 +4,17 @@ import React from "react";
 import { Mountain, Droplets, Radio, AlertCircle } from "lucide-react";
 
 interface StatsGridProps {
-  totalPoints: number;
-  monitoredBasins: number;
-  sensorNodes: number;
-  activeAlerts: number;
+  totalPoints?: number;
+  monitoredBasins?: number;
+  sensorNodes?: number;
+  activeAlerts?: number;
+  stats?: {
+    total_survey_points: number;
+    monitored_basins: number;
+    sensor_nodes: number;
+    active_hotspot_alerts: number;
+    monitored_area_km2: number;
+  };
 }
 
 export const StatsGrid: React.FC<StatsGridProps> = ({
@@ -15,7 +22,12 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
   monitoredBasins,
   sensorNodes,
   activeAlerts,
+  stats,
 }) => {
+  const points = totalPoints ?? stats?.total_survey_points ?? 1250;
+  const basins = monitoredBasins ?? stats?.monitored_basins ?? 6;
+  const nodes = sensorNodes ?? stats?.sensor_nodes ?? 142;
+  const alerts = activeAlerts ?? stats?.active_hotspot_alerts ?? 3;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Metric 1 */}
@@ -30,7 +42,7 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
         </div>
         <div className="flex items-baseline justify-between mt-3">
           <div className="font-mono text-3xl font-bold text-white tracking-tight">
-            {totalPoints.toLocaleString()}
+            {points.toLocaleString()}
           </div>
           <span className="text-[11px] text-zinc-400 font-mono">
             2,131 km² Bounded
@@ -50,7 +62,7 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
         </div>
         <div className="flex items-baseline justify-between mt-3">
           <div className="font-mono text-3xl font-bold text-white tracking-tight">
-            {monitoredBasins}
+            {basins}
           </div>
           <span className="text-[11px] text-zinc-400 font-mono">
             48 Hydrological Nodes
@@ -70,7 +82,7 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
         </div>
         <div className="flex items-baseline justify-between mt-3">
           <div className="font-mono text-3xl font-bold text-white tracking-tight">
-            {sensorNodes}
+            {nodes}
           </div>
           <span className="text-[11px] text-zinc-400 font-mono">
             LoRaWAN Telemetry
@@ -90,7 +102,7 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
         </div>
         <div className="flex items-baseline justify-between mt-3">
           <div className="font-mono text-3xl font-bold text-rose-400 tracking-tight">
-            {activeAlerts}
+            {alerts}
           </div>
           <span className="text-[11px] text-rose-300/80 font-mono">
             Vythiri & Meppadi

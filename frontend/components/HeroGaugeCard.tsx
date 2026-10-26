@@ -4,13 +4,23 @@ import React from "react";
 import { ShieldCheck, Mountain, CloudRain, Trees } from "lucide-react";
 
 interface HeroGaugeCardProps {
-  terrainStability: number;
-  porePressure: number;
-  rocAuc: string;
-  modelName: string;
-  slopeStress: string;
-  rainfallSaturation: string;
-  ndviCohesion: string;
+  terrainStability?: number;
+  porePressure?: number;
+  rocAuc?: string;
+  modelName?: string;
+  slopeStress?: string;
+  rainfallSaturation?: string;
+  ndviCohesion?: string;
+  overview?: {
+    terrain_stability_index: number;
+    pore_pressure_index: number;
+    model_confidence: string;
+    model_name: string;
+    dem_resolution: string;
+    slope_stress_pct: string;
+    rainfall_saturation_pct: string;
+    ndvi_cohesion_pct: string;
+  };
 }
 
 export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
@@ -21,9 +31,18 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
   slopeStress,
   rainfallSaturation,
   ndviCohesion,
+  overview,
 }) => {
-  const stabilityPct = Math.min(100, Math.max(0, terrainStability));
-  const porePressurePct = Math.min(100, Math.max(0, porePressure));
+  const stability = terrainStability ?? overview?.terrain_stability_index ?? 74.8;
+  const pore = porePressure ?? overview?.pore_pressure_index ?? 68.2;
+  const model = modelName ?? overview?.model_name ?? "Ensemble (RF+XGB+LGBM)";
+  const auc = rocAuc ?? overview?.model_confidence ?? "0.9472";
+  const slope = slopeStress ?? overview?.slope_stress_pct ?? "78.4%";
+  const rain = rainfallSaturation ?? overview?.rainfall_saturation_pct ?? "82.1%";
+  const ndvi = ndviCohesion ?? overview?.ndvi_cohesion_pct ?? "64.5%";
+
+  const stabilityPct = Math.min(100, Math.max(0, stability));
+  const porePressurePct = Math.min(100, Math.max(0, pore));
 
   return (
     <div className="coder-dark-card p-6 flex flex-col justify-between min-h-[420px]">
@@ -81,7 +100,7 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
               Stability Index
             </span>
             <div className="text-2xl font-bold font-mono text-white mt-0.5">
-              {terrainStability.toFixed(1)}<span className="text-xs text-zinc-500 font-sans ml-1">/100</span>
+              {stability.toFixed(1)}<span className="text-xs text-zinc-500 font-sans ml-1">/100</span>
             </div>
             <span className="text-[11px] text-emerald-400 font-medium">
               Nominal Incline Factor
@@ -123,7 +142,7 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
               Pore-Water Pressure
             </span>
             <div className="text-2xl font-bold font-mono text-white mt-0.5">
-              {porePressure.toFixed(1)}<span className="text-xs text-zinc-500 font-sans ml-1">/100</span>
+              {pore.toFixed(1)}<span className="text-xs text-zinc-500 font-sans ml-1">/100</span>
             </div>
             <span className="text-[11px] text-amber-400 font-medium">
               Elevated Shear Saturation
@@ -140,7 +159,7 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
           </div>
           <div>
             <div className="text-xs font-bold text-white">
-              {modelName}
+              {model}
             </div>
             <p className="text-[11px] text-zinc-400">
               Gradient Boosted Decision Trees // 30m SRTM DEM Resolution
@@ -149,7 +168,7 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
         </div>
         <div className="text-right">
           <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">
-            ROC-AUC: {rocAuc}
+            ROC-AUC: {auc}
           </span>
         </div>
       </div>
@@ -162,10 +181,10 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
             <span>Slope Angle</span>
           </div>
           <div className="font-mono text-sm font-bold text-white mt-1">
-            {slopeStress}
+            {slope}
           </div>
           <div className="w-full bg-zinc-800 h-1 rounded-full mt-1.5 overflow-hidden">
-            <div className="bg-amber-400 h-full rounded-full transition-all duration-300" style={{ width: slopeStress }} />
+            <div className="bg-amber-400 h-full rounded-full transition-all duration-300" style={{ width: slope }} />
           </div>
         </div>
 
@@ -175,10 +194,10 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
             <span>24h Rainfall</span>
           </div>
           <div className="font-mono text-sm font-bold text-white mt-1">
-            {rainfallSaturation}
+            {rain}
           </div>
           <div className="w-full bg-zinc-800 h-1 rounded-full mt-1.5 overflow-hidden">
-            <div className="bg-sky-400 h-full rounded-full transition-all duration-300" style={{ width: rainfallSaturation }} />
+            <div className="bg-sky-400 h-full rounded-full transition-all duration-300" style={{ width: rain }} />
           </div>
         </div>
 
@@ -188,10 +207,10 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
             <span>NDVI Canopy</span>
           </div>
           <div className="font-mono text-sm font-bold text-white mt-1">
-            {ndviCohesion}
+            {ndvi}
           </div>
           <div className="w-full bg-zinc-800 h-1 rounded-full mt-1.5 overflow-hidden">
-            <div className="bg-emerald-400 h-full rounded-full transition-all duration-300" style={{ width: ndviCohesion }} />
+            <div className="bg-emerald-400 h-full rounded-full transition-all duration-300" style={{ width: ndvi }} />
           </div>
         </div>
       </div>

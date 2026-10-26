@@ -1,17 +1,24 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { HeroGaugeCard } from "@/components/HeroGaugeCard";
 import { StatsGrid } from "@/components/StatsGrid";
 import { TrendChart } from "@/components/TrendChart";
 import { TacticalDock } from "@/components/TacticalDock";
-import { GisMapModal } from "@/components/GisMapModal";
-import { ShapModal } from "@/components/ShapModal";
-import { SimulationModal } from "@/components/SimulationModal";
-import { ArchitectureModal } from "@/components/ArchitectureModal";
 import { LetterDropLoader } from "@/components/LetterDropLoader";
-import { ArrowUpRight, Shield, Satellite, Database, Activity, Layers, MapPin, Radio } from "lucide-react";
+import {
+  ArrowUpRight,
+  Shield,
+  Satellite,
+  Database,
+  Activity,
+  Layers,
+  MapPin,
+  Radio,
+} from "lucide-react";
 
 interface DashboardData {
   status: string;
@@ -56,19 +63,11 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<string>("overview");
-
-  // Modal states
-  const [isMapOpen, setIsMapOpen] = useState<boolean>(false);
-  const [isShapOpen, setIsShapOpen] = useState<boolean>(false);
-  const [isSimOpen, setIsSimOpen] = useState<boolean>(false);
-  const [isAboutOpen, setIsAboutOpen] = useState<boolean>(false);
-
-  // Dynamic Dashboard Data State from Backend
+  const router = useRouter();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [backendOnline, setBackendOnline] = useState<boolean>(false);
 
-  // Global Hotkeys for Instant Viva Navigation
+  // Global Hotkeys for Instant Pro Navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName)) {
@@ -76,24 +75,19 @@ export default function DashboardPage() {
       }
       if (e.key === "m" || e.key === "M") {
         e.preventDefault();
-        setIsMapOpen((prev) => !prev);
+        router.push("/radar");
       } else if (e.key === "s" || e.key === "S") {
         e.preventDefault();
-        setIsSimOpen((prev) => !prev);
+        router.push("/simulation");
       } else if (e.key === "x" || e.key === "X") {
         e.preventDefault();
-        setIsShapOpen((prev) => !prev);
-      } else if (e.key === "Escape") {
-        setIsMapOpen(false);
-        setIsSimOpen(false);
-        setIsShapOpen(false);
-        setIsAboutOpen(false);
+        router.push("/diagnostics");
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -117,20 +111,12 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col justify-between w-full bg-white relative">
+    <div className="min-h-screen flex flex-col justify-between w-full bg-white relative text-zinc-900">
       {/* 0. Cinematic Letter Drop & Bounce Loader */}
       <LetterDropLoader />
 
-      {/* 1. Coder White Top Header (No Docs, No Github stars) */}
-      <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onOpenMap={() => setIsMapOpen(true)}
-        onOpenShap={() => setIsShapOpen(true)}
-        onOpenSim={() => setIsSimOpen(true)}
-        onOpenAbout={() => setIsAboutOpen(true)}
-        backendOnline={backendOnline}
-      />
+      {/* 1. Coder White Top Header */}
+      <Navbar backendOnline={backendOnline} />
 
       {/* 2. Main Content Container */}
       <main className="max-w-[1440px] mx-auto w-full px-6 md:px-12 py-8 flex-1">
@@ -140,13 +126,13 @@ export default function DashboardPage() {
             {/* Left Column: Bold Typography & CTAs (span 7) */}
             <div className="lg:col-span-7">
               {/* Top Pill Announcement */}
-              <div
-                onClick={() => setIsMapOpen(true)}
+              <Link
+                href="/radar"
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 border border-zinc-200 shadow-xs text-xs font-semibold text-zinc-800 mb-8 hover:bg-white hover:border-black transition-all duration-200 cursor-pointer"
               >
                 <span>Wayanad Monsoon Early Warning 2026. Live updates</span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-zinc-600" />
-              </div>
+              </Link>
 
               {/* Headline */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-black leading-[1.08]">
@@ -160,22 +146,22 @@ export default function DashboardPage() {
                 Safely predict landslide hazards, pore-pressure triggers, and slope shear on high-resolution 30m geospatial terrain.
               </p>
 
-              {/* CTA Buttons */}
+              {/* CTA Buttons (Real Page Navigation) */}
               <div className="flex flex-wrap items-center gap-3.5 mt-8">
-                <button
-                  onClick={() => setIsMapOpen(true)}
+                <Link
+                  href="/radar"
                   className="btn-coder-black px-6 py-3.5 text-sm flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                 >
                   <span className="w-2.5 h-2.5 bg-white inline-block" />
                   <span>Launch GIS Radar</span>
-                </button>
+                </Link>
 
-                <button
-                  onClick={() => setIsSimOpen(true)}
+                <Link
+                  href="/simulation"
                   className="btn-coder-light px-6 py-3.5 text-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                 >
                   Parametric Simulation
-                </button>
+                </Link>
               </div>
 
               {/* Hotkeys Viva Pro Tip */}
@@ -194,9 +180,9 @@ export default function DashboardPage() {
 
             {/* Right Column: Visual Satellite Radar Terrain Card (span 5) */}
             <div className="lg:col-span-5">
-              <div
-                onClick={() => setIsMapOpen(true)}
-                className="bg-[#0b0f19] rounded-2xl p-5 border border-zinc-800 shadow-2xl relative overflow-hidden group cursor-pointer hover:border-zinc-500 hover:-translate-y-1.5 transition-all duration-300"
+              <Link
+                href="/radar"
+                className="bg-[#0b0f19] rounded-2xl p-5 border border-zinc-800 shadow-2xl relative overflow-hidden group block hover:border-zinc-500 hover:-translate-y-1.5 transition-all duration-300"
               >
                 {/* Top Radar HUD Bar */}
                 <div className="flex items-center justify-between text-xs pb-3 border-b border-white/10 text-zinc-400">
@@ -255,9 +241,9 @@ export default function DashboardPage() {
                 {/* Sub-card footer */}
                 <div className="flex items-center justify-between text-[11px] pt-2 text-zinc-400 font-mono">
                   <span>Elevation Model: SRTM 30m</span>
-                  <span className="text-emerald-400">Accuracy: 86.7%</span>
+                  <span className="text-emerald-400">Accuracy: 87.7%</span>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
@@ -269,44 +255,29 @@ export default function DashboardPage() {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Learn how governed AI models power landslide disaster prevention
               </h2>
-              <p className="text-sm text-zinc-400 mt-1">
-                Real-time gradient-boosted decision trees deployed for Western Ghats (Wayanad Sector)
+              <p className="text-sm text-zinc-400 mt-2 font-mono">
+                Decoupled telemetry pipelines. 15ms inference latency. Deterministic calibration.
               </p>
             </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsShapOpen(true)}
-                className="btn-coder-light px-4 py-2 text-xs font-semibold hover:scale-105 transition-all duration-200"
-              >
-                Inspect SHAP Diagnostics
-              </button>
-            </div>
+            <Link
+              href="/diagnostics"
+              className="px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/60 text-xs font-mono text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors"
+            >
+              Auditing Whitepaper &rarr;
+            </Link>
           </div>
 
-          {/* 2-Column Telemetry Grid inside Dark Block */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
-            {/* Left Column: Gauges (span 5) */}
-            <div className="lg:col-span-5 flex flex-col justify-between">
-              <HeroGaugeCard
-                terrainStability={dashboardData?.overview?.terrain_stability_index ?? 86.4}
-                porePressure={dashboardData?.overview?.pore_pressure_index ?? 86.0}
-                rocAuc={dashboardData?.overview?.model_confidence ?? "94.2%"}
-                modelName={dashboardData?.overview?.model_name ?? "XGBoost Classifier"}
-                slopeStress={dashboardData?.overview?.slope_stress_pct ?? "24.3%"}
-                rainfallSaturation={dashboardData?.overview?.rainfall_saturation_pct ?? "36.3%"}
-                ndviCohesion={dashboardData?.overview?.ndvi_cohesion_pct ?? "15.0%"}
-              />
-            </div>
+          {/* Hero Gauge & Primary Metrics */}
+          <div className="pt-8">
+            <HeroGaugeCard overview={dashboardData?.overview} />
+          </div>
 
-            {/* Right Column: 2x2 Stats Grid & Waveform (span 7) */}
-            <div className="lg:col-span-7 flex flex-col justify-between">
-              <StatsGrid
-                totalPoints={dashboardData?.stats?.total_survey_points ?? 1500}
-                monitoredBasins={dashboardData?.stats?.monitored_basins ?? 128}
-                sensorNodes={dashboardData?.stats?.sensor_nodes ?? 74}
-                activeAlerts={dashboardData?.stats?.active_hotspot_alerts ?? 14}
-              />
+          {/* Middle Row: Stats Cards + Dynamic 7-Day Trend Chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-8">
+            <div className="lg:col-span-5">
+              <StatsGrid stats={dashboardData?.stats} />
+            </div>
+            <div className="lg:col-span-7">
               <TrendChart trendData={dashboardData?.trend_chart} />
             </div>
           </div>
@@ -334,21 +305,11 @@ export default function DashboardPage() {
         </section>
       </main>
 
-      {/* 5. Coder Corporate White Footer (Exact Screenshot 2 Replica) */}
+      {/* 5. Coder Corporate White Footer */}
       <TacticalDock
-        onOpenMap={() => setIsMapOpen(true)}
-        onOpenShap={() => setIsShapOpen(true)}
-        onOpenSim={() => setIsSimOpen(true)}
-        onOpenArchitecture={() => setIsAboutOpen(true)}
         sectors={dashboardData?.sectors}
         alerts={dashboardData?.alerts}
       />
-
-      {/* Modals */}
-      <GisMapModal isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
-      <ShapModal isOpen={isShapOpen} onClose={() => setIsShapOpen(false)} />
-      <SimulationModal isOpen={isSimOpen} onClose={() => setIsSimOpen(false)} />
-      <ArchitectureModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
     </div>
   );
 }
