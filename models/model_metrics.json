@@ -1,5 +1,5 @@
 {
-  "best_model": "Logistic Regression",
+  "best_model": "XGBoost",
   "benchmark": [
     {
       "Model": "Logistic Regression",
@@ -58,8 +58,8 @@
     }
   ],
   "threshold_calibration": {
-    "calibrated_threshold": 0.25,
+    "calibrated_threshold": 0.35,
     "default_threshold": 0.5,
-    "guaranteed_recall": 0.9679144385026738
+    "guaranteed_recall": 0.9411764705882353
   }
 }

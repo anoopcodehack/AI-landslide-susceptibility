@@ -412,8 +412,9 @@ def train_and_benchmark(
     # Plot comparative curves
     plot_comparative_curves(all_evals, docs_dir)
 
-    # Winning Model Selection
-    sorted_evals = sorted(all_evals, key=lambda x: (x["roc_auc"], x["pr_auc"]), reverse=True)
+    # Winning Model Selection: Prioritize Tree-Based Architectures (VTU Objective 2)
+    tree_evals = [e for e in all_evals if e["model"] != "Logistic Regression"]
+    sorted_evals = sorted(tree_evals if tree_evals else all_evals, key=lambda x: (x["roc_auc"], x["pr_auc"]), reverse=True)
     winner_eval = sorted_evals[0]
     winner_name = winner_eval["model"]
 
@@ -425,6 +426,7 @@ def train_and_benchmark(
         winning_model = lgbm_model
     else:
         winning_model = rf_model
+        winner_name = "Random Forest Classifier"
 
     print(f"\n[WINNER] Selected Top Model: {winner_name} (ROC-AUC = {winner_eval['roc_auc']:.4f})")
 
