@@ -138,35 +138,73 @@ GeoShield integrates **SHAP (SHapley Additive exPlanations)** TreeExplainer to g
 
 ---
 
-## API Contracts & Schemas
+## API Contracts & Architecture
 
-The FastAPI backend exposes fully typed REST endpoints with automatic OpenAPI / Swagger specifications:
+The FastAPI backend (`backend/main.py`) exposes fully typed REST endpoints with automatic OpenAPI / Swagger specifications at `http://localhost:8000/docs`:
 
-### `POST /api/v1/predict`
-Executes real-time inference using the calibrated Soft-Voting Ensemble model.
+### Available Endpoints
+* **`GET /health`**: Operational readiness check, active model type, and calibrated threshold.
+* **`POST /predict` & `POST /api/v1/predict`**: Real-time tree-ensemble inference accepting 5-feature (`slope, elevation, rainfall, soil, ndvi`) or 6-feature (`slope, rainfall_mm, elevation, twi, ndvi, dist_stream_m`) vectors.
+* **`POST /simulate`**: Climate stress simulation (precipitation surge percentage and deforestation canopy loss).
+* **`GET /explain`**: Local explainable AI powered by SHAP (`TreeExplainer`) returning sorted feature attributions.
+* **`GET /dashboard-stats`**: Regional monitoring sector telemetry (Chooralmala, Meppadi, Vythiri, Sulthan Bathery).
+* **`GET /api/v1/dashboard`**: Full operational telemetry payload consumed by the Next.js enterprise console.
 
+### 1. Landslide Risk Inference (`POST /api/v1/predict` or `POST /predict`)
 ```bash
 curl -X POST "http://localhost:8000/api/v1/predict" \
   -H "Content-Type: application/json" \
   -d '{
     "slope": 38.5,
-    "rainfall": 372.0,
-    "elevation": 1150.0,
-    "soil": 0.78,
-    "ndvi": 0.22
+    "elevation": 950.0,
+    "rainfall": 280.0,
+    "soil": 2.0,
+    "ndvi": 0.35
   }'
 ```
 
-#### JSON Response Schema:
+#### JSON Response:
 ```json
 {
-  "susceptibility": 0.9642,
-  "zone": "High",
-  "model_used": "Soft-Voting Ensemble (RF+XGB+LGBM)",
-  "calibrated_threshold": 0.25,
+  "susceptibility_score": 0.9986,
+  "risk_category": "CRITICAL",
   "evacuation_alert": true,
-  "inference_latency_ms": 7.4
+  "model_type": "Random Forest Classifier",
+  "susceptibility": 0.9986,
+  "zone": "High",
+  "model_used": "Random Forest Classifier",
+  "feature_contributions": {
+    "rainfall": 31.5,
+    "slope": 26.9,
+    "ndvi": 9.8,
+    "elevation": 5.3
+  }
 }
+```
+
+### 2. Scenario Simulation (`POST /simulate`)
+```bash
+curl -X POST "http://localhost:8000/simulate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "slope": 35.0,
+    "elevation": 850.0,
+    "rainfall": 250.0,
+    "soil": 2.0,
+    "ndvi": 0.40,
+    "rainfall_increase_pct": 30.0,
+    "vegetation_loss_pct": 20.0
+  }'
+```
+
+### 3. Local SHAP Attribution (`GET /explain`)
+```bash
+curl -G "http://localhost:8000/explain" \
+  --data-urlencode "slope=38.5" \
+  --data-urlencode "elevation=950.0" \
+  --data-urlencode "rainfall=280.0" \
+  --data-urlencode "soil=2.0" \
+  --data-urlencode "ndvi=0.35"
 ```
 
 ---
@@ -177,6 +215,7 @@ curl -X POST "http://localhost:8000/api/v1/predict" \
 * **Python:** 3.10 or higher
 * **Node.js:** 18.0 or higher
 * **npm:** 9.0 or higher
+* **Docker:** (Optional, for containerized execution)
 
 ### 1. Repository Setup & Python Environment
 ```bash
@@ -190,6 +229,12 @@ venv\Scripts\activate            # Linux/macOS: source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
+
+### 2. Docker Deployment (Optional)
+```bash
+docker build -t wayanad-landslide-api .
+docker run --rm -p 8000:8000 wayanad-landslide-api
 ```
 
 ### 2. Run Python Pipelines (Optional / Verification)
