@@ -83,3 +83,18 @@ class DashboardStats(BaseModel):
     sensor_nodes: int
     sector_breakdown: dict[str, float]
     data_source: str
+
+
+class CivilDefenseDirective(BaseModel):
+    """Official DDMA Civil Defense evacuation alert directive."""
+    directive_id: str
+    sector_name: str
+    hazard_level: Literal["CRITICAL", "HIGH", "MODERATE", "LOW"]
+    susceptibility_pct: float
+    evacuation_radius_m: int
+    primary_shelter: str
+    secondary_shelter: str
+    transit_corridor: str
+    emergency_contact: str
+    issued_at: str
+    authority: str

@@ -37,6 +37,20 @@ interface ScenarioPreset {
   badge: string;
 }
 
+interface CivilDirective {
+  directive_id: string;
+  sector_name: string;
+  hazard_level: "CRITICAL" | "HIGH" | "MODERATE" | "LOW";
+  susceptibility_pct: number;
+  evacuation_radius_m: number;
+  primary_shelter: string;
+  secondary_shelter: string;
+  transit_corridor: string;
+  emergency_contact: string;
+  issued_at: string;
+  authority: string;
+}
+
 export default function SimulationPage() {
   const [slope, setSlope] = useState<number>(38.5);
   const [rainfall, setRainfall] = useState<number>(372.0);
@@ -51,6 +65,8 @@ export default function SimulationPage() {
   const [backendOnline, setBackendOnline] = useState<boolean>(false);
   const [copiedPayload, setCopiedPayload] = useState<boolean>(false);
   const [mitigationActive, setMitigationActive] = useState<boolean>(false);
+  const [selectedSector, setSelectedSector] = useState<string>("chooralmala");
+  const [activeDirective, setActiveDirective] = useState<CivilDirective | null>(null);
 
   // Pre-configured Verified Historical Wayanad Scenarios
   const scenarioPresets: ScenarioPreset[] = [
@@ -106,8 +122,24 @@ export default function SimulationPage() {
     setNdvi(preset.ndvi);
     setElevation(preset.elevation);
     setSoil(preset.soil);
+    setSelectedSector(preset.id);
     setMitigationActive(false);
   };
+
+  useEffect(() => {
+    const fetchDirective = async () => {
+      try {
+        const res = await fetch(`http://localhost:8000/api/v1/directive/${selectedSector}`);
+        if (res.ok) {
+          const data: CivilDirective = await res.json();
+          setActiveDirective(data);
+        }
+      } catch (err) {
+        // Graceful offline fallback
+      }
+    };
+    fetchDirective();
+  }, [selectedSector]);
 
   // Effective parameters if mitigation is active
   const effectiveSlope = mitigationActive ? Math.max(10, slope - 12) : slope;
@@ -657,18 +689,23 @@ export default function SimulationPage() {
                   <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                 )}
                 <div>
-                  <h4 className="font-black text-black uppercase text-base tracking-tight">
-                    KSDMA Civil Protection Directive #WAY-2026-X
-                  </h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-black text-black uppercase text-base tracking-tight">
+                      {activeDirective ? activeDirective.directive_id : "KSDMA-WAY-2026-CHOO"}
+                    </h4>
+                    <span className="px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-[10px] text-zinc-600 font-mono">
+                      FastAPI: /api/v1/directive/{selectedSector}
+                    </span>
+                  </div>
                   <p className="text-xs text-zinc-500 mt-0.5">
-                    District Disaster Management Authority // Wayanad Emergency Operations Centre
+                    {activeDirective ? activeDirective.authority : "Kerala State Disaster Management Authority // Wayanad DDMA"}
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => window.print()}
-                className="btn-coder-black px-4 py-2 text-xs flex items-center gap-2"
+                className="btn-coder-black px-4 py-2 text-xs flex items-center gap-2 shadow-2xs"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Official Directive</span>
@@ -677,29 +714,54 @@ export default function SimulationPage() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-5 border-b border-zinc-100 text-xs">
               <div>
-                <span className="text-zinc-400 block text-[10px] uppercase">THREAT LEVEL</span>
+                <span className="text-zinc-400 block text-[10px] uppercase font-mono">THREAT LEVEL</span>
                 <strong className="text-sm font-black" style={{ color: scoreColor }}>
                   {isCritical ? "LEVEL 4: IMMEDIATE EVACUATION" : isHigh ? "LEVEL 3: RELOCATION PREPAREDNESS" : isMod ? "LEVEL 2: ACTIVE WATCH" : "LEVEL 1: NORMAL GROUND"}
                 </strong>
               </div>
               <div>
-                <span className="text-zinc-400 block text-[10px] uppercase">AFFECTED TALUK</span>
-                <strong className="text-sm font-bold text-black">Vythiri / Meppadi Basin</strong>
+                <span className="text-zinc-400 block text-[10px] uppercase font-mono">AFFECTED SECTOR</span>
+                <strong className="text-sm font-bold text-black">
+                  {activeDirective ? activeDirective.sector_name : "Vythiri / Meppadi Basin"}
+                </strong>
               </div>
               <div>
-                <span className="text-zinc-400 block text-[10px] uppercase">SIMULATED RAIN</span>
-                <strong className="text-sm font-bold text-black">{rainfall.toFixed(0)} mm / 24h</strong>
+                <span className="text-zinc-400 block text-[10px] uppercase font-mono">EVACUATION BUFFER</span>
+                <strong className="text-sm font-bold text-black">
+                  {activeDirective ? `${activeDirective.evacuation_radius_m} m Radius` : "750 m Radius"}
+                </strong>
               </div>
               <div>
-                <span className="text-zinc-400 block text-[10px] uppercase">SLOPE GRADIENT</span>
-                <strong className="text-sm font-bold text-black">{effectiveSlope.toFixed(1)}° Shear Angle</strong>
+                <span className="text-zinc-400 block text-[10px] uppercase font-mono">DISPATCH HELPLINE</span>
+                <strong className="text-sm font-bold text-emerald-700 truncate block">
+                  {activeDirective ? activeDirective.emergency_contact : "1077 / 04936-204151"}
+                </strong>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 border-b border-zinc-100 text-xs">
+              <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
+                <span className="text-[10px] uppercase font-mono font-bold text-zinc-500 block mb-1">
+                  DESIGNATED PRIMARY RELIEF SHELTER:
+                </span>
+                <p className="text-zinc-900 font-sans font-medium">
+                  {activeDirective ? activeDirective.primary_shelter : "Meppadi Higher Secondary School Camp #1"}
+                </p>
+              </div>
+              <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
+                <span className="text-[10px] uppercase font-mono font-bold text-zinc-500 block mb-1">
+                  SAFE ARTERIAL TRANSIT CORRIDOR:
+                </span>
+                <p className="text-zinc-900 font-sans font-medium">
+                  {activeDirective ? activeDirective.transit_corridor : "State Highway 59 via Meppadi-Kalpetta Bypass (Avoid Riverbank Axis)"}
+                </p>
               </div>
             </div>
 
             <div className="pt-3 text-xs text-zinc-700 leading-relaxed font-sans">
-              <strong className="font-mono text-black font-bold">OPERATIONAL PROTOCOL: </strong>
+              <strong className="font-mono text-black font-bold">OPERATIONAL DISASTER PROTOCOL: </strong>
               {isCritical
-                ? "Immediate mandatory evacuation of settlements along the riparian corridor within 250m of Iruvaipuzha and Chaliyar tributaries. NDRF / SDRF search and rescue units mobilized. Highway vehicular transit halted."
+                ? "Immediate mandatory evacuation of settlements along the riparian corridor within designated radius. NDRF / SDRF search and rescue units mobilized. Highway vehicular transit restricted to emergency services."
                 : isHigh
                 ? "Pre-emptive movement of vulnerable populations and schools to designated transit shelters at Sulthan Bathery and Kalpetta. Deployment of quick-reaction telemetry teams."
                 : "Continuous telemetry monitoring via automated tipping-bucket rain gauges and acoustic soil sensors. Nominal emergency readiness."}

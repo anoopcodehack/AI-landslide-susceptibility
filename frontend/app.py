@@ -1,24 +1,15 @@
-"""GeoShield // Streamlit + Folium Interactive GIS Decision-Support System.
-
-Fulfills Objective 3 of the VTU syllabus abstract for Wayanad District.
-Provides interactive Folium GIS mapping, parametric What-If scenario testing with XGBoost,
-and Explainable AI (SHAP) factor attributions.
-"""
+"""Streamlit interactive geospatial frontend matching VTU syllabus abstract (Objective 3)."""
 
 from pathlib import Path
 import folium
 import joblib
-import numpy as np
 import pandas as pd
 import requests
 import streamlit as st
-from streamlit_folium import folium_static
+from streamlit_folium import st_folium
 
-# -----------------------------------------------------------------------------
-# 1. Page Configuration & Theme
-# -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="GeoShield // Wayanad GIS Decision-Support System",
+    page_title="GeoShield // Wayanad Landslide Assessment",
     page_icon="🗺️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -33,12 +24,20 @@ st.markdown(
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
     
-    .stMetric {
-        background-color: #12141a;
-        padding: 16px;
-        border-radius: 12px;
-        border: 1px solid #232733;
-        color: white;
+    code, pre {
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    div[data-testid="stMetricValue"] {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 1.8rem;
+    }
+
+    .stButton>button {
+        border-radius: 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
     }
     </style>
     """,
@@ -62,46 +61,84 @@ def load_model():
 model_bundle = load_model()
 
 # -----------------------------------------------------------------------------
+# 1. State Initialization
+# -----------------------------------------------------------------------------
+if "slope" not in st.session_state:
+    st.session_state.slope = 38.5
+if "rainfall" not in st.session_state:
+    st.session_state.rainfall = 372.0
+if "elevation" not in st.session_state:
+    st.session_state.elevation = 1150.0
+if "ndvi" not in st.session_state:
+    st.session_state.ndvi = 0.22
+if "soil" not in st.session_state:
+    st.session_state.soil = 0.78
+
+# -----------------------------------------------------------------------------
 # 2. Sidebar: What-If Parametric Simulation
 # -----------------------------------------------------------------------------
 with st.sidebar:
     st.markdown("### Parametric Scenario Testing")
-    st.caption("Parametric testing via trained XGBoost Tree Classifier")
+    st.caption("Live inference powered by Anoop's XGBoost Classifier & Dishant's FastAPI Gateway")
 
-    slope_val = st.slider("DEM Slope Angle (Degrees)", min_value=5.0, max_value=55.0, value=34.0, step=0.5)
-    rainfall_val = st.slider("24h Accumulated Rainfall (mm)", min_value=20.0, max_value=450.0, value=280.0, step=5.0)
-    elevation_val = st.slider("SRTM Topographic Elevation (m)", min_value=500.0, max_value=2100.0, value=1150.0, step=25.0)
-    ndvi_val = st.slider("NDVI (Canopy Root Cohesion)", min_value=-0.1, max_value=0.85, value=0.28, step=0.02)
-    soil_val = st.slider("Soil Permeability Index", min_value=0.15, max_value=0.95, value=0.65, step=0.05)
+    # Quick Viva Demonstration Presets
+    st.markdown("**Quick Demonstration Presets:**")
+    col_p1, col_p2 = st.columns(2)
+    with col_p1:
+        if st.button("⚡ Chooralmala", help="30 July 2024 cloudburst ground-truth disaster values"):
+            st.session_state.slope = 38.5
+            st.session_state.rainfall = 372.0
+            st.session_state.elevation = 1150.0
+            st.session_state.ndvi = 0.22
+            st.session_state.soil = 0.78
+            st.rerun()
+    with col_p2:
+        if st.button("🛡️ Bathery Safe", help="Sulthan Bathery safe plateau baseline"):
+            st.session_state.slope = 8.5
+            st.session_state.rainfall = 75.0
+            st.session_state.elevation = 840.0
+            st.session_state.ndvi = 0.65
+            st.session_state.soil = 0.45
+            st.rerun()
+
+    st.markdown("---")
+
+    slope_val = st.slider("DEM Slope Angle (Degrees)", min_value=5.0, max_value=55.0, value=float(st.session_state.slope), step=0.5, key="slider_slope")
+    rainfall_val = st.slider("24h Accumulated Rainfall (mm)", min_value=20.0, max_value=450.0, value=float(st.session_state.rainfall), step=5.0, key="slider_rain")
+    elevation_val = st.slider("SRTM Topographic Elevation (m)", min_value=500.0, max_value=2100.0, value=float(st.session_state.elevation), step=25.0, key="slider_elev")
+    ndvi_val = st.slider("NDVI (Canopy Root Cohesion)", min_value=-0.1, max_value=0.85, value=float(st.session_state.ndvi), step=0.02, key="slider_ndvi")
+    soil_val = st.slider("Soil Permeability Index", min_value=0.15, max_value=0.95, value=float(st.session_state.soil), step=0.05, key="slider_soil")
 
     st.markdown("---")
     st.markdown("### Engineering Team // Sahyadri CSE")
     st.markdown(
         """
-        - **Anoop A** (4SF24CS021) — ML & Explainable AI
-        - **Ashith C** (4SF24CS027) — Geospatial Engineering
-        - **Dhruv Shetty** (4SF24CS055) — Frontend & GIS
-        - **Dishant Jain** (4SF24CS057) — Backend REST API
+        - **Anoop A** (`4SF24CS021`) — ML & Explainable AI
+        - **Ashith C** (`4SF24CS027`) — Geospatial Engineering
+        - **Dhruv Shetty** (`4SF24CS055`) — Frontend & GIS
+        - **Dishant Jain** (`4SF24CS057`) — Backend REST API
         """
     )
+
 
 # -----------------------------------------------------------------------------
 # 3. Model Inference Logic
 # -----------------------------------------------------------------------------
 def predict_susceptibility(slope, elevation, rainfall, soil, ndvi):
-    """Predict landslide susceptibility using XGBoost model or backend API."""
+    """Predict landslide susceptibility using trained XGBoost model or backend API."""
     if model_bundle is not None:
         model = model_bundle["model"]
         features = model_bundle["features"]
         df_input = pd.DataFrame([[slope, elevation, rainfall, soil, ndvi]], columns=features)
         prob = float(model.predict_proba(df_input)[0, 1])
-        return round(prob, 4), model_bundle["model_name"]
+        model_title = model_bundle.get("model_name", "XGBoost Classifier")
+        return round(prob, 4), model_title
 
     try:
         res = requests.post(
             "http://localhost:8000/api/v1/predict",
             json={"slope": slope, "elevation": elevation, "rainfall": rainfall, "soil": soil, "ndvi": ndvi},
-            timeout=1.5,
+            timeout=1.0,
         )
         if res.ok:
             data = res.json()
@@ -130,9 +167,26 @@ with col1:
 with col2:
     st.metric("Hazard Classification", zone)
 with col3:
-    st.metric("Model ROC-AUC", "94.2%", delta="XGBoost Classifier")
+    st.metric("Operational Model", model_name, delta="ROC-AUC 94.0%")
 with col4:
-    st.metric("Monitored Corridor", "Meppadi / Vythiri", delta="Active 30m Grid")
+    st.metric("Calibrated Threshold", "0.25", delta="Recall > 95%")
+
+# Active Evacuation Alert Banner
+if prob >= 0.75:
+    st.error("🚨 **CRITICAL DEBRIS FLOW WARNING ACTIVE (P > 75%)** — High probability of slope shear failure along saturated riverbank axis.")
+    try:
+        dir_res = requests.get("http://localhost:8000/api/v1/directive/chooralmala", timeout=1.0)
+        if dir_res.ok:
+            dir_data = dir_res.json()
+            with st.expander(f"📄 Official Evacuation Notice — {dir_data['directive_id']}", expanded=True):
+                st.markdown(f"**Target Sector:** {dir_data['sector_name']}")
+                st.markdown(f"**Mandatory Evacuation Radius:** `{dir_data['evacuation_radius_m']} metres`")
+                st.markdown(f"**Designated Primary Shelter:** {dir_data['primary_shelter']}")
+                st.markdown(f"**Safe Arterial Highway Corridor:** `{dir_data['transit_corridor']}`")
+                st.markdown(f"**District Emergency Dispatch:** `{dir_data['emergency_contact']}`")
+                st.caption(f"Authority: {dir_data['authority']} • Dispatched: {dir_data['issued_at']}")
+    except Exception:
+        pass
 
 st.markdown("---")
 
@@ -157,10 +211,10 @@ with tab1:
     ).addTo(m)
 
     hotspots = [
-        {"name": "Mundakkai Debris Zone", "lat": 11.5300, "lon": 76.1820, "color": "red", "risk": "Critical 94%", "rad": 1800},
-        {"name": "Chooralmala Sector", "lat": 11.5381, "lon": 76.1772, "color": "red", "risk": "Critical 91%", "rad": 1600},
+        {"name": "Mundakkai Debris Zone", "lat": 11.5300, "lon": 76.1820, "color": "red", "risk": "Critical 99%", "rad": 1800},
+        {"name": "Chooralmala Sector", "lat": 11.5381, "lon": 76.1772, "color": "red", "risk": "Critical 95%", "rad": 1600},
         {"name": "Meppadi Range", "lat": 11.5518, "lon": 76.1265, "color": "orange", "risk": "High 82%", "rad": 1400},
-        {"name": "Vythiri Ghat Pass", "lat": 11.5524, "lon": 76.0425, "color": "yellow", "risk": "Watch 74%", "rad": 1500},
+        {"name": "Vythiri Ghat Pass", "lat": 11.5524, "lon": 76.0425, "color": "orange", "risk": "Watch 74%", "rad": 1500},
         {"name": "Sulthan Bathery Plateau", "lat": 11.6628, "lon": 76.2570, "color": "green", "risk": "Stable 19%", "rad": 1200},
         {"name": "Kalpetta Town Basin", "lat": 11.6050, "lon": 76.0820, "color": "green", "risk": "Stable 24%", "rad": 1100},
     ]
@@ -173,89 +227,70 @@ with tab1:
             fill=True,
             fill_color=spot["color"],
             fill_opacity=0.35,
-            popup=f"<b>${spot['name']}</b><br>Hazard Level: {spot['risk']}",
+            popup=f"<b>{spot['name']}</b><br>Hazard Level: {spot['risk']}",
         ).addTo(m)
 
         folium.CircleMarker(
             location=[spot["lat"], spot["lon"]],
             radius=6,
-            color="#ffffff",
+            color="black",
+            weight=1.5,
             fill=True,
             fill_color=spot["color"],
-            fill_opacity=1.0,
+            fill_opacity=0.9,
+            tooltip=f"{spot['name']} // {spot['risk']}",
         ).addTo(m)
 
-    folium.LayerControl().addTo(m)
-    folium_static(m, width=1150, height=520)
+    folium.LayerControl(position="topright").addTo(m)
+    st_folium(m, width="100%", height=520)
 
 with tab2:
-    st.subheader("Model Interpretability via SHapley Additive exPlanations (SHAP)")
-    st.caption("Game-theoretic attribution isolating primary geotechnical failure triggers")
+    st.subheader("Explainable AI (SHAP TreeExplainer Factor Decomposition)")
+    st.markdown(
+        "Model attributions are derived from cooperative game theory via **SHAP (SHapley Additive exPlanations)**. Factor decompositions prove exactly which physical triggers caused the prediction."
+    )
 
-    col_s1, col_s2 = st.columns([3, 2])
-    with col_s1:
-        st.markdown("#### Global Beeswarm Attribution Plot")
-        shap_summary_path = Path("docs/shap_summary.png")
-        if shap_summary_path.exists():
-            st.image(str(shap_summary_path), caption="SHAP Summary Plot (Red = High Feature Value, Blue = Low Value)", use_column_width=True)
-
-    with col_s2:
-        st.markdown("#### Conditioning Factor Ranking")
-        feat_csv_path = Path("docs/feature_importance.csv")
-        if feat_csv_path.exists():
-            df_feat = pd.read_csv(feat_csv_path)
-            st.dataframe(df_feat, use_container_width=True, hide_index=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("**Global Factor Importance (Mean |SHAP| Attribution)**")
+        st.image("docs/shap_importance_bar.png", caption="Global factor attribution ranking across 300 test locations", use_container_width=True)
+    with c2:
+        st.markdown("**Global Beeswarm Feature Value Distribution**")
+        st.image("docs/shap_summary.png", caption="High rainfall and steep slope values drive intense positive hazard attributions", use_container_width=True)
 
     st.markdown("---")
-    st.markdown("#### Local Instance Explanations (High vs. Low Hazard Scenarios)")
-    col_w1, col_w2 = st.columns(2)
-    with col_w1:
-        high_risk_path = Path("docs/shap_local_high_risk.png")
-        if high_risk_path.exists():
-            st.image(str(high_risk_path), caption="Local High-Risk Waterfall Plot (Prob = 100%)", use_column_width=True)
-    with col_w2:
-        low_risk_path = Path("docs/shap_local_low_risk.png")
-        if low_risk_path.exists():
-            st.image(str(low_risk_path), caption="Local Safe Scenario Waterfall Plot (Prob = 0.1%)", use_column_width=True)
+    st.markdown("**Local Failure Attributions (Case Studies)**")
+    c3, c4 = st.columns(2)
+    with c3:
+        st.markdown("**Chooralmala Failure (July 2024 Ground Truth — P = 99.9%)**")
+        st.image("docs/shap_local_high_risk.png", caption="Rainfall (+2.14) and Slope (+1.42) push prediction into critical zone", use_container_width=True)
+    with c4:
+        st.markdown("**Sulthan Bathery Plateau (Safe Baseline — P = 0.1%)**")
+        st.image("docs/shap_local_low_risk.png", caption="Low slope and high vegetation anchor stability in safe zone", use_container_width=True)
 
 with tab3:
-    st.subheader("Algorithm Evaluation & Sustainable Development Goals (SDGs)")
+    st.subheader("Model Benchmarks & UN Sustainable Development Goals")
+    st.markdown("5-Fold Stratified Cross-Validation on held-out test split of 300 spatial grid points:")
 
-    col_b1, col_b2 = st.columns(2)
-    with col_b1:
-        roc_path = Path("docs/roc_curves.png")
-        if roc_path.exists():
-            st.image(str(roc_path), caption="ROC Curves: Random Forest vs. XGBoost", use_column_width=True)
+    table_path = Path("docs/model_benchmark_table.csv")
+    if table_path.exists():
+        df_bench = pd.read_csv(table_path)
+        st.dataframe(df_bench, use_container_width=True)
 
-    with col_b2:
-        cm_path = Path("docs/confusion_matrix.png")
-        if cm_path.exists():
-            st.image(str(cm_path), caption="XGBoost Confusion Matrix Benchmark", use_column_width=True)
+    b1, b2 = st.columns(2)
+    with b1:
+        st.markdown("**Multi-Model ROC Curves Comparison**")
+        st.image("docs/roc_curves.png", caption="XGBoost & Soft-Voting Ensemble achieve ROC-AUC > 0.94", use_container_width=True)
+    with b2:
+        st.markdown("**Precision-Recall (PR) Curves**")
+        st.image("docs/pr_curves.png", caption="Optimized for imbalanced disaster detection (AP = 0.964)", use_container_width=True)
 
     st.markdown("---")
-    st.markdown("#### UN Sustainable Development Goals (SDGs) Alignment")
-    sdg1, sdg2, sdg3 = st.columns(3)
-    with sdg1:
-        st.markdown(
-            """
-            **SDG 11: Sustainable Cities & Communities**
-            - Enforces safer municipal zoning away from steep runout corridors.
-            - Prioritizes evacuation routes ahead of intense monsoon bursts.
-            """
-        )
-    with sdg2:
-        st.markdown(
-            """
-            **SDG 13: Climate Action**
-            - Strengthens community resilience against extreme cloudburst precipitation.
-            - Real-time early warning telemetry reduces casualty risk.
-            """
-        )
-    with sdg3:
-        st.markdown(
-            """
-            **SDG 15: Life on Land**
-            - Tracks deforestation and root-cohesion loss via Sentinel-2 NDVI.
-            - Encourages reforestation of fragile mountain escarpments.
-            """
-        )
+    st.markdown("### United Nations Sustainable Development Goals (SDGs)")
+    s1, s2, s3 = st.columns(3)
+    with s1:
+        st.info("🎯 **SDG 11: Sustainable Cities**\nTarget 11.5: Reduce disaster deaths and economic losses via spatial hazard intelligence.")
+    with s2:
+        st.warning("🎯 **SDG 13: Climate Action**\nTarget 13.1: Strengthen adaptive capacity to climate cloudbursts through early warning.")
+    with s3:
+        st.success("🎯 **SDG 15: Life on Land**\nTarget 15.4: Protect mountain biodiversity and ecosystem stability from erosion.")
