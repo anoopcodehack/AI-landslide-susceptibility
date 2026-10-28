@@ -1,1 +1,1 @@
-"""Backend package for the landslide susceptibility application."""
+# GeoShield AI Backend Package
