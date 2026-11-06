@@ -146,3 +146,15 @@ body {
 .animate-loader-progress {
   animation: loaderProgress 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Leaflet Container Full-Bleed Fixes */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #0c0e14 !important;
+  font-family: var(--font-mono) !important;
+}
+
+.leaflet-tile-pane {
+  filter: contrast(1.05) saturate(1.1);
+}

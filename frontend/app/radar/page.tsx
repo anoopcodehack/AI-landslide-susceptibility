@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import "leaflet/dist/leaflet.css";
 import { Navbar } from "@/components/Navbar";
 import { TacticalDock } from "@/components/TacticalDock";
 import {
@@ -138,93 +139,151 @@ export default function RadarPage() {
     return { color: "#dc2626", risk: "Disaster Zone 88%", radiusMultiplier: 1.2 };
   };
 
+  // 1. Initialize Leaflet Map ONCE on mount
   useEffect(() => {
     if (!mapRef.current) return;
+    let resizeObserver: ResizeObserver | null = null;
 
     import("leaflet").then((L) => {
-      if (!leafletMap.current && mapRef.current) {
-        const map = L.map(mapRef.current, {
-          zoomControl: false,
-        }).setView([11.55, 76.15], 11);
+      if (!mapRef.current || leafletMap.current) return;
 
-        const satelliteLayer = L.tileLayer(
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          { attribution: "Esri World Imagery", maxZoom: 17 }
+      const map = L.map(mapRef.current, {
+        zoomControl: false,
+      }).setView([11.55, 76.15], 11);
+
+      const satelliteLayer = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { attribution: "Esri World Imagery", maxZoom: 18 }
+      );
+
+      const osmLayer = L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        { attribution: "OpenStreetMap Contributors", maxZoom: 18 }
+      );
+
+      const labelsLayer = L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png",
+        { subdomains: "abcd", maxZoom: 18 }
+      );
+
+      satelliteLayer.addTo(map);
+      labelsLayer.addTo(map);
+      L.control.zoom({ position: "bottomright" }).addTo(map);
+
+      layersRef.current = { satellite: satelliteLayer, osm: osmLayer };
+      leafletMap.current = map;
+
+      // Default selected hotspot
+      setSelectedHotspot(hotspots[1]); // Chooralmala
+
+      // Invalidate size immediately and after layout rendering settles
+      map.invalidateSize();
+      setTimeout(() => map.invalidateSize(), 100);
+      setTimeout(() => map.invalidateSize(), 300);
+      setTimeout(() => map.invalidateSize(), 800);
+
+      // Add Iruvaipuzha Debris Runout Polyline (Idea 2)
+      const debrisAxis: [number, number][] = [
+        [11.528, 76.142], // Vellarimala Apex
+        [11.534, 76.138], // Punchirimattam
+        [11.542, 76.131], // Mundakkai
+        [11.552, 76.126], // Chooralmala
+        [11.565, 76.115], // Attamala
+      ];
+
+      L.polyline(debrisAxis, {
+        color: "#ef4444",
+        weight: 5,
+        opacity: 0.9,
+        dashArray: "6, 6",
+      })
+        .addTo(map)
+        .bindPopup(
+          "<div style='font-family: monospace; font-size: 11px; font-weight: bold; color: #dc2626;'>🌊 Iruvaipuzha Debris Flow Channel (6.1 km Runout Corridor)</div>"
         );
 
-        const osmLayer = L.tileLayer(
-          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          { attribution: "OpenStreetMap Contributors", maxZoom: 18 }
-        );
-
-        const labelsLayer = L.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png",
-          { subdomains: "abcd", maxZoom: 17 }
-        );
-
-        satelliteLayer.addTo(map);
-        labelsLayer.addTo(map);
-        L.control.zoom({ position: "bottomright" }).addTo(map);
-
-        layersRef.current = { satellite: satelliteLayer, osm: osmLayer };
-        leafletMap.current = map;
-
-        // Default selected hotspot
-        setSelectedHotspot(hotspots[1]); // Chooralmala
-      }
-
-      if (leafletMap.current) {
-        circlesRef.current.forEach((layer) => layer.remove());
-        circlesRef.current = [];
-
-        hotspots.forEach((spot) => {
-          const { color, risk, radiusMultiplier } = getTimelineProperties(spot.id, timelineStep);
-          const circle = L.circle([spot.lat, spot.lon], {
-            radius: spot.baseRadius * radiusMultiplier,
-            color: color,
-            fillColor: color,
-            fillOpacity: 0.38,
-            weight: 2,
-          })
-            .addTo(leafletMap.current)
-            .bindPopup(
-              `<div style="font-family: monospace; padding: 6px; color: #09090b;">
-                <h4 style="margin: 0 0 4px 0; font-size: 13px; font-weight: 800;">${spot.name}</h4>
-                <p style="margin: 2px 0; font-size: 11px; font-weight: bold; color: ${color};">
-                  Timeline Status: ${risk}
-                </p>
-                <p style="margin: 4px 0 0; font-size: 10px; color: #52525b; line-height: 1.3;">
-                  ${spot.desc}
-                </p>
-              </div>`
-            );
-
-          const dot = L.circleMarker([spot.lat, spot.lon], {
-            radius: 5,
-            color: "#ffffff",
-            fillColor: color,
-            fillOpacity: 1.0,
-            weight: 2,
-          }).addTo(leafletMap.current);
-
-          circle.on("click", () => {
-            setSelectedHotspot(spot);
-          });
-          dot.on("click", () => {
-            setSelectedHotspot(spot);
-          });
-
-          circlesRef.current.push(circle, dot);
-        });
+      // Auto-refresh tiles whenever container changes dimensions (e.g. flexbox layout expansion)
+      resizeObserver = new ResizeObserver(() => {
+        if (map) {
+          map.invalidateSize();
+        }
+      });
+      if (mapRef.current) {
+        resizeObserver.observe(mapRef.current);
       }
     });
 
+    const handleResize = () => {
+      if (leafletMap.current) {
+        leafletMap.current.invalidateSize();
+      }
+    };
+    window.addEventListener("resize", handleResize);
+
     return () => {
+      window.removeEventListener("resize", handleResize);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       if (leafletMap.current) {
         leafletMap.current.remove();
         leafletMap.current = null;
       }
     };
+  }, []);
+
+  // 2. Update Hotspot Circles whenever timelineStep changes without destroying or reloading the map
+  useEffect(() => {
+    if (!leafletMap.current) return;
+
+    import("leaflet").then((L) => {
+      if (!leafletMap.current) return;
+
+      circlesRef.current.forEach((layer) => layer.remove());
+      circlesRef.current = [];
+
+      hotspots.forEach((spot) => {
+        const { color, risk, radiusMultiplier } = getTimelineProperties(spot.id, timelineStep);
+        const circle = L.circle([spot.lat, spot.lon], {
+          radius: spot.baseRadius * radiusMultiplier,
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.38,
+          weight: 2,
+        })
+          .addTo(leafletMap.current)
+          .bindPopup(
+            `<div style="font-family: monospace; padding: 6px; color: #09090b;">
+              <h4 style="margin: 0 0 4px 0; font-size: 13px; font-weight: 800;">${spot.name}</h4>
+              <p style="margin: 2px 0; font-size: 11px; font-weight: bold; color: ${color};">
+                Timeline Status: ${risk}
+              </p>
+              <p style="margin: 4px 0 0; font-size: 10px; color: #52525b; line-height: 1.3;">
+                ${spot.desc}
+              </p>
+            </div>`
+          );
+
+        const dot = L.circleMarker([spot.lat, spot.lon], {
+          radius: 5,
+          color: "#ffffff",
+          fillColor: color,
+          fillOpacity: 1.0,
+          weight: 2,
+        }).addTo(leafletMap.current);
+
+        circle.on("click", () => {
+          setSelectedHotspot(spot);
+        });
+        dot.on("click", () => {
+          setSelectedHotspot(spot);
+        });
+
+        circlesRef.current.push(circle, dot);
+      });
+
+      leafletMap.current.invalidateSize();
+    });
   }, [timelineStep]);
 
   const switchLayer = (type: "satellite" | "osm") => {
@@ -366,8 +425,8 @@ export default function RadarPage() {
         {/* Main Map + Side Telemetry Panel Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-8">
           {/* Map Container (Span 8) */}
-          <div className="lg:col-span-8 relative w-full h-[62vh] rounded-2xl overflow-hidden border border-zinc-300 shadow-md">
-            <div ref={mapRef} className="w-full h-full bg-zinc-950" />
+          <div className="lg:col-span-8 relative w-full h-[62vh] min-h-[480px] rounded-2xl overflow-hidden border border-zinc-300 shadow-md">
+            <div ref={mapRef} className="w-full h-full min-h-[480px] bg-zinc-950" />
 
             {/* Corner Crosshairs */}
             <div className="absolute top-2 left-2 text-white/40 pointer-events-none font-mono text-[10px] select-none">
