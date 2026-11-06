@@ -44,17 +44,33 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-MODEL_PATH = Path("models/landslide_model.joblib")
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+
+def resolve_path(rel_path: str) -> str:
+    """Resolve file path whether executed from repo root or inside frontend directory."""
+    p = Path(rel_path)
+    if p.exists():
+        return str(p)
+    p_root = ROOT_DIR / rel_path
+    if p_root.exists():
+        return str(p_root)
+    return rel_path
 
 
 @st.cache_resource
 def load_model():
     """Load trained model artifact into memory."""
-    if MODEL_PATH.exists():
-        try:
-            return joblib.load(MODEL_PATH)
-        except Exception:
-            return None
+    candidates = [
+        Path("models/landslide_model.joblib"),
+        ROOT_DIR / "models" / "landslide_model.joblib",
+    ]
+    for p in candidates:
+        if p.exists():
+            try:
+                return joblib.load(p)
+            except Exception:
+                pass
     return None
 
 
@@ -344,26 +360,26 @@ with tab2:
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("**Global Factor Importance (Mean |SHAP| Attribution)**")
-        st.image("docs/shap_importance_bar.png", caption="Global factor attribution ranking across 300 test locations", use_container_width=True)
+        st.image(resolve_path("docs/shap_importance_bar.png"), caption="Global factor attribution ranking across 300 test locations", use_container_width=True)
     with c2:
         st.markdown("**Global Beeswarm Feature Value Distribution**")
-        st.image("docs/shap_summary.png", caption="High rainfall and steep slope values drive intense positive hazard attributions", use_container_width=True)
+        st.image(resolve_path("docs/shap_summary.png"), caption="High rainfall and steep slope values drive intense positive hazard attributions", use_container_width=True)
 
     st.markdown("---")
     st.markdown("**Local Failure Attributions (Case Studies)**")
     c3, c4 = st.columns(2)
     with c3:
         st.markdown("**Chooralmala Failure (July 2024 Ground Truth — P = 99.9%)**")
-        st.image("docs/shap_local_high_risk.png", caption="Rainfall (+2.14) and Slope (+1.42) push prediction into critical zone", use_container_width=True)
+        st.image(resolve_path("docs/shap_local_high_risk.png"), caption="Rainfall (+2.14) and Slope (+1.42) push prediction into critical zone", use_container_width=True)
     with c4:
         st.markdown("**Sulthan Bathery Plateau (Safe Baseline — P = 0.1%)**")
-        st.image("docs/shap_local_low_risk.png", caption="Low slope and high vegetation anchor stability in safe zone", use_container_width=True)
+        st.image(resolve_path("docs/shap_local_low_risk.png"), caption="Low slope and high vegetation anchor stability in safe zone", use_container_width=True)
 
 with tab3:
     st.subheader("Model Benchmarks & UN Sustainable Development Goals")
     st.markdown("5-Fold Stratified Cross-Validation on held-out test split of 300 spatial grid points:")
 
-    table_path = Path("docs/model_benchmark_table.csv")
+    table_path = Path(resolve_path("docs/model_benchmark_table.csv"))
     if table_path.exists():
         df_bench = pd.read_csv(table_path)
         st.dataframe(df_bench, use_container_width=True)
@@ -371,10 +387,10 @@ with tab3:
     b1, b2 = st.columns(2)
     with b1:
         st.markdown("**Multi-Model ROC Curves Comparison**")
-        st.image("docs/roc_curves.png", caption="XGBoost & Soft-Voting Ensemble achieve ROC-AUC > 0.94", use_container_width=True)
+        st.image(resolve_path("docs/roc_curves.png"), caption="XGBoost & Soft-Voting Ensemble achieve ROC-AUC > 0.94", use_container_width=True)
     with b2:
         st.markdown("**Precision-Recall (PR) Curves**")
-        st.image("docs/pr_curves.png", caption="Optimized for imbalanced disaster detection (AP = 0.964)", use_container_width=True)
+        st.image(resolve_path("docs/pr_curves.png"), caption="Optimized for imbalanced disaster detection (AP = 0.964)", use_container_width=True)
 
     st.markdown("---")
     st.markdown("### United Nations Sustainable Development Goals (SDGs)")
