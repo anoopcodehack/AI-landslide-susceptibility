@@ -98,3 +98,50 @@ class CivilDefenseDirective(BaseModel):
     emergency_contact: str
     issued_at: str
     authority: str
+
+
+class LiveWeatherTelemetry(BaseModel):
+    """Real-time meteorological telemetry for Wayanad District (Open-Meteo API)."""
+    station_name: str
+    latitude: float
+    longitude: float
+    timestamp: str
+    current_precipitation_mm: float
+    past_24h_rainfall_mm: float
+    temperature_c: float
+    relative_humidity_pct: float
+    wind_speed_kmh: float
+    cloud_cover_pct: float
+    weather_condition: str
+    source: Literal["LIVE_OPEN_METEO_API", "OFFLINE_CALIBRATED_FALLBACK"]
+    live_susceptibility_score: float
+    live_risk_category: str
+    evacuation_alert: bool
+
+
+class RunoutWaypoint(BaseModel):
+    name: str
+    latitude: float
+    longitude: float
+    elevation_m: float
+    distance_from_apex_km: float
+    estimated_arrival_minutes: float
+    debris_velocity_ms: float
+    impact_pressure_kpa: float
+    hazard_status: Literal["IMMEDIATE_DEVASTATION", "CRITICAL_RUNOUT", "ACTIVE_INUNDATION", "MONITORED_MARGIN"]
+
+
+class DebrisRunoutSimulation(BaseModel):
+    """Downstream hydraulic debris flow runout routing (Fahrboschung travel angle)."""
+    corridor_id: str
+    corridor_name: str
+    apex_elevation_m: float
+    valley_floor_elevation_m: float
+    total_drop_height_m: float
+    total_runout_distance_km: float
+    apparent_friction_angle_deg: float
+    estimated_volume_m3: float
+    channel_axis_points: list[list[float]]
+    affected_waypoints: list[RunoutWaypoint]
+    evacuation_lead_time_min: float
+    advisory: str
