@@ -9,6 +9,7 @@ import { StatsGrid } from "@/components/StatsGrid";
 import { TrendChart } from "@/components/TrendChart";
 import { TacticalDock } from "@/components/TacticalDock";
 import { LetterDropLoader } from "@/components/LetterDropLoader";
+import { API_BASE_URL } from "@/lib/api";
 import {
   ArrowUpRight,
   Shield,
@@ -92,7 +93,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/v1/dashboard");
+        const res = await fetch(`${API_BASE_URL}/api/v1/dashboard`);
         if (res.ok) {
           const data: DashboardData = await res.json();
           setDashboardData(data);

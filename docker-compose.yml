@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  # 1. FastAPI ASGI ML Inference Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: geoshield-backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  # 2. Next.js 14 Developer Console Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: geoshield-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+
+  # 3. Streamlit Folium Viva Interface
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: geoshield-streamlit
+    command: ["streamlit", "run", "frontend/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    ports:
+      - "8501:8501"
+    restart: unless-stopped

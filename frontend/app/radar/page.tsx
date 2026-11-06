@@ -5,6 +5,7 @@ import Link from "next/link";
 import "leaflet/dist/leaflet.css";
 import { Navbar } from "@/components/Navbar";
 import { TacticalDock } from "@/components/TacticalDock";
+import { API_BASE_URL } from "@/lib/api";
 import {
   Map,
   Satellite,
@@ -98,7 +99,7 @@ export default function RadarPage() {
   const syncLiveWeather = async () => {
     setWeatherLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/v1/weather/live");
+      const res = await fetch(`${API_BASE_URL}/api/v1/weather/live`);
       if (res.ok) {
         const data: LiveWeatherTelemetry = await res.json();
         setLiveWeather(data);

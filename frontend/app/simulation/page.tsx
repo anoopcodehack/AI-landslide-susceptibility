@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { TacticalDock } from "@/components/TacticalDock";
+import { API_BASE_URL } from "@/lib/api";
 import {
   Cpu,
   Mountain,
@@ -185,7 +186,7 @@ export default function SimulationPage() {
   useEffect(() => {
     const fetchDirective = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/directive/${selectedSector}`);
+        const res = await fetch(`${API_BASE_URL}/api/v1/directive/${selectedSector}`);
         if (res.ok) {
           const data: CivilDirective = await res.json();
           setActiveDirective(data);
@@ -200,7 +201,7 @@ export default function SimulationPage() {
   const syncLiveWeather = async () => {
     setWeatherLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/v1/weather/live");
+      const res = await fetch(`${API_BASE_URL}/api/v1/weather/live`);
       if (res.ok) {
         const data: LiveWeatherTelemetry = await res.json();
         setLiveWeather(data);
@@ -238,7 +239,7 @@ export default function SimulationPage() {
   const fetchRunout = async () => {
     setRunoutLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/v1/runout/chooralmala");
+      const res = await fetch(`${API_BASE_URL}/api/v1/runout/chooralmala`);
       if (res.ok) {
         const data: DebrisRunoutSimulation = await res.json();
         setRunoutData(data);
@@ -359,7 +360,7 @@ export default function SimulationPage() {
     const runInference = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:8000/api/v1/predict", {
+        const res = await fetch(`${API_BASE_URL}/api/v1/predict`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
