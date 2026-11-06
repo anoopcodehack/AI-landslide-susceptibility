@@ -46,6 +46,8 @@ export default function RadarPage() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [backendOnline, setBackendOnline] = useState<boolean>(true);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
+  const [cursorCoords, setCursorCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [hoveredWaypoint, setHoveredWaypoint] = useState<any | null>(null);
 
   const timelineMilestones = [
     { label: "T - 48h", date: "28 Jul 2024", rain: "45 mm", status: "Nominal Monsoon Baseline", severity: "stable" },
@@ -123,6 +125,74 @@ export default function RadarPage() {
     },
   ];
 
+  const channelWaypoints = [
+    {
+      name: "1. Vellarimala Failure Apex",
+      subtitle: "Scar Initiation // 42° Escarpment",
+      lat: 11.528,
+      lon: 76.142,
+      elevation: 1480,
+      distKm: 0.0,
+      etaMinutes: 0.0,
+      velocityMs: 24.5,
+      pressureKPa: 142,
+      status: "IMMEDIATE DEVASTATION",
+      statusColor: "#ef4444",
+    },
+    {
+      name: "2. Upper Punchirimattam Estate",
+      subtitle: "Tea Worker Settlement Axis",
+      lat: 11.534,
+      lon: 76.138,
+      elevation: 1220,
+      distKm: 1.2,
+      etaMinutes: 3.4,
+      velocityMs: 19.2,
+      pressureKPa: 118,
+      status: "IMMEDIATE DEVASTATION",
+      statusColor: "#ef4444",
+    },
+    {
+      name: "3. Mundakkai Village & Market",
+      subtitle: "Primary Commercial Cluster & Bridge",
+      lat: 11.542,
+      lon: 76.131,
+      elevation: 980,
+      distKm: 2.3,
+      etaMinutes: 7.1,
+      velocityMs: 16.8,
+      pressureKPa: 89,
+      status: "CRITICAL RUNOUT",
+      statusColor: "#f97316",
+    },
+    {
+      name: "4. Chooralmala Town & River Bridge",
+      subtitle: "Valley Floor Inundation Center (9° Slope)",
+      lat: 11.552,
+      lon: 76.126,
+      elevation: 790,
+      distKm: 4.2,
+      etaMinutes: 14.2,
+      velocityMs: 13.4,
+      pressureKPa: 68,
+      status: "ACTIVE INUNDATION",
+      statusColor: "#eab308",
+    },
+    {
+      name: "5. Attamala Valley Confluence",
+      subtitle: "Downstream Dissipation & Sedimentation",
+      lat: 11.565,
+      lon: 76.115,
+      elevation: 680,
+      distKm: 6.1,
+      etaMinutes: 22.5,
+      velocityMs: 8.5,
+      pressureKPa: 31,
+      status: "MONITORED MARGIN",
+      statusColor: "#10b981",
+    },
+  ];
+
   const getTimelineProperties = (spotId: string, step: number) => {
     if (spotId === "bathery" || spotId === "kalpetta") {
       return { color: "#10b981", risk: step === 2 ? "Low 24%" : "Safe 18%", radiusMultiplier: 0.8 };
@@ -173,6 +243,14 @@ export default function RadarPage() {
       layersRef.current = { satellite: satelliteLayer, osm: osmLayer };
       leafletMap.current = map;
 
+      // Track cursor coordinates dynamically across satellite map
+      map.on("mousemove", (e: any) => {
+        setCursorCoords({ lat: e.latlng.lat, lon: e.latlng.lng });
+      });
+      map.on("mouseout", () => {
+        setCursorCoords(null);
+      });
+
       // Default selected hotspot
       setSelectedHotspot(hotspots[1]); // Chooralmala
 
@@ -198,9 +276,55 @@ export default function RadarPage() {
         dashArray: "6, 6",
       })
         .addTo(map)
-        .bindPopup(
-          "<div style='font-family: monospace; font-size: 11px; font-weight: bold; color: #dc2626;'>🌊 Iruvaipuzha Debris Flow Channel (6.1 km Runout Corridor)</div>"
+        .bindTooltip(
+          "<div style='font-family: monospace; font-size: 11px; font-weight: bold; color: #ef4444;'>🌊 Iruvaipuzha High-Momentum Debris Channel (6.1 km Runout Corridor)</div>",
+          { direction: "top", opacity: 0.95, className: "coder-map-tooltip" }
         );
+
+      // Add interactive waypoint markers along the debris corridor
+      channelWaypoints.forEach((wp) => {
+        const wpMarker = L.circleMarker([wp.lat, wp.lon], {
+          radius: 6,
+          color: "#ffffff",
+          fillColor: wp.statusColor,
+          fillOpacity: 1.0,
+          weight: 2,
+        }).addTo(map);
+
+        const wpHtml = `
+          <div style="font-family: monospace; font-size: 11px; line-height: 1.45; min-width: 220px;">
+            <div style="font-weight: 800; font-size: 12px; color: ${wp.statusColor}; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 3px; margin-bottom: 4px;">
+              🌊 ${wp.name}
+            </div>
+            <div style="color: #cbd5e1; font-size: 10px; margin-bottom: 3px;">${wp.subtitle}</div>
+            <div style="display: flex; justify-content: space-between; color: #ffffff; font-weight: bold; margin-bottom: 3px;">
+              <span>ETA: ${wp.etaMinutes === 0 ? "T = 0 (Trigger)" : `T + ${wp.etaMinutes} min`}</span>
+              <span style="color: #fca5a5;">${wp.velocityMs} m/s</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; color: #a1a1aa; font-size: 10px; margin-bottom: 4px;">
+              <span>Elevation: <strong style="color: #fff;">${wp.elevation} m</strong></span>
+              <span>Distance: <strong style="color: #fff;">+${wp.distKm} km</strong></span>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 4px; padding: 3px 6px; font-size: 9px; color: #fca5a5; font-weight: bold; text-align: center;">
+              Impact: ${wp.pressureKPa} kPa • ${wp.status}
+            </div>
+          </div>
+        `;
+
+        wpMarker.bindTooltip(wpHtml, {
+          direction: "top",
+          offset: [0, -10],
+          opacity: 0.98,
+          className: "coder-map-tooltip",
+        });
+
+        wpMarker.on("mouseover", () => {
+          setHoveredWaypoint(wp);
+        });
+        wpMarker.on("mouseout", () => {
+          setHoveredWaypoint(null);
+        });
+      });
 
       // Auto-refresh tiles whenever container changes dimensions (e.g. flexbox layout expansion)
       resizeObserver = new ResizeObserver(() => {
@@ -250,27 +374,56 @@ export default function RadarPage() {
           fillColor: color,
           fillOpacity: 0.38,
           weight: 2,
-        })
-          .addTo(leafletMap.current)
-          .bindPopup(
-            `<div style="font-family: monospace; padding: 6px; color: #09090b;">
-              <h4 style="margin: 0 0 4px 0; font-size: 13px; font-weight: 800;">${spot.name}</h4>
-              <p style="margin: 2px 0; font-size: 11px; font-weight: bold; color: ${color};">
-                Timeline Status: ${risk}
-              </p>
-              <p style="margin: 4px 0 0; font-size: 10px; color: #52525b; line-height: 1.3;">
-                ${spot.desc}
-              </p>
-            </div>`
-          );
+        }).addTo(leafletMap.current);
 
         const dot = L.circleMarker([spot.lat, spot.lon], {
-          radius: 5,
+          radius: 6,
           color: "#ffffff",
           fillColor: color,
           fillOpacity: 1.0,
-          weight: 2,
+          weight: 2.5,
         }).addTo(leafletMap.current);
+
+        // Rich Tactical Hover Tooltip
+        const tooltipHtml = `
+          <div style="font-family: monospace; font-size: 11px; line-height: 1.45; min-width: 220px;">
+            <div style="font-weight: 800; font-size: 12px; color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 3px; margin-bottom: 4px;">
+              📍 ${spot.name}
+            </div>
+            <div style="color: ${color}; font-weight: bold; font-size: 11px; margin-bottom: 3px;">
+              ● Timeline Status: ${risk}
+            </div>
+            <div style="display: flex; justify-content: space-between; color: #a1a1aa; font-size: 10px; margin-bottom: 3px;">
+              <span>Elevation: <strong style="color: #fff;">${spot.elevation} m</strong></span>
+              <span>Slope: <strong style="color: #fff;">${spot.slope}° Shear</strong></span>
+            </div>
+            <div style="color: #71717a; font-size: 9px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 3px; margin-top: 2px;">
+              Corridor: ${spot.corridor}
+            </div>
+          </div>
+        `;
+
+        circle.bindTooltip(tooltipHtml, {
+          direction: "top",
+          offset: [0, -10],
+          opacity: 0.98,
+          className: "coder-map-tooltip",
+        });
+
+        dot.bindTooltip(tooltipHtml, {
+          direction: "top",
+          offset: [0, -10],
+          opacity: 0.98,
+          className: "coder-map-tooltip",
+        });
+
+        // Instant mouse hover activates sector inspection
+        circle.on("mouseover", () => {
+          setSelectedHotspot(spot);
+        });
+        dot.on("mouseover", () => {
+          setSelectedHotspot(spot);
+        });
 
         circle.on("click", () => {
           setSelectedHotspot(spot);
@@ -452,6 +605,18 @@ export default function RadarPage() {
                 <span className="text-zinc-800 font-bold">{currentMilestone.date}</span>
               </div>
             </div>
+
+            {/* Live Cursor Coordinate HUD Badge */}
+            <div className="absolute bottom-3 left-3 bg-zinc-950/85 text-white border border-zinc-700/80 px-3 py-1.5 rounded-lg text-[10px] font-mono flex items-center gap-2.5 backdrop-blur-md pointer-events-none shadow-md z-[400]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>
+                {cursorCoords
+                  ? `LAT: ${cursorCoords.lat.toFixed(4)}° N • LON: ${cursorCoords.lon.toFixed(4)}° E`
+                  : "+ 11.5500° N • 76.1500° E"}
+              </span>
+              <span className="text-zinc-500">•</span>
+              <span className="text-emerald-400 font-semibold">UTM Zone 43N</span>
+            </div>
           </div>
 
           {/* Right Side Telemetry HUD Drawer (Span 4) */}
@@ -462,7 +627,7 @@ export default function RadarPage() {
                 <span>Sector Telemetry Inspector</span>
               </span>
               <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold">
-                10-min Sync
+                Live Hover Active
               </span>
             </div>
 
@@ -508,10 +673,10 @@ export default function RadarPage() {
 
                 {/* Action Link to Simulation */}
                 <Link
-                  href="/simulation"
-                  className="btn-coder-black w-full py-2.5 text-xs flex items-center justify-center gap-1.5"
+                  href={`/simulation?sector=${selectedHotspot.id}&slope=${selectedHotspot.slope}&elevation=${selectedHotspot.elevation}`}
+                  className="btn-coder-black w-full py-2.5 text-xs flex items-center justify-center gap-1.5 shadow-2xs hover:bg-zinc-800"
                 >
-                  <span>Simulate {selectedHotspot.name.split(" ")[0]} Terrain</span>
+                  <span>Simulate {selectedHotspot.name.split(" ")[0]} in Studio</span>
                   <span>&rarr;</span>
                 </Link>
               </div>
@@ -583,6 +748,137 @@ export default function RadarPage() {
             ))}
           </div>
         </div>
+
+        {/* Topographic Elevation Profile & Kinetic Energy Corridor Card */}
+        <section className="mb-8 p-6 md:p-8 bg-zinc-950 text-white rounded-2xl border border-zinc-800 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-zinc-800">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                <h3 className="text-base font-black font-mono uppercase tracking-wider text-white">
+                  Topographic Elevation Cross-Section & Hydraulic Momentum Profile
+                </h3>
+                <span className="px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800 text-[10px] font-mono font-bold">
+                  Vellarimala &rarr; Chooralmala Corridor
+                </span>
+              </div>
+              <p className="text-xs text-zinc-400 font-sans max-w-2xl">
+                Hydraulic momentum trace of the 30 July 2024 cloudburst channel. Shows how 1.85M m³ of boulder slurry accelerated down an 800m vertical drop, inundating the 9° valley floor settlements.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 font-mono text-xs">
+              <div className="bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-800 text-center">
+                <span className="text-[9px] text-zinc-500 block uppercase">TOTAL DROP (H)</span>
+                <strong className="text-red-400 text-sm">800 m</strong>
+              </div>
+              <div className="bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-800 text-center">
+                <span className="text-[9px] text-zinc-500 block uppercase">RUNOUT REACH (L)</span>
+                <strong className="text-white text-sm">6.1 km</strong>
+              </div>
+              <div className="bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-800 text-center">
+                <span className="text-[9px] text-zinc-500 block uppercase">LEAD TIME</span>
+                <strong className="text-amber-400 text-sm">14.2 min</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* SVG Elevation Profile Waveform */}
+          <div className="pt-6 pb-4">
+            <div className="w-full h-32 relative overflow-hidden">
+              <svg className="w-full h-full" viewBox="0 0 1000 120" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="elevationGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#ef4444" stopOpacity="0.4" />
+                    <stop offset="50%" stopColor="#f97316" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
+                  </linearGradient>
+                </defs>
+                {/* Cross section fill */}
+                <path
+                  d="M 50 15 Q 200 35 380 62 T 680 92 L 950 105 L 950 120 L 50 120 Z"
+                  fill="url(#elevationGrad)"
+                />
+                {/* Terrain surface contour line */}
+                <path
+                  d="M 50 15 Q 200 35 380 62 T 680 92 L 950 105"
+                  fill="none"
+                  stroke="#ef4444"
+                  strokeWidth="3"
+                />
+                {/* Waypoint nodes on curve */}
+                <circle cx="50" cy="15" r="5" fill="#ef4444" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="250" cy="45" r="5" fill="#ef4444" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="450" cy="72" r="5" fill="#f97316" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="700" cy="94" r="5" fill="#eab308" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="950" cy="105" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="2" />
+              </svg>
+
+              {/* Station elevation callouts */}
+              <div className="absolute top-1 left-2 font-mono text-[10px] text-red-400 font-bold">
+                Apex: 1480m (42°)
+              </div>
+              <div className="absolute top-8 left-[23%] font-mono text-[10px] text-red-400 font-semibold">
+                Punchirimattam: 1220m
+              </div>
+              <div className="absolute top-16 left-[43%] font-mono text-[10px] text-orange-400 font-semibold">
+                Mundakkai: 980m
+              </div>
+              <div className="absolute bottom-6 left-[68%] font-mono text-[10px] text-yellow-400 font-bold">
+                Chooralmala: 790m (9° Valley)
+              </div>
+              <div className="absolute bottom-2 right-2 font-mono text-[10px] text-emerald-400 font-bold">
+                Attamala: 680m
+              </div>
+            </div>
+          </div>
+
+          {/* 5-Station Kinematics Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-4 border-t border-zinc-800 text-xs font-mono">
+            {channelWaypoints.map((wp, idx) => (
+              <div
+                key={idx}
+                className="bg-zinc-900/90 p-3 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-bold text-zinc-400">WP #{idx + 1}</span>
+                  <span
+                    className="text-[9px] px-1.5 py-0.2 rounded font-bold"
+                    style={{ backgroundColor: `${wp.statusColor}22`, color: wp.statusColor }}
+                  >
+                    {wp.status.split(" ")[0]}
+                  </span>
+                </div>
+                <div className="font-bold text-white text-xs truncate mb-1" title={wp.name}>
+                  {wp.name.split(". ")[1]}
+                </div>
+                <div className="text-[10px] text-zinc-400 space-y-0.5">
+                  <div className="flex justify-between">
+                    <span>Elevation:</span>
+                    <strong className="text-zinc-200">{wp.elevation} m</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Arrival ETA:</span>
+                    <strong className="text-white">{wp.etaMinutes === 0 ? "T = 0" : `+${wp.etaMinutes}m`}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Flow Velocity:</span>
+                    <strong className="text-red-400">{wp.velocityMs} m/s</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Impact Press:</span>
+                    <strong className="text-zinc-200">{wp.pressureKPa} kPa</strong>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 p-3 bg-zinc-900 rounded-lg border border-zinc-800 text-xs text-zinc-400 font-sans leading-relaxed">
+            <strong className="text-white font-mono font-bold">Scientific Finding: </strong>
+            Chooralmala settlement sits on a gentle 9° valley floor. Conventional susceptibility mapping classifies it as &quot;Low Slope / Moderate Risk&quot;. GeoShield integrates upstream momentum routing to detect long-runout hydraulic debris flows across the Western Ghats.
+          </div>
+        </section>
       </main>
 
       {/* Coder Corporate Footer */}
