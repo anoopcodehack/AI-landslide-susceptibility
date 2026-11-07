@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { TacticalDock } from "@/components/TacticalDock";
 import { API_BASE_URL } from "@/lib/api";
+import { useAlerts } from "@/components/AlertCenter";
 import {
   Cpu,
   Mountain,
@@ -125,6 +126,8 @@ export default function SimulationPage() {
   const [runoutLoading, setRunoutLoading] = useState<boolean>(false);
   const [showRunoutAnalysis, setShowRunoutAnalysis] = useState<boolean>(true);
 
+  const { triggerAlert } = useAlerts();
+
   // Pre-configured Verified Historical Wayanad Scenarios
   const scenarioPresets: ScenarioPreset[] = [
     {
@@ -181,6 +184,32 @@ export default function SimulationPage() {
     setSoil(preset.soil);
     setSelectedSector(preset.id);
     setMitigationActive(false);
+
+    if (preset.id === "chooralmala") {
+      triggerAlert({
+        level: "RED",
+        title: "KSDMA EVACUATION DIRECTIVE: Chooralmala Sector",
+        message: "Parametric scenario: 372mm rainfall influx with 38° slope breaches soil shear strength envelope (96.4% susceptibility).",
+        sector: "Chooralmala Sector",
+        actionUrl: "/simulation",
+      });
+    } else if (preset.id === "vythiri" || preset.id === "meppadi") {
+      triggerAlert({
+        level: "ORANGE",
+        title: "Civil Defense Watch // Escarpment Saturation",
+        message: `${preset.name} loaded with ${preset.rainfall}mm rainfall. Escarpment shear zone active.`,
+        sector: preset.name,
+        actionUrl: "/simulation",
+      });
+    } else if (preset.id === "bathery") {
+      triggerAlert({
+        level: "GREEN",
+        title: "Civil Defense Telemetry: Sulthan Bathery Safe Ground",
+        message: "Gentle 11° tableland terrain with 0.68 NDVI. Model confirms low susceptibility (1.2%) suitable for evacuation staging.",
+        sector: "Sulthan Bathery Tableland",
+        actionUrl: "/simulation",
+      });
+    }
   };
 
   useEffect(() => {

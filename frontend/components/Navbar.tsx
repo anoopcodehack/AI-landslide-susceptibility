@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowUpRight } from "lucide-react";
+import { AlertBellDrawer } from "./AlertBellDrawer";
 
 interface NavbarProps {
   activeTab?: string;
@@ -74,6 +75,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Right Action Controls */}
       <div className="hidden sm:flex items-center gap-3">
+        {/* Civil Defense Early Warning Notification Drawer */}
+        <AlertBellDrawer />
+
         {/* Status Pill */}
         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 text-xs font-medium text-zinc-700 border border-zinc-200 shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -104,6 +108,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Hamburger Toggle Button */}
       <div className="lg:hidden flex items-center gap-2">
+        <AlertBellDrawer />
         <Link
           href="/radar"
           className="btn-coder-black px-2.5 py-1 text-xs sm:hidden"

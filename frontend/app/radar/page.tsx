@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import { Navbar } from "@/components/Navbar";
 import { TacticalDock } from "@/components/TacticalDock";
 import { API_BASE_URL } from "@/lib/api";
+import { useAlerts } from "@/components/AlertCenter";
 import {
   Map,
   Satellite,
@@ -74,6 +75,8 @@ export default function RadarPage() {
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
   const [cursorCoords, setCursorCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [hoveredWaypoint, setHoveredWaypoint] = useState<any | null>(null);
+
+  const { triggerAlert } = useAlerts();
 
   // Live real-time AWS weather telemetry (Section 3 Future Flow of Research Poster)
   const [liveWeather, setLiveWeather] = useState<LiveWeatherTelemetry>({
@@ -613,6 +616,32 @@ export default function RadarPage() {
     setTimelineStep(newStep);
     if (leafletMap.current) {
       leafletMap.current.invalidateSize();
+    }
+
+    if (newStep === 2) {
+      triggerAlert({
+        level: "RED",
+        title: "KSDMA PEAK HAZARD // EVACUATION DIRECTIVE",
+        message: "372mm cloudburst saturation detected. High-momentum debris surge active down Iruvaipuzha channel (Chooralmala & Mundakkai).",
+        sector: "Chooralmala & Mundakkai (6.1 km Axis)",
+        actionUrl: "/radar",
+      });
+    } else if (newStep === 1) {
+      triggerAlert({
+        level: "ORANGE",
+        title: "Civil Defense Watch // Valley Saturation",
+        message: "185mm sustained valley rainfall. Soil pore-pressure reaches 92% of critical shear capacity.",
+        sector: "Wayanad Escarpments",
+        actionUrl: "/radar",
+      });
+    } else if (newStep === 4) {
+      triggerAlert({
+        level: "GREEN",
+        title: "Live Synoptic Telemetry // Nominal Envelope",
+        message: `Real-time AWS #04 feed active (${liveWeather.past_24h_rainfall_mm.toFixed(1)}mm rain). Pore pressure stable across all 6 sectors.`,
+        sector: "Live AWS Mesh #04",
+        actionUrl: "/radar",
+      });
     }
   };
 
