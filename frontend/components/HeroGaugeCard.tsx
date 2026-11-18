@@ -44,6 +44,20 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
   const stabilityPct = Math.min(100, Math.max(0, stability));
   const porePressurePct = Math.min(100, Math.max(0, pore));
 
+  const stabilityStatus =
+    stability >= 75
+      ? { text: "Nominal Stable Incline", color: "text-emerald-400" }
+      : stability >= 50
+      ? { text: "Marginal Incline Watch", color: "text-amber-400" }
+      : { text: "Critical Incline Shear", color: "text-rose-400" };
+
+  const poreStatus =
+    pore >= 75
+      ? { text: "Elevated Shear Saturation", color: "text-amber-400" }
+      : pore >= 50
+      ? { text: "Moderate Pore Saturation", color: "text-amber-300" }
+      : { text: "Nominal Hydrostatic Baseline", color: "text-emerald-400" };
+
   return (
     <div className="coder-dark-card p-6 flex flex-col justify-between min-h-[420px]">
       {/* Top Telemetry Header */}
@@ -102,8 +116,8 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
             <div className="text-2xl font-bold font-mono text-white mt-0.5">
               {stability.toFixed(1)}<span className="text-xs text-zinc-500 font-sans ml-1">/100</span>
             </div>
-            <span className="text-[11px] text-emerald-400 font-medium">
-              Nominal Incline Factor
+            <span className={`text-[11px] font-medium ${stabilityStatus.color}`}>
+              {stabilityStatus.text}
             </span>
           </div>
         </div>
@@ -144,8 +158,8 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
             <div className="text-2xl font-bold font-mono text-white mt-0.5">
               {pore.toFixed(1)}<span className="text-xs text-zinc-500 font-sans ml-1">/100</span>
             </div>
-            <span className="text-[11px] text-amber-400 font-medium">
-              Elevated Shear Saturation
+            <span className={`text-[11px] font-medium ${poreStatus.color}`}>
+              {poreStatus.text}
             </span>
           </div>
         </div>

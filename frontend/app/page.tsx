@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { HeroGaugeCard } from "@/components/HeroGaugeCard";
 import { StatsGrid } from "@/components/StatsGrid";
-import { TrendChart } from "@/components/TrendChart";
+import { TrendChart, TrendData } from "@/components/TrendChart";
 import { TacticalDock } from "@/components/TacticalDock";
 import { LetterDropLoader } from "@/components/LetterDropLoader";
 import { API_BASE_URL } from "@/lib/api";
@@ -40,11 +40,7 @@ interface DashboardData {
     active_hotspot_alerts: number;
     monitored_area_km2: number;
   };
-  trend_chart: {
-    weekly: Array<{ day: string; rainfall_mm: number; hazard_idx: number; highlight?: boolean }>;
-    daily: Array<{ time: string; rainfall_mm: number }>;
-    monthly: Array<{ week: string; rainfall_mm: number }>;
-  };
+  trend_chart: TrendData;
   sectors: Array<{
     id: string;
     name: string;
