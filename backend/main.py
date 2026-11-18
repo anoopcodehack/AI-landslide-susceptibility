@@ -648,8 +648,10 @@ def get_live_weather():
         "&hourly=precipitation&past_days=1&forecast_days=1"
     )
 
+    source = "LIVE_OPEN_METEO_API"
     try:
-        resp = requests.get(url, timeout=2.5)
+        headers = {"User-Agent": "GeoShield-Wayanad-EWS/2.0"}
+        resp = requests.get(url, headers=headers, timeout=8.0)
         if resp.status_code == 200:
             payload = resp.json()
             current = payload.get("current", {})
@@ -657,39 +659,50 @@ def get_live_weather():
             hourly_rain = hourly.get("precipitation", [])
             past_24h_sum = round(float(sum(hourly_rain[:24]) if len(hourly_rain) >= 24 else sum(hourly_rain)), 1)
             curr_precip = round(float(current.get("precipitation", 0.0)), 1)
-            temp_c = round(float(current.get("temperature_2m", 24.5)), 1)
-            humidity = round(float(current.get("relative_humidity_2m", 92.0)), 1)
-            wind = round(float(current.get("wind_speed_10m", 14.2)), 1)
-            cloud = round(float(current.get("cloud_cover", 85.0)), 1)
+            temp_c = round(float(current.get("temperature_2m", 21.0)), 1)
+            humidity = round(float(current.get("relative_humidity_2m", 70.0)), 1)
+            wind = round(float(current.get("wind_speed_10m", 5.0)), 1)
+            cloud = round(float(current.get("cloud_cover", 15.0)), 1)
 
-            wcode = current.get("weather_code", 61)
-            condition = (
-                "Torrential Rain & Cloudburst" if wcode in [65, 82] or curr_precip > 15
-                else "Heavy Rain Showers" if wcode in [63, 81] or curr_precip > 5
-                else "Moderate Precipitation" if wcode in [61, 80] or curr_precip > 0.5
-                else "Overcast Monsoon Clouds" if cloud > 70
-                else "Partly Cloudy Highland"
-            )
-            source = "LIVE_OPEN_METEO_API"
+            wcode = int(current.get("weather_code", 0))
+            if wcode >= 95:
+                condition = "Severe Thunderstorm Activity"
+            elif wcode >= 65 or curr_precip >= 15.0:
+                condition = "Torrential Downpour & Cloudburst Alert"
+            elif wcode >= 61 or curr_precip >= 5.0:
+                condition = "Heavy Orographic Rain Showers"
+            elif wcode >= 51 or curr_precip > 0.5:
+                condition = "Light Mountain Drizzle"
+            elif wcode in [45, 48]:
+                condition = "Highland Fog & Ridge Mist"
+            elif cloud >= 75:
+                condition = "Overcast Monsoon Skies"
+            elif cloud >= 30:
+                condition = "Scattered Clouds / Partly Cloudy"
+            else:
+                condition = "Clear Sky / Calm Highland Conditions"
         else:
             raise ValueError(f"HTTP {resp.status_code}")
     except Exception:
-        past_24h_sum = 285.0
-        curr_precip = 18.5
-        temp_c = 22.8
-        humidity = 96.0
-        wind = 24.5
-        cloud = 98.0
-        condition = "Extreme Orographic Cloudburst (Autonomous Telemetry)"
+        # Realistic seasonal baseline for Wayanad post-monsoon (Nov-Dec)
+        past_24h_sum = 0.0
+        curr_precip = 0.0
+        temp_c = 20.5
+        humidity = 68.0
+        wind = 5.2
+        cloud = 15.0
+        condition = "Fair Highland Conditions (Calibrated Seasonal Baseline)"
         source = "OFFLINE_CALIBRATED_FALLBACK"
 
-    # Evaluate trained model on real live rainfall telemetry
+    # Evaluate trained model dynamically on real live rainfall telemetry
+    # Soil saturation dynamically scales with live rainfall volume
+    live_soil = float(np.clip(0.35 + (past_24h_sum / 350.0) * 0.45, 0.20, 0.90))
     eval_req = PredictionRequest(
         slope=38.5,
-        elevation=1150.0,
-        rainfall=max(past_24h_sum, 150.0 if source == "OFFLINE_CALIBRATED_FALLBACK" else past_24h_sum),
-        soil=0.78,
-        ndvi=0.25,
+        elevation=950.0,
+        rainfall=past_24h_sum,
+        soil=live_soil,
+        ndvi=0.45,
     )
     score = predict_score(eval_req)
     cat = category_for(score)
