@@ -257,13 +257,13 @@ with tab1:
         tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         name="Esri World Imagery (Satellite)",
         attr="Esri Satellite",
-    ).addTo(m)
+    ).add_to(m)
 
     folium.TileLayer(
         tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         name="OpenStreetMap (Standard)",
         attr="OpenStreetMap",
-    ).addTo(m)
+    ).add_to(m)
 
     hotspots = [
         {"name": "Mundakkai Debris Zone", "lat": 11.5300, "lon": 76.1820, "color": "red", "risk": "Critical 99%", "rad": 1800},
@@ -283,7 +283,7 @@ with tab1:
             fill_color=spot["color"],
             fill_opacity=0.35,
             popup=f"<b>{spot['name']}</b><br>Hazard Level: {spot['risk']}",
-        ).addTo(m)
+        ).add_to(m)
 
         folium.CircleMarker(
             location=[spot["lat"], spot["lon"]],
@@ -294,7 +294,7 @@ with tab1:
             fill_color=spot["color"],
             fill_opacity=0.9,
             tooltip=f"{spot['name']} // {spot['risk']}",
-        ).addTo(m)
+        ).add_to(m)
 
     # Downstream Debris Flow Runout Axis (Iruvaipuzha Channel Corridor - Idea 2)
     debris_axis = [
@@ -312,7 +312,7 @@ with tab1:
         opacity=0.9,
         dash_array="8, 6",
         tooltip="🌊 Iruvaipuzha High-Momentum Debris Channel (6.1 km Runout)",
-    ).addTo(m)
+    ).add_to(m)
 
     runout_waypoints = [
         {"name": "1. Vellarimala Apex (1480m)", "lat": 11.528, "lon": 76.142, "eta": "T = 0 min", "vel": "18.5 m/s", "p": "142 kPa", "status": "IMMEDIATE DEVASTATION"},
@@ -333,9 +333,9 @@ with tab1:
             fill_opacity=1.0,
             tooltip=f"{wp['name']} | ETA: {wp['eta']} | Velocity: {wp['vel']} | Impact: {wp['p']}",
             popup=f"<b>{wp['name']}</b><br>ETA: {wp['eta']}<br>Flow Velocity: {wp['vel']}<br>Impact Pressure: {wp['p']}<br>Status: <b>{wp['status']}</b>",
-        ).addTo(m)
+        ).add_to(m)
 
-    folium.LayerControl(position="topright").addTo(m)
+    folium.LayerControl(position="topright").add_to(m)
     st_folium(m, width="100%", height=520)
 
     with st.expander("🌊 Downstream Debris Flow Runout Routing Analysis (Vellarimala → Chooralmala Corridor)", expanded=True):
