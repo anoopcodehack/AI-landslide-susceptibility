@@ -21,6 +21,7 @@ class PredictionRequest(BaseModel):
 
     # Geotechnical & hydrological parameters
     soil: float | None = Field(default=2.0, ge=0, description="Soil type / cohesion factor (Default: 2.0 Loam)")
+    soil_moisture: float | None = Field(default=None, ge=0, description="Soil moisture ratio / saturation")
     twi: float | None = Field(default=10.5, ge=-20, le=40, description="Topographic Wetness Index")
     dist_stream_m: float | None = Field(default=120.0, ge=0, le=100000, description="Distance to nearest drainage stream in metres")
 
@@ -32,6 +33,8 @@ class PredictionRequest(BaseModel):
         return 0.0
 
     def get_soil_value(self) -> float:
+        if self.soil_moisture is not None:
+            return float(self.soil_moisture)
         return float(self.soil if self.soil is not None else 2.0)
 
 
