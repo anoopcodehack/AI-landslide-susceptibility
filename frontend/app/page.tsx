@@ -135,7 +135,6 @@ export default function DashboardPage() {
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-black leading-[1.08]">
                 Your terrain has vulnerabilities. <br />
                 Your infrastructure needs precision.
-                <span className="w-3 h-6 md:h-8 bg-black inline-block ml-1.5 align-middle" />
               </h1>
 
               {/* Subtitle */}

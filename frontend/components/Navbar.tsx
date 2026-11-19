@@ -73,8 +73,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
       </div>
 
-      {/* Right Action Controls */}
-      <div className="hidden sm:flex items-center gap-3">
+      {/* Right Action Controls (Desktop lg+) */}
+      <div className="hidden lg:flex items-center gap-2.5 xl:gap-3">
         {/* Civil Defense Early Warning Notification Drawer */}
         <AlertBellDrawer />
 
@@ -106,12 +106,12 @@ export const Navbar: React.FC<NavbarProps> = ({
         </Link>
       </div>
 
-      {/* Mobile Hamburger Toggle Button */}
+      {/* Mobile / Tablet Controls (< lg) */}
       <div className="lg:hidden flex items-center gap-2">
         <AlertBellDrawer />
         <Link
           href="/radar"
-          className="btn-coder-black px-2.5 py-1 text-xs sm:hidden"
+          className="btn-coder-black px-2.5 py-1 text-xs"
         >
           Radar
         </Link>

@@ -799,8 +799,7 @@ export default function RadarPage() {
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-1" />
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-black">
-              Wayanad GIS Radar.
-              <span className="w-3 h-6 md:h-7 bg-black inline-block ml-1.5 align-middle" />
+              Wayanad GIS Radar
             </h1>
             <p className="text-sm sm:text-base text-zinc-600 max-w-3xl mt-2 font-normal leading-relaxed">
               Tactical geospatial observation platform integrating NASA SRTM digital elevation with Sentinel-2
