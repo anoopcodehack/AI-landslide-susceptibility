@@ -13,8 +13,13 @@ import {
   Zap,
   Send,
   CheckCircle2,
+  Smartphone,
+  RefreshCw,
+  ExternalLink,
 } from "lucide-react";
-import { sendTelegramAlert } from "@/lib/api";
+import { sendTelegramAlert, autoDetectTelegramChat } from "@/lib/api";
+
+const DEFAULT_BOT_TOKEN = "8792643988:AAGT1vj7yD6AsIh8ND72VvssIwCpWG1DGtU";
 
 export const AlertBellDrawer: React.FC = () => {
   const {
@@ -31,21 +36,43 @@ export const AlertBellDrawer: React.FC = () => {
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // Telegram Bot State
-  const [telegramToken, setTelegramToken] = useState<string>("");
+  const [telegramToken, setTelegramToken] = useState<string>(DEFAULT_BOT_TOKEN);
   const [telegramChatId, setTelegramChatId] = useState<string>("");
   const [telegramStatus, setTelegramStatus] = useState<string | null>(null);
   const [telegramLoading, setTelegramLoading] = useState<boolean>(false);
+  const [detectingChat, setDetectingChat] = useState<boolean>(false);
   const [showTelegramConfig, setShowTelegramConfig] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
     if (typeof window !== "undefined") {
-      const savedToken = localStorage.getItem("geoshield_telegram_token") || "";
+      const savedToken = localStorage.getItem("geoshield_telegram_token") || DEFAULT_BOT_TOKEN;
       const savedChat = localStorage.getItem("geoshield_telegram_chat_id") || "";
-      if (savedToken) setTelegramToken(savedToken);
+      setTelegramToken(savedToken);
       if (savedChat) setTelegramChatId(savedChat);
     }
   }, []);
+
+  const handleAutoDetectChat = async () => {
+    setDetectingChat(true);
+    setTelegramStatus(null);
+    try {
+      const res = await autoDetectTelegramChat(telegramToken);
+      if (res.ok && res.detected && res.chat_id) {
+        setTelegramChatId(res.chat_id);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("geoshield_telegram_chat_id", res.chat_id);
+        }
+        setTelegramStatus(`Detected recipient: ${res.user || "You"} (Chat ID: ${res.chat_id})`);
+      } else {
+        setTelegramStatus(res.detail || "Open @GeoShield_Warning_Bot on Telegram and tap 'Start', then try again.");
+      }
+    } catch (err: any) {
+      setTelegramStatus(`Detection failed: ${err.message}`);
+    } finally {
+      setDetectingChat(false);
+    }
+  };
 
   const handleDispatchTelegram = async () => {
     setTelegramLoading(true);
@@ -229,29 +256,63 @@ export const AlertBellDrawer: React.FC = () => {
             </div>
 
             {showTelegramConfig && (
-              <div className="space-y-2 mb-2.5 pt-2 border-t border-zinc-200">
-                <div>
-                  <label className="text-[10px] text-zinc-500 block mb-0.5 font-semibold">BOT TOKEN (@BotFather)</label>
-                  <input
-                    type="password"
-                    placeholder="123456789:ABCdefGhIJKlmNoPQRstuVWXyz"
-                    value={telegramToken}
-                    onChange={(e) => {
-                      setTelegramToken(e.target.value);
-                      if (typeof window !== "undefined") localStorage.setItem("geoshield_telegram_token", e.target.value);
-                    }}
-                    className="w-full px-2 py-1 text-[11px] rounded border border-zinc-300 font-mono focus:outline-none focus:border-black bg-white"
-                  />
+              <div className="space-y-2.5 mb-2.5 pt-2 border-t border-zinc-200">
+                <div className="p-2 bg-blue-50/70 border border-blue-200/60 rounded text-[10.5px] text-blue-900 leading-snug">
+                  <div className="font-bold flex items-center gap-1 mb-0.5">
+                    <Smartphone className="w-3 h-3 text-blue-600" />
+                    <span>Quick 1-Step Telegram Connect:</span>
+                  </div>
+                  <div>
+                    1. Open{" "}
+                    <a
+                      href="https://t.me/GeoShield_Warning_Bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold underline text-blue-800"
+                    >
+                      @GeoShield_Warning_Bot
+                    </a>{" "}
+                    on Telegram and press <strong>Start</strong>.
+                  </div>
+                  <div>
+                    2. Click <strong>Auto-Detect Phone</strong> below!
+                  </div>
                 </div>
+
                 <div>
-                  <label className="text-[10px] text-zinc-500 block mb-0.5 font-semibold">CHAT ID (@userinfobot / Channel)</label>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <label className="text-[10px] text-zinc-500 font-semibold">RECIPIENT CHAT ID</label>
+                    <button
+                      type="button"
+                      onClick={handleAutoDetectChat}
+                      disabled={detectingChat}
+                      className="text-[10px] text-blue-600 font-bold hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-2.5 h-2.5 ${detectingChat ? "animate-spin" : ""}`} />
+                      <span>{detectingChat ? "Checking..." : "Auto-Detect Phone"}</span>
+                    </button>
+                  </div>
                   <input
                     type="text"
-                    placeholder="e.g. 987654321"
+                    placeholder="Click 'Auto-Detect' or enter Chat ID (e.g. 987654321)"
                     value={telegramChatId}
                     onChange={(e) => {
                       setTelegramChatId(e.target.value);
                       if (typeof window !== "undefined") localStorage.setItem("geoshield_telegram_chat_id", e.target.value);
+                    }}
+                    className="w-full px-2 py-1 text-[11px] rounded border border-zinc-300 font-mono focus:outline-none focus:border-black bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-zinc-500 block mb-0.5 font-semibold">BOT TOKEN (Preset to @GeoShield_Warning_Bot)</label>
+                  <input
+                    type="password"
+                    placeholder="Bot API Token"
+                    value={telegramToken}
+                    onChange={(e) => {
+                      setTelegramToken(e.target.value);
+                      if (typeof window !== "undefined") localStorage.setItem("geoshield_telegram_token", e.target.value);
                     }}
                     className="w-full px-2 py-1 text-[11px] rounded border border-zinc-300 font-mono focus:outline-none focus:border-black bg-white"
                   />

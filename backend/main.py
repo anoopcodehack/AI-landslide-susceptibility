@@ -5,6 +5,9 @@ import os
 from pathlib import Path
 from typing import Any, Literal
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import joblib
 import numpy as np
 import pandas as pd
@@ -891,3 +894,45 @@ def dispatch_telegram_alert(payload: TelegramAlertRequest):
             telegram_response=None,
             detail=f"Connection failure to Telegram API: {str(exc)}"
         )
+
+
+@app.get("/api/v1/alerts/telegram/updates")
+def get_telegram_updates(bot_token: str | None = None):
+    """
+    Check recent updates from Telegram Bot to auto-detect user's chat_id.
+    """
+    token = bot_token or os.environ.get("TELEGRAM_BOT_TOKEN")
+    if not token:
+        return {"ok": False, "detail": "Bot token not configured"}
+    try:
+        resp = requests.get(f"https://api.telegram.org/bot{token}/getUpdates", timeout=6)
+        data = resp.json()
+        if not data.get("ok"):
+            return {"ok": False, "detail": data.get("description", "Error querying Telegram")}
+
+        results = data.get("result", [])
+        if not results:
+            return {
+                "ok": True,
+                "detected": False,
+                "detail": "No recent messages. Please send '/start' or a message to @GeoShield_Warning_Bot on Telegram first.",
+                "bot_username": "GeoShield_Warning_Bot",
+            }
+
+        # Grab latest chat
+        latest_msg = results[-1].get("message", {}) or results[-1].get("channel_post", {})
+        chat = latest_msg.get("chat", {})
+        chat_id = str(chat.get("id"))
+        first_name = chat.get("first_name", "")
+        username = chat.get("username", "")
+
+        return {
+            "ok": True,
+            "detected": True,
+            "chat_id": chat_id,
+            "user": first_name or username,
+            "bot_username": "GeoShield_Warning_Bot",
+            "detail": f"Detected Chat ID {chat_id} from {first_name or username}",
+        }
+    except Exception as exc:
+        return {"ok": False, "detail": str(exc)}

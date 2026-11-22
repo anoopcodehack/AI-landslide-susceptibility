@@ -43,3 +43,22 @@ export async function sendTelegramAlert(
   }
   return res.json();
 }
+
+/**
+ * Check recent Telegram updates to auto-detect the user's chat_id
+ */
+export async function autoDetectTelegramChat(botToken?: string): Promise<{
+  ok: boolean;
+  detected?: boolean;
+  chat_id?: string;
+  user?: string;
+  bot_username?: string;
+  detail: string;
+}> {
+  const query = botToken ? `?bot_token=${encodeURIComponent(botToken)}` : "";
+  const res = await fetch(`${API_BASE_URL}/api/v1/alerts/telegram/updates${query}`);
+  if (!res.ok) {
+    return { ok: false, detail: "Failed to connect to backend updates API" };
+  }
+  return res.json();
+}
