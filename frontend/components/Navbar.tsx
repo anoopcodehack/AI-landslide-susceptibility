@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowUpRight } from "lucide-react";
@@ -21,6 +21,26 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [jumpingLetter, setJumpingLetter] = useState<number | null>(null);
+  const [hasEntered, setHasEntered] = useState<boolean>(false);
+
+  const brandLetters = ["G", "E", "O", "S", "H", "I", "E", "L", "D"];
+
+  useEffect(() => {
+    // Release entrance animation lock after all letters drop into place
+    const timer = setTimeout(() => {
+      setHasEntered(true);
+    }, 1300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const triggerJump = (index: number) => {
+    if (jumpingLetter !== null) return;
+    setJumpingLetter(index);
+    setTimeout(() => {
+      setJumpingLetter(null);
+    }, 450);
+  };
 
   const navLinks = [
     { name: "Overview", href: "/", shortcut: "" },
@@ -32,17 +52,41 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="coder-white-header sticky top-0 z-40 px-6 md:px-12 py-3.5 flex items-center justify-between border-b border-zinc-200/80 bg-white/95 backdrop-blur-md">
-      {/* Brand: GEOSHIELD */}
+      {/* Brand: GEOSHIELD with Staggered Entrance & Contained Bouncing 'D' on Hover */}
       <div className="flex items-center gap-8">
         <Link
           href="/"
           className="flex items-center gap-2 cursor-pointer select-none group"
         >
-          <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs shadow-xs">
+          <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs shadow-xs group-hover:scale-105 transition-transform">
             GS
           </div>
-          <span className="text-lg font-black tracking-tight text-black uppercase font-sans group-hover:opacity-85 transition-opacity">
-            GeoShield
+          <span className="text-xl font-black tracking-tight text-black uppercase font-mono flex items-center">
+            {brandLetters.map((char, index) => {
+              const isD = char === "D" || index === brandLetters.length - 1;
+              const isJumping = jumpingLetter === index;
+              return (
+                <span
+                  key={index}
+                  style={!hasEntered ? { animationDelay: `${index * 0.08}s` } : undefined}
+                  onMouseEnter={() => {
+                    if (isD) triggerJump(index);
+                  }}
+                  className={`inline-block select-none transition-colors duration-150 ${
+                    !hasEntered ? "nav-letter-drop" : ""
+                  } ${
+                    isJumping
+                      ? "animate-jump text-emerald-600"
+                      : isD
+                      ? "hover:text-emerald-600 cursor-pointer"
+                      : "hover:text-zinc-700 cursor-default"
+                  }`}
+                  title={isD ? "D" : undefined}
+                >
+                  {char}
+                </span>
+              );
+            })}
           </span>
         </Link>
 
