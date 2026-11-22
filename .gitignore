@@ -2,7 +2,15 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+# Environment & Secrets
 .env
+.env.*
+*.env
+.env.local
+.env.*.local
+frontend/.env
+frontend/.env.*
+frontend/*.env
 .streamlit/
 data/raw/*
 data/processed/*

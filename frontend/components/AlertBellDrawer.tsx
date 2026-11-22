@@ -19,8 +19,8 @@ import {
 } from "lucide-react";
 import { sendTelegramAlert, autoDetectTelegramChat } from "@/lib/api";
 
-const DEFAULT_BOT_TOKEN = "8792643988:AAGT1vj7yD6AsIh8ND72VvssIwCpWG1DGtU";
-const DEFAULT_CHAT_ID = "6564249620";
+const DEFAULT_BOT_TOKEN = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN || "";
+const DEFAULT_CHAT_ID = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID || "";
 
 export const AlertBellDrawer: React.FC = () => {
   const {

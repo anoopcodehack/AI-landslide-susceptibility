@@ -274,8 +274,8 @@ Timestamp: 2026-11-22T12:45:00 UTC | GeoShield Autonomous Early Warning Network
 * Create or retrieve your bot token from [`@BotFather`](https://t.me/BotFather).
 * Add to `.env` or system environment variables:
   ```env
-  TELEGRAM_BOT_TOKEN="8792643988:AAGT1vj7yD6AsIh8ND72VvssIwCpWG1DGtU"
-  TELEGRAM_CHAT_ID="6564249620"
+  TELEGRAM_BOT_TOKEN="your_bot_token_from_botfather"
+  TELEGRAM_CHAT_ID="your_telegram_chat_id"
   ```
 * Start the bot by opening [`t.me/GeoShield_Warning_Bot`](https://t.me/GeoShield_Warning_Bot) and tapping `/start`.
 * Query `GET /api/v1/alerts/telegram/updates` to automatically detect incoming chat IDs without manual lookup.
