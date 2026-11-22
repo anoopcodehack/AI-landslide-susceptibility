@@ -252,8 +252,8 @@ def test_telegram_alert_simulation_and_formatting() -> None:
         susceptibility_pct=96.4,
         message_en="Immediate valley-floor evacuation order active. Relocate to Meppadi relief shelter.",
         message_kn="ತೀವ್ರ ಭೂಕುಸಿತದ ಸಾಧ್ಯತೆ ಇರುವುದರಿಂದ ನದಿ ಪಾತ್ರದ ನಿವಾಸಿಗಳು ತಕ್ಷಣ ಸುರಕ್ಷಿತ ಸ್ಥಳಗಳಿಗೆ ತೆರಳಿ.",
-        bot_token=None,
-        chat_id=None,
+        bot_token="SIMULATED",
+        chat_id="SIMULATED",
     )
     res = dispatch_telegram_alert(req)
     assert res.status == "SIMULATED"

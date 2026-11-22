@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Bell,
@@ -15,6 +15,10 @@ import {
   RotateCcw,
   Sliders,
 } from "lucide-react";
+import { sendTelegramAlert } from "@/lib/api";
+
+const DEFAULT_BOT_TOKEN = "8792643988:AAGT1vj7yD6AsIh8ND72VvssIwCpWG1DGtU";
+const DEFAULT_CHAT_ID = "6564249620";
 
 export interface CivilAlert {
   id: string;
@@ -116,6 +120,7 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [activeToast, setActiveToast] = useState<CivilAlert | null>(null);
   const [audioEnabled, setAudioEnabled] = useState<boolean>(true);
+  const lastTelegramDispatchRef = useRef<number>(0);
 
   const toggleAudio = () => setAudioEnabled((prev) => !prev);
 
@@ -142,6 +147,46 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         });
       } catch {
         // Fallback
+      }
+    }
+
+    // AUTOMATIC TELEGRAM BROADCAST: Dispatch RED and ORANGE civil alerts instantly to Telegram!
+    if (alert.level === "RED" || alert.level === "ORANGE") {
+      const now = Date.now();
+      // Throttle rapid repeated triggers within 4 seconds to prevent flood
+      if (now - lastTelegramDispatchRef.current > 4000) {
+        lastTelegramDispatchRef.current = now;
+
+        const token = (typeof window !== "undefined" && localStorage.getItem("geoshield_telegram_token")) || DEFAULT_BOT_TOKEN;
+        const chatId = (typeof window !== "undefined" && localStorage.getItem("geoshield_telegram_chat_id")) || DEFAULT_CHAT_ID;
+
+        const messageKn = alert.messageKn || (
+          alert.level === "RED"
+            ? "ತೀವ್ರ 372 ಮಿಮೀ ಭಾರಿ ಮಳೆಯಿಂದ ಮಣ್ಣು ಸಡಿಲಗೊಂಡಿದೆ. ಇರುವಾಂಝಿಪುಳ ನದಿ ಪಾತ್ರದಲ್ಲಿ (ಚೂರಲ್ಮಲಾ ಮತ್ತು ಮುಂಡಕ್ಕೈ) ತೀವ್ರ ಭೂಕುಸಿತ ಸಂಭವಿಸುವ ಸಾಧ್ಯತೆಯಿದೆ. ತಕ್ಷಣ ಸುರಕ್ಷಿತ ಸ್ಥಳಕ್ಕೆ ತೆರಳಿ."
+            : "ವಯನಾಡು ಕಣಿವೆ ಪ್ರದೇಶದಲ್ಲಿ ಭಾರಿ ಮಳೆ ಮುಂದುವರಿದಿದ್ದು, ಮಣ್ಣಿನ ಸವೆತ ಮತ್ತು ಭೂಕುಸಿತದ ಸಾಧ್ಯತೆ ಹೆಚ್ಚಾಗಿದೆ. ಎಚ್ಚರಿಕೆ ವಹಿಸಿ."
+        );
+
+        const sectorKn = alert.sectorKn || (
+          alert.sector?.toLowerCase().includes("chooralmala")
+            ? "ಚೂರಲ್ಮಲಾ ಮತ್ತು ಮುಂಡಕ್ಕೈ ಕಾರಿಡಾರ್"
+            : alert.sector?.toLowerCase().includes("vythiri")
+            ? "ವೈತಿರಿ ಘಾಟ್ ವಲಯ"
+            : "ವಯನಾಡು ಜಿಲ್ಲಾ ವಲಯ"
+        );
+
+        sendTelegramAlert({
+          level: alert.level,
+          sector: alert.sector || "Chooralmala & Mundakkai (6.1 km Axis)",
+          sector_kn: sectorKn,
+          rainfall_mm: alert.rainfallMm || (alert.level === "RED" ? 372.0 : 185.0),
+          susceptibility_pct: alert.susceptibilityPct || (alert.level === "RED" ? 96.4 : 74.2),
+          message_en: alert.message,
+          message_kn: messageKn,
+          bot_token: token,
+          chat_id: chatId,
+        }).catch((err) => {
+          console.warn("[GeoShield] Automatic Telegram alert dispatch error:", err);
+        });
       }
     }
   };

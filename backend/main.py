@@ -828,8 +828,8 @@ def dispatch_telegram_alert(payload: TelegramAlertRequest):
     to Telegram Bot API without emoji spam.
     Supports dynamic bot_token/chat_id from request or environment variables.
     """
-    bot_token = payload.bot_token or os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = payload.chat_id or os.environ.get("TELEGRAM_CHAT_ID")
+    bot_token = payload.bot_token if payload.bot_token is not None else os.environ.get("TELEGRAM_BOT_TOKEN")
+    chat_id = payload.chat_id if payload.chat_id is not None else os.environ.get("TELEGRAM_CHAT_ID")
 
     level_en = "CRITICAL HAZARD" if payload.level == "RED" else "CIVIL DEFENSE WATCH" if payload.level == "ORANGE" else "ADVISORY"
     level_kn = "ತೀವ್ರ ಅಪಾಯ" if payload.level == "RED" else "ಮುನ್ನೆಚ್ಚರಿಕೆ" if payload.level == "ORANGE" else "ಸಾಮಾನ್ಯ ಸ್ಥಿತಿ"
@@ -852,13 +852,13 @@ def dispatch_telegram_alert(payload: TelegramAlertRequest):
         f"GeoShield AI // Early Warning & Civil Defense Mesh"
     )
 
-    if not bot_token or not chat_id:
+    if not bot_token or not chat_id or bot_token == "SIMULATED" or chat_id == "SIMULATED":
         return TelegramAlertResponse(
             status="SIMULATED",
             recipient_chat_id=chat_id or "Not configured",
             formatted_message=formatted_message,
             telegram_response=None,
-            detail="Bilingual alert generated successfully. To receive on phone, configure Telegram Bot Token and Chat ID."
+            detail="Bilingual alert generated successfully in Simulation Mode."
         )
 
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -868,7 +868,7 @@ def dispatch_telegram_alert(payload: TelegramAlertRequest):
     }
 
     try:
-        resp = requests.post(url, json=data, timeout=8)
+        resp = requests.post(url, json=data, timeout=3.0)
         resp_json = resp.json()
         if resp.status_code == 200 and resp_json.get("ok"):
             return TelegramAlertResponse(
