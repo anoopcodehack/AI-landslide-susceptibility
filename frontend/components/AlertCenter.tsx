@@ -20,9 +20,14 @@ export interface CivilAlert {
   id: string;
   level: "GREEN" | "YELLOW" | "ORANGE" | "RED";
   title: string;
+  titleKn?: string;
   message: string;
+  messageKn?: string;
   timestamp: string;
   sector?: string;
+  sectorKn?: string;
+  rainfallMm?: number;
+  susceptibilityPct?: number;
   actionUrl?: string;
 }
 
@@ -97,9 +102,14 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       id: "baseline-01",
       level: "GREEN",
       title: "Atmospheric Telemetry Nominal",
+      titleKn: "ವಾತಾವರಣ ಟೆಲಿಮೆಟ್ರಿ ಸಹಜ ಸ್ಥಿತಿ",
       message: "Open-Meteo AWS #04 synoptic telemetry confirms 2.8mm/24h rainfall. Soil pore-pressure within baseline stability envelope across Wayanad.",
+      messageKn: "ಓಪನ್-ಮೆಟಿಯೋ ಹವಾಮಾನ ಕೇಂದ್ರ #04 ರ ಪ್ರಕಾರ 2.8 ಮಿಮೀ ಮಳೆಯಾಗಿದೆ. ವಯನಾಡಿನಲ್ಲಿ ಮಣ್ಣಿನ ಒತ್ತಡ ಸಹಜ ಮಟ್ಟದಲ್ಲಿದೆ.",
       timestamp: "Today (Live Synoptic)",
       sector: "District-Wide Baseline",
+      sectorKn: "ಜಿಲ್ಲಾವಾರು ಸಹಜ ವಲಯ",
+      rainfallMm: 2.8,
+      susceptibilityPct: 18.2,
       actionUrl: "/radar",
     },
   ]);
@@ -148,8 +158,13 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     triggerAlert({
       level: "RED",
       title: "KSDMA CRITICAL HAZARD // EVACUATION ORDER",
+      titleKn: "ಕೆಎಸ್‌ಡಿಎಂಎ ತೀವ್ರ ಅಪಾಯ // ಸ್ಥಳಾಂತರ ಆದೇಶ",
       message: "Catastrophic 372mm cloudburst saturation detected. High-momentum debris flow runout active along Iruvaipuzha channel (Chooralmala & Mundakkai).",
+      messageKn: "ತೀವ್ರ 372 ಮಿಮೀ ಭಾರಿ ಮಳೆಯಿಂದ ಮಣ್ಣು ಸಡಿಲಗೊಂಡಿದೆ. ಇರುವಾಂಝಿಪುಳ ನದಿ ಪಾತ್ರದಲ್ಲಿ (ಚೂರಲ್ಮಲಾ ಮತ್ತು ಮುಂಡಕ್ಕೈ) ತೀವ್ರ ಭೂಕುಸಿತ ಸಂಭವಿಸುವ ಸಾಧ್ಯತೆಯಿದೆ. ತಕ್ಷಣ ಸುರಕ್ಷಿತ ಸ್ಥಳಕ್ಕೆ ತೆರಳಿ.",
       sector: "Chooralmala & Mundakkai (6.1 km Axis)",
+      sectorKn: "ಚೂರಲ್ಮಲಾ ಮತ್ತು ಮುಂಡಕ್ಕೈ ಕಾರಿಡಾರ್",
+      rainfallMm: 372.0,
+      susceptibilityPct: 96.4,
       actionUrl: "/radar",
     });
   };
@@ -238,6 +253,12 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               <p className="text-[11px] text-zinc-600 font-sans mt-1 leading-relaxed">
                 {activeToast.message}
               </p>
+              {activeToast.messageKn && (
+                <div className="mt-1.5 p-1.5 bg-zinc-50 border border-zinc-200/60 rounded text-[10.5px] text-zinc-700 font-sans leading-relaxed">
+                  <span className="text-[9px] font-mono font-bold text-zinc-400 block uppercase mb-0.5">ಕನ್ನಡ // Kannada Advisory</span>
+                  {activeToast.messageKn}
+                </div>
+              )}
               {activeToast.sector && (
                 <div className="mt-2 text-[10px] text-zinc-500 flex items-center gap-1.5">
                   <span className="text-zinc-400 uppercase">Sector:</span>

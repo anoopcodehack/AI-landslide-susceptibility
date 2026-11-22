@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+import os
 from pathlib import Path
 from typing import Any, Literal
 
@@ -25,6 +26,8 @@ from backend.schemas import (
     RunoutWaypoint,
     SimulationRequest,
     SimulationResponse,
+    TelegramAlertRequest,
+    TelegramAlertResponse,
 )
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -813,3 +816,78 @@ def get_chooralmala_runout():
         evacuation_lead_time_min=14.0,
         advisory="CRITICAL CHANNEL ROUTING: High-velocity boulder slurry wave propagates along the Iruvaipuzha tributary axis. Valley floor settlements with <12° local slope are within direct inundation path. Immediate evacuation from riverbanks to elevated ridges required.",
     )
+
+
+@app.post("/api/v1/alerts/telegram", response_model=TelegramAlertResponse)
+def dispatch_telegram_alert(payload: TelegramAlertRequest):
+    """
+    Dispatch official bilingual (English + Kannada) Civil Defense early warning alert
+    to Telegram Bot API without emoji spam.
+    Supports dynamic bot_token/chat_id from request or environment variables.
+    """
+    bot_token = payload.bot_token or os.environ.get("TELEGRAM_BOT_TOKEN")
+    chat_id = payload.chat_id or os.environ.get("TELEGRAM_CHAT_ID")
+
+    level_en = "CRITICAL HAZARD" if payload.level == "RED" else "CIVIL DEFENSE WATCH" if payload.level == "ORANGE" else "ADVISORY"
+    level_kn = "ತೀವ್ರ ಅಪಾಯ" if payload.level == "RED" else "ಮುನ್ನೆಚ್ಚರಿಕೆ" if payload.level == "ORANGE" else "ಸಾಮಾನ್ಯ ಸ್ಥಿತಿ"
+
+    sector_display = f"{payload.sector} ({payload.sector_kn})" if payload.sector_kn else payload.sector
+
+    # Clean, professional formatting without excessive emojis (as requested by user)
+    formatted_message = (
+        f"[KSDMA CIVIL DEFENSE ALERT // ತುರ್ತು ವಿಪತ್ತು ಎಚ್ಚರಿಕೆ]\n"
+        f"--------------------------------------------------\n"
+        f"Sector / ಪ್ರದೇಶ: {sector_display}\n"
+        f"Hazard Level / ಅಪಾಯದ ಮಟ್ಟ: {level_en} ({level_kn})\n"
+        f"24h Rainfall / ಮಳೆ ಪ್ರಮಾಣ: {payload.rainfall_mm:.1f} mm\n"
+        f"AI Susceptibility / ಕೃತಕ ಬುದ್ಧಿಮತ್ತೆ ಅಪಾಯ: {payload.susceptibility_pct:.1f}% (XGBoost)\n\n"
+        f"DIRECTIVE (English):\n"
+        f"{payload.message_en}\n\n"
+        f"ತುರ್ತು ನಿರ್ದೇಶನ (ಕನ್ನಡ):\n"
+        f"{payload.message_kn}\n"
+        f"--------------------------------------------------\n"
+        f"GeoShield AI // Early Warning & Civil Defense Mesh"
+    )
+
+    if not bot_token or not chat_id:
+        return TelegramAlertResponse(
+            status="SIMULATED",
+            recipient_chat_id=chat_id or "Not configured",
+            formatted_message=formatted_message,
+            telegram_response=None,
+            detail="Bilingual alert generated successfully. To receive on phone, configure Telegram Bot Token and Chat ID."
+        )
+
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    data = {
+        "chat_id": chat_id,
+        "text": formatted_message,
+    }
+
+    try:
+        resp = requests.post(url, json=data, timeout=8)
+        resp_json = resp.json()
+        if resp.status_code == 200 and resp_json.get("ok"):
+            return TelegramAlertResponse(
+                status="SENT",
+                recipient_chat_id=chat_id,
+                formatted_message=formatted_message,
+                telegram_response=resp_json,
+                detail="Alert successfully broadcasted to Telegram recipient."
+            )
+        else:
+            return TelegramAlertResponse(
+                status="ERROR",
+                recipient_chat_id=chat_id,
+                formatted_message=formatted_message,
+                telegram_response=resp_json,
+                detail=f"Telegram API returned error: {resp_json.get('description', 'Unknown error')}"
+            )
+    except Exception as exc:
+        return TelegramAlertResponse(
+            status="ERROR",
+            recipient_chat_id=chat_id,
+            formatted_message=formatted_message,
+            telegram_response=None,
+            detail=f"Connection failure to Telegram API: {str(exc)}"
+        )

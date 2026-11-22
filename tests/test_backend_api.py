@@ -4,6 +4,7 @@ import pytest
 from backend.main import (
     category_for,
     dashboard_stats,
+    dispatch_telegram_alert,
     explain,
     get_civil_defense_directive,
     get_chooralmala_runout,
@@ -21,7 +22,7 @@ from backend.main import (
     simulate,
     zone_for,
 )
-from backend.schemas import PredictionRequest, SimulationRequest
+from backend.schemas import PredictionRequest, SimulationRequest, TelegramAlertRequest
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -239,3 +240,27 @@ def test_classification_helper_functions() -> None:
     assert zone_for(0.10) == "Low"
     assert zone_for(0.40) == "Moderate"
     assert zone_for(0.80) == "High"
+
+
+def test_telegram_alert_simulation_and_formatting() -> None:
+    """Verify bilingual (English + Kannada) alert formatting without emoji clutter."""
+    req = TelegramAlertRequest(
+        level="RED",
+        sector="Chooralmala & Mundakkai",
+        sector_kn="ಚೂರಲ್ಮಲಾ ಮತ್ತು ಮುಂಡಕ್ಕೈ",
+        rainfall_mm=372.0,
+        susceptibility_pct=96.4,
+        message_en="Immediate valley-floor evacuation order active. Relocate to Meppadi relief shelter.",
+        message_kn="ತೀವ್ರ ಭೂಕುಸಿತದ ಸಾಧ್ಯತೆ ಇರುವುದರಿಂದ ನದಿ ಪಾತ್ರದ ನಿವಾಸಿಗಳು ತಕ್ಷಣ ಸುರಕ್ಷಿತ ಸ್ಥಳಗಳಿಗೆ ತೆರಳಿ.",
+        bot_token=None,
+        chat_id=None,
+    )
+    res = dispatch_telegram_alert(req)
+    assert res.status == "SIMULATED"
+    assert "KSDMA CIVIL DEFENSE ALERT" in res.formatted_message
+    assert "ತುರ್ತು ವಿಪತ್ತು ಎಚ್ಚರಿಕೆ" in res.formatted_message
+    assert "ಚೂರಲ್ಮಲಾ ಮತ್ತು ಮುಂಡಕ್ಕೈ" in res.formatted_message
+    assert "372.0 mm" in res.formatted_message
+    assert "96.4%" in res.formatted_message
+    assert "DIRECTIVE (English):" in res.formatted_message
+    assert "ತುರ್ತು ನಿರ್ದೇಶನ (ಕನ್ನಡ):" in res.formatted_message

@@ -11,7 +11,10 @@ import {
   X,
   ShieldAlert,
   Zap,
+  Send,
+  CheckCircle2,
 } from "lucide-react";
+import { sendTelegramAlert } from "@/lib/api";
 
 export const AlertBellDrawer: React.FC = () => {
   const {
@@ -27,9 +30,53 @@ export const AlertBellDrawer: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  // Telegram Bot State
+  const [telegramToken, setTelegramToken] = useState<string>("");
+  const [telegramChatId, setTelegramChatId] = useState<string>("");
+  const [telegramStatus, setTelegramStatus] = useState<string | null>(null);
+  const [telegramLoading, setTelegramLoading] = useState<boolean>(false);
+  const [showTelegramConfig, setShowTelegramConfig] = useState<boolean>(false);
+
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      const savedToken = localStorage.getItem("geoshield_telegram_token") || "";
+      const savedChat = localStorage.getItem("geoshield_telegram_chat_id") || "";
+      if (savedToken) setTelegramToken(savedToken);
+      if (savedChat) setTelegramChatId(savedChat);
+    }
   }, []);
+
+  const handleDispatchTelegram = async () => {
+    setTelegramLoading(true);
+    setTelegramStatus(null);
+    try {
+      const latest = alerts[0];
+      const res = await sendTelegramAlert({
+        level: latest?.level || "RED",
+        sector: latest?.sector || "Chooralmala & Mundakkai (6.1 km Axis)",
+        sector_kn: latest?.sectorKn || "ಚೂರಲ್ಮಲಾ ಮತ್ತು ಮುಂಡಕ್ಕೈ ಕಾರಿಡಾರ್",
+        rainfall_mm: latest?.rainfallMm || 372.0,
+        susceptibility_pct: latest?.susceptibilityPct || 96.4,
+        message_en: latest?.message || "Immediate valley-floor evacuation order active. Relocate to Meppadi relief shelter.",
+        message_kn: latest?.messageKn || "ತೀವ್ರ ಭೂಕುಸಿತದ ಸಾಧ್ಯತೆ ಇರುವುದರಿಂದ ನದಿ ಪಾತ್ರದ ನಿವಾಸಿಗಳು ತಕ್ಷಣ ಸುರಕ್ಷಿತ ಸ್ಥಳಗಳಿಗೆ ತೆರಳಿ. ಮೆಪ್ಪಾಡಿ ಪರಿಹಾರ ಕೇಂದ್ರಕ್ಕೆ ಸ್ಥಳಾಂತರಗೊಳ್ಳಿ.",
+        bot_token: telegramToken.trim() || undefined,
+        chat_id: telegramChatId.trim() || undefined,
+      });
+
+      if (res.status === "SENT") {
+        setTelegramStatus(`Dispatched live to Telegram: Chat ID ${res.recipient_chat_id}`);
+      } else if (res.status === "SIMULATED") {
+        setTelegramStatus("Simulated Mode: Bilingual alert generated. To receive live on phone, enter Bot Token & Chat ID.");
+      } else {
+        setTelegramStatus(`Telegram Error: ${res.detail}`);
+      }
+    } catch (err: any) {
+      setTelegramStatus(`Failed to send: ${err.message}`);
+    } finally {
+      setTelegramLoading(false);
+    }
+  };
 
   // Close when pressing Escape key and lock body scroll when open
   useEffect(() => {
@@ -165,6 +212,70 @@ export const AlertBellDrawer: React.FC = () => {
             </button>
           </div>
 
+          {/* Telegram Bot Bilingual Alert Dispatch Panel */}
+          <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 shrink-0">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5 font-bold text-black text-[11px]">
+                <Send className="w-3.5 h-3.5 text-blue-600" />
+                <span>Telegram Bot Broadcast (Eng + ಕನ್ನಡ)</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowTelegramConfig(!showTelegramConfig)}
+                className="text-[10px] text-zinc-500 hover:text-black underline font-semibold cursor-pointer"
+              >
+                {showTelegramConfig ? "Hide Config" : "Bot Setup"}
+              </button>
+            </div>
+
+            {showTelegramConfig && (
+              <div className="space-y-2 mb-2.5 pt-2 border-t border-zinc-200">
+                <div>
+                  <label className="text-[10px] text-zinc-500 block mb-0.5 font-semibold">BOT TOKEN (@BotFather)</label>
+                  <input
+                    type="password"
+                    placeholder="123456789:ABCdefGhIJKlmNoPQRstuVWXyz"
+                    value={telegramToken}
+                    onChange={(e) => {
+                      setTelegramToken(e.target.value);
+                      if (typeof window !== "undefined") localStorage.setItem("geoshield_telegram_token", e.target.value);
+                    }}
+                    className="w-full px-2 py-1 text-[11px] rounded border border-zinc-300 font-mono focus:outline-none focus:border-black bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-zinc-500 block mb-0.5 font-semibold">CHAT ID (@userinfobot / Channel)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 987654321"
+                    value={telegramChatId}
+                    onChange={(e) => {
+                      setTelegramChatId(e.target.value);
+                      if (typeof window !== "undefined") localStorage.setItem("geoshield_telegram_chat_id", e.target.value);
+                    }}
+                    className="w-full px-2 py-1 text-[11px] rounded border border-zinc-300 font-mono focus:outline-none focus:border-black bg-white"
+                  />
+                </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleDispatchTelegram}
+              disabled={telegramLoading}
+              className="w-full py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors text-[11px] font-bold flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-60"
+            >
+              <Send className="w-3 h-3" />
+              <span>{telegramLoading ? "Dispatching..." : "Send Bilingual Alert to Telegram"}</span>
+            </button>
+
+            {telegramStatus && (
+              <div className="mt-2 p-2 rounded bg-white border border-zinc-200 text-[10px] text-zinc-700 font-mono leading-relaxed">
+                {telegramStatus}
+              </div>
+            )}
+          </div>
+
           {/* Notification Feed List */}
           <div className="pt-2">
             <div className="flex items-center justify-between mb-2 text-[10px] text-zinc-400 uppercase font-bold tracking-wider">
@@ -201,6 +312,15 @@ export const AlertBellDrawer: React.FC = () => {
                     <p className="text-[11px] text-zinc-600 font-sans leading-relaxed">
                       {item.message}
                     </p>
+
+                    {item.messageKn && (
+                      <div className="mt-1.5 p-2 rounded bg-white/80 border border-zinc-200/60 text-[10.5px] text-zinc-700 font-sans leading-relaxed">
+                        <span className="text-[9px] font-mono font-bold text-zinc-400 block uppercase mb-0.5">
+                          ಕನ್ನಡ // Kannada Advisory
+                        </span>
+                        {item.messageKn}
+                      </div>
+                    )}
 
                     <div className="mt-2 pt-2 border-t border-zinc-200/60 flex items-center justify-between text-[10px]">
                       <span className="text-zinc-500 font-semibold">{item.sector}</span>

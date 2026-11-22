@@ -148,3 +148,24 @@ class DebrisRunoutSimulation(BaseModel):
     affected_waypoints: list[RunoutWaypoint]
     evacuation_lead_time_min: float
     advisory: str
+
+
+class TelegramAlertRequest(BaseModel):
+    """Payload for multi-lingual (English + Kannada) Civil Defense Telegram broadcast."""
+    level: Literal["RED", "ORANGE", "YELLOW", "GREEN"] = "RED"
+    sector: str = "Chooralmala & Mundakkai"
+    sector_kn: str | None = "ಚೂರಲ್ಮಲಾ ಮತ್ತು ಮುಂಡಕ್ಕೈ"
+    rainfall_mm: float = 372.0
+    susceptibility_pct: float = 96.4
+    message_en: str = "Immediate valley-floor evacuation order active. High-momentum debris flow runout detected along river corridor. Relocate to Meppadi relief shelter."
+    message_kn: str = "ತೀವ್ರ ಭೂಕುಸಿತ ಮತ್ತು ಮಣ್ಣಿನ ಹರಿವಿನ ಸಾಧ್ಯತೆ ಇರುವುದರಿಂದ ನದಿ ಪಾತ್ರದ ನಿವಾಸಿಗಳು ತಕ್ಷಣ ಸುರಕ್ಷಿತ ಸ್ಥಳಗಳಿಗೆ ತೆರಳಿ. ಮೆಪ್ಪಾಡಿ ಪರಿಹಾರ ಕೇಂದ್ರಕ್ಕೆ ತಕ್ಷಣ ಸ್ಥಳಾಂತರಗೊಳ್ಳಿ."
+    bot_token: str | None = None
+    chat_id: str | None = None
+
+
+class TelegramAlertResponse(BaseModel):
+    status: Literal["SENT", "SIMULATED", "ERROR"]
+    recipient_chat_id: str | None
+    formatted_message: str
+    telegram_response: dict | None = None
+    detail: str
