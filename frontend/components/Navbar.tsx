@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, ArrowUpRight, Globe } from "lucide-react";
 import { AlertBellDrawer } from "./AlertBellDrawer";
+import { useLanguage } from "@/lib/LanguageContext";
 
 interface NavbarProps {
   activeTab?: string;
@@ -20,6 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   backendOnline = true,
 }) => {
   const pathname = usePathname();
+  const { language, setLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [jumpingLetter, setJumpingLetter] = useState<number | null>(null);
   const [hasEntered, setHasEntered] = useState<boolean>(false);
@@ -43,11 +45,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const navLinks = [
-    { name: "Overview", href: "/", shortcut: "" },
-    { name: "GIS Radar", href: "/radar", shortcut: "M" },
-    { name: "XAI Diagnostics", href: "/diagnostics", shortcut: "X" },
-    { name: "Simulation Studio", href: "/simulation", shortcut: "S" },
-    { name: "Governance & SDGs", href: "/governance", shortcut: "" },
+    { name: t("nav_overview"), href: "/", shortcut: "" },
+    { name: t("nav_radar"), href: "/radar", shortcut: "M" },
+    { name: t("nav_diagnostics"), href: "/diagnostics", shortcut: "X" },
+    { name: t("nav_simulation"), href: "/simulation", shortcut: "S" },
+    { name: t("nav_governance"), href: "/governance", shortcut: "" },
   ];
 
   return (
@@ -116,6 +118,32 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Right Action Controls (Desktop lg+) */}
       <div className="hidden lg:flex items-center gap-2.5 xl:gap-3">
+        {/* Bilingual Language Switcher (EN | ಕನ್ನಡ) */}
+        <div className="flex items-center rounded-full bg-zinc-100 p-0.5 border border-zinc-200/90 shadow-2xs font-sans text-xs">
+          <button
+            onClick={() => setLanguage("en")}
+            className={`px-2.5 py-0.5 rounded-full font-bold transition-all ${
+              language === "en"
+                ? "bg-black text-white shadow-xs"
+                : "text-zinc-600 hover:text-black"
+            }`}
+            title="Switch to English"
+          >
+            EN
+          </button>
+          <button
+            onClick={() => setLanguage("kn")}
+            className={`px-2.5 py-0.5 rounded-full font-bold transition-all ${
+              language === "kn"
+                ? "bg-black text-white shadow-xs"
+                : "text-zinc-600 hover:text-black"
+            }`}
+            title="ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಿ (Switch to Kannada)"
+          >
+            ಕನ್ನಡ
+          </button>
+        </div>
+
         {/* Civil Defense Early Warning Notification Drawer */}
         <AlertBellDrawer />
 
@@ -123,7 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 text-xs font-medium text-zinc-700 border border-zinc-200 shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="font-mono text-[11px]">
-            {backendOnline ? "Cluster Online • 12ms" : "Telemetry Active"}
+            {backendOnline ? t("cluster_online") : t("telemetry_active")}
           </span>
         </div>
 
@@ -134,7 +162,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             pathname === "/simulation" ? "border-black font-bold text-black" : ""
           }`}
         >
-          Parametric Sim
+          {t("parametric_sim")}
         </Link>
 
         {/* Action Button 2: Launch Radar */}
@@ -143,18 +171,26 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="btn-coder-black px-3.5 py-1.5 text-xs flex items-center gap-1.5 transition-transform active:scale-95"
         >
           <span className="w-2 h-2 bg-white inline-block" />
-          <span>Launch Radar</span>
+          <span>{t("launch_radar")}</span>
         </Link>
       </div>
 
       {/* Mobile / Tablet Controls (< lg) */}
       <div className="lg:hidden flex items-center gap-2">
+        {/* Mobile Language Switcher */}
+        <button
+          onClick={() => setLanguage(language === "en" ? "kn" : "en")}
+          className="px-2 py-1 rounded-md bg-zinc-100 text-zinc-800 text-xs font-bold border border-zinc-200"
+          title="Toggle Language"
+        >
+          {language === "en" ? "ಕನ್ನಡ" : "EN"}
+        </button>
         <AlertBellDrawer />
         <Link
           href="/radar"
           className="btn-coder-black px-2.5 py-1 text-xs"
         >
-          Radar
+          {t("nav_radar")}
         </Link>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

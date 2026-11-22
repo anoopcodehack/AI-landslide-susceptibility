@@ -9,6 +9,7 @@ import { StatsGrid } from "@/components/StatsGrid";
 import { TrendChart, TrendData } from "@/components/TrendChart";
 import { TacticalDock } from "@/components/TacticalDock";
 import { LetterDropLoader } from "@/components/LetterDropLoader";
+import { useLanguage } from "@/lib/LanguageContext";
 import { API_BASE_URL } from "@/lib/api";
 import {
   ArrowUpRight,
@@ -69,6 +70,7 @@ interface DashboardData {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { language, t } = useLanguage();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [backendOnline, setBackendOnline] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -180,15 +182,23 @@ export default function DashboardPage() {
             <div className="lg:col-span-7 space-y-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-zinc-200/90 text-xs font-semibold text-zinc-900 shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Wayanad Early Warning System • Open-Meteo AWS #04 Telemetry</span>
+                <span>
+                  {language === "kn"
+                    ? "ವಯನಾಡು ಮುನ್ಸೂಚನಾ ವ್ಯವಸ್ಥೆ • ನೈಜ-ಸಮಯದ ಹವಾಮಾನ ಟೆಲಿಮೆಟ್ರಿ"
+                    : "Wayanad Early Warning System • Open-Meteo AWS #04 Telemetry"}
+                </span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-zinc-950 leading-tight drop-shadow-2xs">
-                GeoShield AI: Wayanad Landslide Early Warning
+                {language === "kn"
+                  ? "ಜಿಯೋಶೀಲ್ಡ್ AI: ವಯನಾಡು ಭೂಕುಸಿತ ಮುನ್ಸೂಚನಾ ರೇಡಾರ್"
+                  : "GeoShield AI: Wayanad Landslide Early Warning"}
               </h1>
 
               <p className="text-sm sm:text-base text-zinc-900 max-w-xl font-medium leading-relaxed drop-shadow-2xs">
-                Autonomous 30m terrain susceptibility intelligence powered by <strong>XGBoost</strong>, <strong>SHAP TreeExplainer</strong>, and real-time synoptic weather telemetry.
+                {language === "kn"
+                  ? "ಪಶ್ಚಿಮ ಘಟ್ಟಗಳ ವಿಪತ್ತು ವಲಯಗಳಲ್ಲಿ ಭೌತಶಾಸ್ತ್ರ ಆಧಾರಿತ ಯಂತ್ರ ಕಲಿಕೆ (XGBoost), ಶ್ಯಾಪ್ (SHAP) ಕಾರಣ ವಿಶ್ಲೇಷಣೆ ಮತ್ತು ನೈಜ-ಸಮಯದ ಹವಾಮಾನ ಟೆಲಿಮೆಟ್ರಿ."
+                  : "Autonomous 30m terrain susceptibility intelligence powered by XGBoost, SHAP TreeExplainer, and real-time synoptic weather telemetry."}
               </p>
 
               {/* Action Buttons */}
@@ -198,7 +208,7 @@ export default function DashboardPage() {
                   className="px-5 py-3 rounded-xl bg-black text-white text-xs font-semibold flex items-center gap-2 hover:bg-zinc-800 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md"
                 >
                   <Compass className="w-4 h-4 text-emerald-400" />
-                  <span>Launch GIS Tactical Radar</span>
+                  <span>{language === "kn" ? "ಜಿಐಎಸ್ ರೇಡಾರ್ ಪ್ರಾರಂಭಿಸಿ" : "Launch GIS Tactical Radar"}</span>
                   <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
                 </Link>
 
@@ -207,7 +217,7 @@ export default function DashboardPage() {
                   className="px-5 py-3 rounded-xl bg-white/95 hover:bg-white border border-zinc-300 text-zinc-900 text-xs font-semibold flex items-center gap-2 hover:border-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xs backdrop-blur-md"
                 >
                   <Sliders className="w-4 h-4 text-zinc-600" />
-                  <span>What-If Simulator</span>
+                  <span>{language === "kn" ? "ಸಿಮ್ಯುಲೇಶನ್ ಸ್ಟುಡಿಯೋ" : "What-If Simulator"}</span>
                 </Link>
 
                 <Link
@@ -215,7 +225,7 @@ export default function DashboardPage() {
                   className="px-5 py-3 rounded-xl bg-white/90 hover:bg-white border border-zinc-200 text-zinc-800 text-xs font-semibold flex items-center gap-2 transition-all backdrop-blur-md shadow-xs"
                 >
                   <BarChart3 className="w-4 h-4 text-zinc-600" />
-                  <span>AI Benchmarks</span>
+                  <span>{language === "kn" ? "ಮಾದರಿ ಬೆಂಚ್‌ಮಾರ್ಕ್" : "AI Benchmarks"}</span>
                 </Link>
               </div>
 

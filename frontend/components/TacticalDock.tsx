@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Sliders, GitBranch } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 
 interface SectorItem {
   id: string;
@@ -37,6 +38,7 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
   sectors,
   alerts,
 }) => {
+  const { language } = useLanguage();
   const [slopeThreshold, setSlopeThreshold] = useState<number>(32);
 
   const defaultSectors: SectorItem[] = [
@@ -115,14 +117,18 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
         <div className="relative z-10 max-w-[1440px] w-full mx-auto px-6 md:px-12 pt-6 flex flex-wrap items-center justify-between gap-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-xs font-mono font-semibold text-white shadow-md">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>NASA SRTM 30m • Sentinel Radar Orbit Scan Active</span>
+            <span>
+              {language === "kn"
+                ? "ನಾಸಾ SRTM 30m • ಸೆಂಟಿನೆಲ್ ಉಪಗ್ರಹ ಕಕ್ಷೆ ಸ್ಕ್ಯಾನ್ ಸಕ್ರಿಯ"
+                : "NASA SRTM 30m • Sentinel Radar Orbit Scan Active"}
+            </span>
           </div>
 
           <button
             onClick={onOpenMap}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-xs font-semibold text-zinc-200 hover:text-white transition-all shadow-md cursor-pointer hover:bg-black/85"
           >
-            <span>View Fullscreen GIS Radar</span>
+            <span>{language === "kn" ? "ಪೂರ್ಣ ಪರದೆಯ ಜಿಐಎಸ್ ರೇಡಾರ್" : "View Fullscreen GIS Radar"}</span>
             <span>&rarr;</span>
           </button>
         </div>
@@ -134,7 +140,7 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
             {/* Column 1: Live Sectors (5 cols) */}
             <div className="md:col-span-5 space-y-2.5">
               <span className="text-xs font-bold text-white uppercase tracking-wider block drop-shadow-md">
-                Live Sector Hazards
+                {language === "kn" ? "ಪ್ರಸ್ತುತ ವಲಯ ಅಪಾಯಗಳು" : "Live Sector Hazards"}
               </span>
 
               <div className="grid grid-cols-3 gap-2.5">
@@ -155,7 +161,13 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
                         }`}
                       />
                       <span className="text-xs font-bold text-white truncate">
-                        {sec.name.split(" ")[0]}
+                        {language === "kn"
+                          ? sec.id === "bathery"
+                            ? "ಬತ್ತೇರಿ"
+                            : sec.id === "vythiri"
+                            ? "ವೈತಿರಿ"
+                            : "ಮೇಪ್ಪಾಡಿ"
+                          : sec.name.split(" ")[0]}
                       </span>
                     </div>
                     <span className="font-mono text-base font-black text-white">
@@ -169,7 +181,7 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
             {/* Column 2: Critical Alerts (4 cols) */}
             <div className="md:col-span-4 space-y-2.5">
               <span className="text-xs font-bold text-white uppercase tracking-wider block drop-shadow-md">
-                Active Hazard Warnings
+                {language === "kn" ? "ಸಕ್ರಿಯ ಅಪಾಯ ಎಚ್ಚರಿಕೆಗಳು" : "Active Hazard Warnings"}
               </span>
 
               <div className="space-y-2">
@@ -188,7 +200,13 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
                             : "bg-emerald-500"
                         }`}
                       />
-                      <span className="font-semibold text-white truncate">{alert.title}</span>
+                      <span className="font-semibold text-white truncate">
+                        {language === "kn" && alert.id === 1
+                          ? "ಮುಂಡಕ್ಕೈ ಶಿಲಾಖಂಡಗಳ ಹರಿವಿನ ಎಚ್ಚರಿಕೆ"
+                          : language === "kn" && alert.id === 2
+                          ? "ಚೂರಲ್‌ಮಾಲಾ ಇಳಿಜಾರು ಕತ್ತರಿ ಎಚ್ಚರಿಕೆ"
+                          : alert.title}
+                      </span>
                     </div>
                     <span className="text-[10px] font-mono text-zinc-400 shrink-0">
                       {alert.timestamp}
@@ -204,7 +222,7 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
                 onClick={onOpenMap}
                 className="w-full py-2.5 px-4 rounded-xl bg-white text-black hover:bg-zinc-200 font-bold text-xs flex items-center justify-center gap-2 shadow-xl transition-all active:scale-98 cursor-pointer"
               >
-                <span>Launch GIS Tactical Radar</span>
+                <span>{language === "kn" ? "ಜಿಐಎಸ್ ರೇಡಾರ್ ಪ್ರಾರಂಭಿಸಿ" : "Launch GIS Tactical Radar"}</span>
                 <span>&rarr;</span>
               </button>
 
@@ -212,7 +230,7 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
                 onClick={onOpenSim}
                 className="w-full py-2.5 px-4 rounded-xl bg-black/80 hover:bg-black text-white border border-white/25 font-semibold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-98 cursor-pointer backdrop-blur-md"
               >
-                <span>What-If Simulation</span>
+                <span>{language === "kn" ? "ಸಿಮ್ಯುಲೇಶನ್ ಸ್ಟುಡಿಯೋ" : "What-If Simulation"}</span>
                 <span>&rarr;</span>
               </button>
             </div>
