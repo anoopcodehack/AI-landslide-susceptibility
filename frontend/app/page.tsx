@@ -162,21 +162,32 @@ export default function DashboardPage() {
 
       <main className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 md:px-12 py-6 flex-1 space-y-8">
         
-        {/* 1. VISUAL HERO COMMAND BANNER */}
-        <div className="relative rounded-3xl p-6 sm:p-8 md:p-10 border border-zinc-200/90 shadow-sm overflow-hidden text-zinc-900 bg-white">
+        {/* 1. VISUAL HERO COMMAND BANNER WITH REAL LANDSLIDE TERRAIN BACKGROUND */}
+        <div className="relative rounded-3xl p-6 sm:p-8 md:p-10 border border-zinc-200/90 shadow-md overflow-hidden text-zinc-900 bg-slate-900">
+          {/* Authentic Landslide Debris Flow Terrain Background Image - Highly Visible */}
+          <div
+            className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform duration-1000 scale-105"
+            style={{
+              backgroundImage: "url('/images/landslide_hero_bg.jpg')",
+            }}
+          />
+
+          {/* Clean Gradient Overlay: Subtle white wash behind text on the left, fading to completely transparent on the right so the mountain slope failure and valley debris are fully visible */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent pointer-events-none" />
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
             {/* Left: Quick Summary & Action Launchers (7 cols) */}
             <div className="lg:col-span-7 space-y-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-800 shadow-2xs">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-zinc-200/90 text-xs font-semibold text-zinc-900 shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Wayanad Early Warning System • Open-Meteo AWS #04 Telemetry</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-black leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-zinc-950 leading-tight drop-shadow-2xs">
                 GeoShield AI: Wayanad Landslide Early Warning
               </h1>
 
-              <p className="text-sm sm:text-base text-zinc-600 max-w-xl font-normal leading-relaxed">
+              <p className="text-sm sm:text-base text-zinc-900 max-w-xl font-medium leading-relaxed drop-shadow-2xs">
                 Autonomous 30m terrain susceptibility intelligence powered by <strong>XGBoost</strong>, <strong>SHAP TreeExplainer</strong>, and real-time synoptic weather telemetry.
               </p>
 
@@ -193,7 +204,7 @@ export default function DashboardPage() {
 
                 <Link
                   href="/simulation"
-                  className="px-5 py-3 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-300 text-zinc-800 text-xs font-semibold flex items-center gap-2 hover:border-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xs"
+                  className="px-5 py-3 rounded-xl bg-white/95 hover:bg-white border border-zinc-300 text-zinc-900 text-xs font-semibold flex items-center gap-2 hover:border-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xs backdrop-blur-md"
                 >
                   <Sliders className="w-4 h-4 text-zinc-600" />
                   <span>What-If Simulator</span>
@@ -201,7 +212,7 @@ export default function DashboardPage() {
 
                 <Link
                   href="/diagnostics"
-                  className="px-5 py-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 text-xs font-semibold flex items-center gap-2 transition-all"
+                  className="px-5 py-3 rounded-xl bg-white/90 hover:bg-white border border-zinc-200 text-zinc-800 text-xs font-semibold flex items-center gap-2 transition-all backdrop-blur-md shadow-xs"
                 >
                   <BarChart3 className="w-4 h-4 text-zinc-600" />
                   <span>AI Benchmarks</span>
@@ -209,25 +220,25 @@ export default function DashboardPage() {
               </div>
 
               {/* Metric Highlights Pill Bar */}
-              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-zinc-200 max-w-lg text-center">
-                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200 shadow-2xs">
-                  <span className="text-[10px] text-zinc-500 uppercase font-semibold block">Model AUC</span>
+              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-zinc-300/80 max-w-lg text-center">
+                <div className="bg-white/95 backdrop-blur-md p-2.5 rounded-xl border border-zinc-200/90 shadow-xs">
+                  <span className="text-[10px] text-zinc-600 uppercase font-semibold block">Model AUC</span>
                   <strong className="text-sm sm:text-base font-black text-black">94.00%</strong>
                 </div>
-                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200 shadow-2xs">
-                  <span className="text-[10px] text-zinc-500 uppercase font-semibold block">Disaster Recall</span>
-                  <strong className="text-sm sm:text-base font-black text-emerald-600">94.12%</strong>
+                <div className="bg-white/95 backdrop-blur-md p-2.5 rounded-xl border border-zinc-200/90 shadow-xs">
+                  <span className="text-[10px] text-zinc-600 uppercase font-semibold block">Disaster Recall</span>
+                  <strong className="text-sm sm:text-base font-black text-emerald-700">94.12%</strong>
                 </div>
-                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200 shadow-2xs">
-                  <span className="text-[10px] text-zinc-500 uppercase font-semibold block">Spatial Cells</span>
-                  <strong className="text-sm sm:text-base font-black text-blue-600">1,500 30m</strong>
+                <div className="bg-white/95 backdrop-blur-md p-2.5 rounded-xl border border-zinc-200/90 shadow-xs">
+                  <span className="text-[10px] text-zinc-600 uppercase font-semibold block">Spatial Cells</span>
+                  <strong className="text-sm sm:text-base font-black text-blue-700">1,500 30m</strong>
                 </div>
               </div>
             </div>
 
             {/* Right: Clean Enterprise Sector Risk Status Card (5 cols) */}
             <div className="lg:col-span-5">
-              <div className="bg-zinc-50/80 rounded-2xl p-5 border border-zinc-200 shadow-2xs flex flex-col justify-between space-y-4">
+              <div className="bg-white/85 backdrop-blur-md rounded-2xl p-5 border border-white/80 shadow-md flex flex-col justify-between space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -243,7 +254,7 @@ export default function DashboardPage() {
                 {/* 3 Real Wayanad Sectors with actual project hazard telemetry */}
                 <div className="space-y-2.5">
                   {/* Sector 1: Chooralmala */}
-                  <div className="p-3 rounded-xl bg-white border border-red-200 shadow-2xs flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-white/95 border border-red-200 shadow-2xs flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-red-950">Chooralmala (Epicenter)</span>
@@ -259,7 +270,7 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Sector 2: Vythiri Ghat */}
-                  <div className="p-3 rounded-xl bg-white border border-amber-200 shadow-2xs flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-white/95 border border-amber-200 shadow-2xs flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-amber-950">Vythiri Ghat Incline</span>
@@ -275,7 +286,7 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Sector 3: Sulthan Bathery */}
-                  <div className="p-3 rounded-xl bg-white border border-emerald-200 shadow-2xs flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-white/95 border border-emerald-200 shadow-2xs flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-emerald-950">Sulthan Bathery Plateau</span>

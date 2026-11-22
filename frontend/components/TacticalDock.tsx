@@ -98,176 +98,125 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
 
   return (
     <footer className="mt-16 bg-black text-zinc-300 border-t border-zinc-800">
-      {/* 1. Monitored Corridors & Real-Time Alert Grid */}
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-10 border-b border-zinc-800/80">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Corridors Column (span 5) */}
-          <div className="lg:col-span-5 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
-                    Monitored Corridors • Wayanad Sector
-                  </h4>
-                  <p className="text-base font-bold text-white mt-0.5">
-                    Spatial Susceptibility Index
-                  </p>
-                </div>
-                <button
-                  onClick={onOpenMap}
-                  className="group flex items-center gap-1 text-xs font-semibold text-zinc-300 hover:text-white transition-all duration-200 cursor-pointer"
-                >
-                  <span>View GIS Radar</span>
-                  <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
-                    &rarr;
-                  </span>
-                </button>
-              </div>
+      {/* 1. Cinematic GIS Command Console & Telemetry Dock - Medium Balanced Tone */}
+      <div className="relative overflow-hidden border-b border-zinc-800 bg-zinc-950 min-h-[480px] md:min-h-[560px] flex flex-col justify-between">
+        {/* Background Image: Satellite 3D Terrain Scanning Command Console - Balanced Medium Opacity */}
+        <div
+          className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-70"
+          style={{
+            backgroundImage: "url('/images/tactical_dock_bg.jpg')",
+          }}
+        />
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {sectorList.map((sec) => (
+        {/* Balanced Medium Overlay: Tones down the middle glare while keeping the full satellite, 3D mountain, and screens clearly visible */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/70 pointer-events-none" />
+
+        {/* Top Floating Telemetry Status Bar */}
+        <div className="relative z-10 max-w-[1440px] w-full mx-auto px-6 md:px-12 pt-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-xs font-mono font-semibold text-white shadow-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>NASA SRTM 30m • Sentinel Radar Orbit Scan Active</span>
+          </div>
+
+          <button
+            onClick={onOpenMap}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-xs font-semibold text-zinc-200 hover:text-white transition-all shadow-md cursor-pointer hover:bg-black/85"
+          >
+            <span>View Fullscreen GIS Radar</span>
+            <span>&rarr;</span>
+          </button>
+        </div>
+
+        {/* Bottom Floating Tactical Control Dock */}
+        <div className="relative z-10 max-w-[1440px] w-full mx-auto px-6 md:px-12 pb-8 pt-12">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-end">
+            
+            {/* Column 1: Live Sectors (5 cols) */}
+            <div className="md:col-span-5 space-y-2.5">
+              <span className="text-xs font-bold text-white uppercase tracking-wider block drop-shadow-md">
+                Live Sector Hazards
+              </span>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                {sectorList.slice(0, 3).map((sec) => (
                   <div
                     key={sec.id}
                     onClick={onOpenMap}
-                    className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/80 hover:bg-zinc-800 hover:border-zinc-700 cursor-pointer transition-all duration-200 hover:-translate-y-1.5 flex flex-col justify-between group"
+                    className="p-3 rounded-xl border border-white/20 bg-black/75 backdrop-blur-md hover:bg-black/90 hover:border-white/40 cursor-pointer transition-all duration-200 hover:-translate-y-1 text-center group shadow-xl"
                   >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-white line-clamp-1 group-hover:translate-x-0.5 transition-transform duration-200">
-                          {sec.name}
-                        </span>
-                        <span
-                          className={`w-2 h-2 rounded-full transition-transform group-hover:scale-125 duration-200 ${
-                            sec.variant === "green"
-                              ? "bg-emerald-500"
-                              : sec.variant === "amber"
-                              ? "bg-amber-500"
-                              : "bg-rose-500"
-                          }`}
-                        />
-                      </div>
-                      <p className="text-[10px] text-zinc-400 mt-1">
-                        {sec.status_label}
-                      </p>
-                    </div>
-
-                    <div className="flex items-baseline justify-between mt-3 pt-2 border-t border-zinc-800">
-                      <span className="font-mono text-base font-bold text-white">
-                        {sec.score_pct}
-                      </span>
-                      <span className="font-mono text-[10px] text-zinc-500">
-                        {sec.last_survey}
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          sec.variant === "green"
+                            ? "bg-emerald-500"
+                            : sec.variant === "amber"
+                            ? "bg-amber-500"
+                            : "bg-red-500"
+                        }`}
+                      />
+                      <span className="text-xs font-bold text-white truncate">
+                        {sec.name.split(" ")[0]}
                       </span>
                     </div>
+                    <span className="font-mono text-base font-black text-white">
+                      {sec.score_pct}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Threshold Slider */}
-            <div className="mt-5 pt-4 border-t border-zinc-800/80">
-              <div className="flex items-center justify-between text-xs font-medium mb-1.5">
-                <span className="text-zinc-400 flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5 text-zinc-500" /> Incline Shear Threshold
-                </span>
-                <span className="font-mono text-xs font-bold text-white bg-zinc-900 border border-zinc-700 px-2 py-0.5 rounded transition-transform duration-200 hover:scale-105">
-                  {slopeThreshold}°
-                </span>
-              </div>
-              <input
-                type="range"
-                min="15"
-                max="50"
-                value={slopeThreshold}
-                onChange={(e) => setSlopeThreshold(Number(e.target.value))}
-                className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white transition-all hover:h-2"
-              />
-              <div className="flex justify-between text-[10px] font-mono text-zinc-500 mt-1">
-                <span>15° (Valley Floor)</span>
-                <span>30° (Nominal)</span>
-                <span>&gt;45° (Critical Shear)</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Real-Time Alerts Stream (span 4) */}
-          <div className="lg:col-span-4 flex flex-col justify-between">
-            <div>
-              <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 mb-1">
-                Event Telemetry • Live Stream
-              </h4>
-              <p className="text-base font-bold text-white mb-3">
-                Hazard Alerts & Sensor Displacements
-              </p>
+            {/* Column 2: Critical Alerts (4 cols) */}
+            <div className="md:col-span-4 space-y-2.5">
+              <span className="text-xs font-bold text-white uppercase tracking-wider block drop-shadow-md">
+                Active Hazard Warnings
+              </span>
 
               <div className="space-y-2">
-                {alertList.map((alert) => (
+                {alertList.slice(0, 2).map((alert) => (
                   <div
                     key={alert.id}
-                    className="p-3 rounded-xl border border-zinc-800 bg-zinc-900/80 hover:bg-zinc-800/80 hover:border-zinc-700 hover:translate-x-1 transition-all duration-200 flex items-center justify-between gap-3 text-xs cursor-default"
+                    className="px-3.5 py-2.5 rounded-xl border border-white/20 bg-black/75 backdrop-blur-md flex items-center justify-between gap-2 text-xs shadow-xl"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 truncate">
                       <span
-                        className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                        className={`w-2 h-2 rounded-full shrink-0 ${
                           alert.severity === "danger"
-                            ? "bg-rose-500 animate-pulse"
+                            ? "bg-red-500 animate-pulse"
                             : alert.severity === "warning"
                             ? "bg-amber-500"
                             : "bg-emerald-500"
                         }`}
                       />
-                      <span className="font-medium text-zinc-200 line-clamp-1">{alert.title}</span>
+                      <span className="font-semibold text-white truncate">{alert.title}</span>
                     </div>
-                    <span className="font-mono text-[10px] text-zinc-500 flex-shrink-0">
+                    <span className="text-[10px] font-mono text-zinc-400 shrink-0">
                       {alert.timestamp}
                     </span>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Action Module Launchers (span 3) */}
-          <div className="lg:col-span-3 flex flex-col justify-between bg-zinc-900/90 p-5 rounded-2xl border border-zinc-800 shadow-sm">
-            <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 block mb-1">
-                Spatial Decision-Support Tools
-              </span>
-              <p className="text-sm font-bold text-white mb-3">
-                Operator Controls
-              </p>
+            {/* Column 3: Quick Operator Actions (3 cols) */}
+            <div className="md:col-span-3 flex flex-col justify-end space-y-2.5">
+              <button
+                onClick={onOpenMap}
+                className="w-full py-2.5 px-4 rounded-xl bg-white text-black hover:bg-zinc-200 font-bold text-xs flex items-center justify-center gap-2 shadow-xl transition-all active:scale-98 cursor-pointer"
+              >
+                <span>Launch GIS Tactical Radar</span>
+                <span>&rarr;</span>
+              </button>
 
-              <div className="space-y-2.5">
-                <button
-                  onClick={onOpenMap}
-                  className="group w-full bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-semibold py-2.5 px-4 rounded-full text-xs flex items-center justify-between transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                >
-                  <span className="group-hover:translate-x-0.5 transition-transform duration-200">Launch GIS Radar</span>
-                  <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
-                </button>
-
-                <button
-                  onClick={onOpenShap}
-                  className="group w-full bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-semibold py-2.5 px-4 rounded-full text-xs flex items-center justify-between transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                >
-                  <span className="group-hover:translate-x-0.5 transition-transform duration-200">SHAP Factor Attribution</span>
-                  <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
-                </button>
-
-                <button
-                  onClick={onOpenSim}
-                  className="group w-full bg-white hover:bg-zinc-200 text-black font-bold py-2.5 px-4 rounded-full text-xs flex items-center justify-between transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                >
-                  <span className="group-hover:translate-x-0.5 transition-transform duration-200">Parametric Simulation</span>
-                  <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
-                </button>
-              </div>
+              <button
+                onClick={onOpenSim}
+                className="w-full py-2.5 px-4 rounded-xl bg-black/80 hover:bg-black text-white border border-white/25 font-semibold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-98 cursor-pointer backdrop-blur-md"
+              >
+                <span>What-If Simulation</span>
+                <span>&rarr;</span>
+              </button>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-zinc-800 text-[10px] font-mono text-zinc-500 flex items-center justify-between">
-              <span>XGBoost 1.7.6</span>
-              <span>Sub-10ms Latency</span>
-            </div>
           </div>
         </div>
       </div>
