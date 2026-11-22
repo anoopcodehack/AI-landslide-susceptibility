@@ -20,6 +20,7 @@ import {
 import { sendTelegramAlert, autoDetectTelegramChat } from "@/lib/api";
 
 const DEFAULT_BOT_TOKEN = "8792643988:AAGT1vj7yD6AsIh8ND72VvssIwCpWG1DGtU";
+const DEFAULT_CHAT_ID = "6564249620";
 
 export const AlertBellDrawer: React.FC = () => {
   const {
@@ -37,7 +38,7 @@ export const AlertBellDrawer: React.FC = () => {
 
   // Telegram Bot State
   const [telegramToken, setTelegramToken] = useState<string>(DEFAULT_BOT_TOKEN);
-  const [telegramChatId, setTelegramChatId] = useState<string>("");
+  const [telegramChatId, setTelegramChatId] = useState<string>(DEFAULT_CHAT_ID);
   const [telegramStatus, setTelegramStatus] = useState<string | null>(null);
   const [telegramLoading, setTelegramLoading] = useState<boolean>(false);
   const [detectingChat, setDetectingChat] = useState<boolean>(false);
@@ -47,9 +48,9 @@ export const AlertBellDrawer: React.FC = () => {
     setMounted(true);
     if (typeof window !== "undefined") {
       const savedToken = localStorage.getItem("geoshield_telegram_token") || DEFAULT_BOT_TOKEN;
-      const savedChat = localStorage.getItem("geoshield_telegram_chat_id") || "";
+      const savedChat = localStorage.getItem("geoshield_telegram_chat_id") || DEFAULT_CHAT_ID;
       setTelegramToken(savedToken);
-      if (savedChat) setTelegramChatId(savedChat);
+      setTelegramChatId(savedChat);
     }
   }, []);
 
