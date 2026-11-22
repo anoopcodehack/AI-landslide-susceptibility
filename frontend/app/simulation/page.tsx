@@ -1042,134 +1042,148 @@ export default function SimulationPage() {
         {/* Downstream Hydraulic Debris Flow Runout Routing Card (Idea 2) */}
         {runoutData && (
           <section className="mt-12 pt-8 border-t border-zinc-200">
-            <div className="p-6 md:p-8 rounded-2xl border border-zinc-300 bg-white shadow-sm">
-              <div className="flex flex-wrap items-center justify-between pb-4 border-b border-zinc-200 gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-md bg-red-100 text-red-700">
-                      <Waves className="w-5 h-5" />
+            <div className="relative p-6 md:p-8 rounded-2xl border border-zinc-200/90 shadow-md overflow-hidden bg-slate-900 text-zinc-900">
+              {/* Authentic Landslide Debris Flow Terrain Background Image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform duration-700 scale-105"
+                style={{
+                  backgroundImage: "url('/images/landslide_hero_bg.jpg')",
+                }}
+              />
+
+              {/* Balanced Gradient Overlay for High Terrain Visibility + Perfect Text Readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/88 to-white/60 pointer-events-none" />
+
+              {/* Content Wrapper */}
+              <div className="relative z-10">
+                <div className="flex flex-wrap items-center justify-between pb-4 border-b border-zinc-200/80 gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 rounded-md bg-red-100 text-red-700">
+                        <Waves className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-lg font-black tracking-tight text-black font-sans">
+                        Downstream Hydraulic Debris Flow Runout Routing
+                      </h3>
+                      <span className="px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 text-[10px] font-mono font-bold">
+                        Iruvaipuzha Corridor // 30 Jul 2024
+                      </span>
                     </div>
-                    <h3 className="text-lg font-black tracking-tight text-black font-sans">
-                      Downstream Hydraulic Debris Flow Runout Routing
-                    </h3>
-                    <span className="px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 text-[10px] font-mono font-bold">
-                      Iruvaipuzha Corridor // 30 Jul 2024
+                    <p className="text-xs text-zinc-600 mt-1 font-sans font-medium">
+                      Physical modeling of channelized landslide momentum. Explains why Chooralmala valley settlements suffered catastrophic destruction despite gentle local slope angles (&lt;12°).
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 font-mono text-xs">
+                    <span className="px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-xs text-zinc-700 border border-zinc-200/90 font-semibold flex items-center gap-1.5 shadow-2xs">
+                      <Clock className="w-3.5 h-3.5 text-zinc-500" /> Lead Time: <strong className="text-black">{runoutData.evacuation_lead_time_min} mins</strong>
                     </span>
+                    <button
+                      onClick={() => setShowRunoutAnalysis(!showRunoutAnalysis)}
+                      className="btn-coder-light px-3 py-1.5 text-xs font-mono shadow-2xs"
+                    >
+                      {showRunoutAnalysis ? "Collapse Details" : "Expand Routing"}
+                    </button>
                   </div>
-                  <p className="text-xs text-zinc-600 mt-1 font-sans">
-                    Physical modeling of channelized landslide momentum. Explains why Chooralmala valley settlements suffered catastrophic destruction despite gentle local slope angles (&lt;12°).
-                  </p>
                 </div>
 
-                <div className="flex items-center gap-2 font-mono text-xs">
-                  <span className="px-3 py-1.5 rounded-lg bg-zinc-100 text-zinc-700 border border-zinc-200 font-semibold flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-zinc-500" /> Lead Time: <strong className="text-black">{runoutData.evacuation_lead_time_min} mins</strong>
-                  </span>
-                  <button
-                    onClick={() => setShowRunoutAnalysis(!showRunoutAnalysis)}
-                    className="btn-coder-light px-3 py-1.5 text-xs font-mono"
-                  >
-                    {showRunoutAnalysis ? "Collapse Details" : "Expand Routing"}
-                  </button>
+                {/* Corridor Topography Key Metrics */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 py-4 border-b border-zinc-200/80 font-mono text-xs">
+                  <div className="p-3 bg-white/90 backdrop-blur-xs rounded-xl border border-zinc-200/90 shadow-2xs">
+                    <span className="text-zinc-500 block text-[10px] uppercase font-bold">Apex Elevation</span>
+                    <strong className="text-sm font-black text-black">{runoutData.apex_elevation_m} m</strong>
+                    <span className="text-[10px] text-zinc-400 block">Vellarimala Peak</span>
+                  </div>
+                  <div className="p-3 bg-white/90 backdrop-blur-xs rounded-xl border border-zinc-200/90 shadow-2xs">
+                    <span className="text-zinc-500 block text-[10px] uppercase font-bold">Valley Floor</span>
+                    <strong className="text-sm font-black text-black">{runoutData.valley_floor_elevation_m} m</strong>
+                    <span className="text-[10px] text-zinc-400 block">Attamala Junction</span>
+                  </div>
+                  <div className="p-3 bg-white/90 backdrop-blur-xs rounded-xl border border-zinc-200/90 shadow-2xs">
+                    <span className="text-zinc-500 block text-[10px] uppercase font-bold">Total Drop (H)</span>
+                    <strong className="text-sm font-black text-red-600">{runoutData.total_drop_height_m} m</strong>
+                    <span className="text-[10px] text-zinc-400 block">Hydraulic Head</span>
+                  </div>
+                  <div className="p-3 bg-white/90 backdrop-blur-xs rounded-xl border border-zinc-200/90 shadow-2xs">
+                    <span className="text-zinc-500 block text-[10px] uppercase font-bold">Runout Reach (L)</span>
+                    <strong className="text-sm font-black text-black">{runoutData.total_runout_distance_km} km</strong>
+                    <span className="text-[10px] text-zinc-400 block">Channel Length</span>
+                  </div>
+                  <div className="p-3 bg-white/90 backdrop-blur-xs rounded-xl border border-zinc-200/90 shadow-2xs">
+                    <span className="text-zinc-500 block text-[10px] uppercase font-bold">Estimated Volume</span>
+                    <strong className="text-sm font-black text-black">{(runoutData.estimated_volume_m3 / 1000000).toFixed(2)}M m³</strong>
+                    <span className="text-[10px] text-zinc-400 block">Debris + Slurry</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Corridor Topography Key Metrics */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 py-4 border-b border-zinc-100 font-mono text-xs">
-                <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
-                  <span className="text-zinc-500 block text-[10px] uppercase font-bold">Apex Elevation</span>
-                  <strong className="text-sm font-black text-black">{runoutData.apex_elevation_m} m</strong>
-                  <span className="text-[10px] text-zinc-400 block">Vellarimala Peak</span>
-                </div>
-                <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
-                  <span className="text-zinc-500 block text-[10px] uppercase font-bold">Valley Floor</span>
-                  <strong className="text-sm font-black text-black">{runoutData.valley_floor_elevation_m} m</strong>
-                  <span className="text-[10px] text-zinc-400 block">Attamala Junction</span>
-                </div>
-                <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
-                  <span className="text-zinc-500 block text-[10px] uppercase font-bold">Total Drop (H)</span>
-                  <strong className="text-sm font-black text-red-600">{runoutData.total_drop_height_m} m</strong>
-                  <span className="text-[10px] text-zinc-400 block">Hydraulic Head</span>
-                </div>
-                <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
-                  <span className="text-zinc-500 block text-[10px] uppercase font-bold">Runout Reach (L)</span>
-                  <strong className="text-sm font-black text-black">{runoutData.total_runout_distance_km} km</strong>
-                  <span className="text-[10px] text-zinc-400 block">Channel Length</span>
-                </div>
-                <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
-                  <span className="text-zinc-500 block text-[10px] uppercase font-bold">Estimated Volume</span>
-                  <strong className="text-sm font-black text-black">{(runoutData.estimated_volume_m3 / 1000000).toFixed(2)}M m³</strong>
-                  <span className="text-[10px] text-zinc-400 block">Debris + Slurry</span>
-                </div>
-              </div>
-
-              {showRunoutAnalysis && (
-                <div className="mt-5 space-y-4">
-                  {/* Waypoint Stepper Table */}
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left font-mono text-xs border border-zinc-200 rounded-lg overflow-hidden">
-                      <thead className="bg-zinc-100 text-zinc-700 uppercase text-[10px] font-bold tracking-wider">
-                        <tr>
-                          <th className="py-2.5 px-3">Corridor Waypoint</th>
-                          <th className="py-2.5 px-3">Elevation</th>
-                          <th className="py-2.5 px-3">Distance</th>
-                          <th className="py-2.5 px-3">Estimated ETA</th>
-                          <th className="py-2.5 px-3">Debris Velocity</th>
-                          <th className="py-2.5 px-3">Impact Pressure</th>
-                          <th className="py-2.5 px-3">Hazard Classification</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-zinc-200 bg-white">
-                        {runoutData.affected_waypoints.map((wp, idx) => (
-                          <tr key={idx} className="hover:bg-zinc-50 transition-colors">
-                            <td className="py-2.5 px-3 font-semibold text-zinc-900 flex items-center gap-1.5">
-                              <span className="w-4 h-4 rounded-full bg-zinc-200 text-zinc-800 text-[10px] flex items-center justify-center font-bold">
-                                {idx + 1}
-                              </span>
-                              {wp.name}
-                            </td>
-                            <td className="py-2.5 px-3 text-zinc-600">{wp.elevation_m} m</td>
-                            <td className="py-2.5 px-3 text-zinc-600">+{wp.distance_from_apex_km.toFixed(1)} km</td>
-                            <td className="py-2.5 px-3 text-zinc-900 font-bold">
-                              {wp.estimated_arrival_minutes === 0 ? "T = 0 (Failure)" : `T + ${wp.estimated_arrival_minutes.toFixed(1)} min`}
-                            </td>
-                            <td className="py-2.5 px-3">
-                              <span className="font-bold text-red-600">{wp.debris_velocity_ms.toFixed(1)} m/s</span>
-                              <span className="text-[10px] text-zinc-400 ml-1">({(wp.debris_velocity_ms * 3.6).toFixed(0)} km/h)</span>
-                            </td>
-                            <td className="py-2.5 px-3 font-bold text-zinc-800">
-                              {wp.impact_pressure_kpa.toFixed(0)} kPa
-                            </td>
-                            <td className="py-2.5 px-3">
-                              <span
-                                className={`text-[10px] px-2 py-0.5 rounded font-mono font-bold ${
-                                  wp.hazard_status === "IMMEDIATE_DEVASTATION"
-                                    ? "bg-red-100 text-red-800 border border-red-300"
-                                    : wp.hazard_status === "CRITICAL_RUNOUT"
-                                    ? "bg-orange-100 text-orange-800 border border-orange-300"
-                                    : wp.hazard_status === "ACTIVE_INUNDATION"
-                                    ? "bg-amber-100 text-amber-800 border border-amber-300"
-                                    : "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                                }`}
-                              >
-                                {wp.hazard_status.replace(/_/g, " ")}
-                              </span>
-                            </td>
+                {showRunoutAnalysis && (
+                  <div className="mt-5 space-y-4">
+                    {/* Waypoint Stepper Table */}
+                    <div className="overflow-x-auto rounded-xl border border-zinc-200/90 shadow-2xs bg-white/90 backdrop-blur-xs">
+                      <table className="w-full text-left font-mono text-xs">
+                        <thead className="bg-zinc-100/90 text-zinc-700 uppercase text-[10px] font-bold tracking-wider border-b border-zinc-200">
+                          <tr>
+                            <th className="py-2.5 px-3">Corridor Waypoint</th>
+                            <th className="py-2.5 px-3">Elevation</th>
+                            <th className="py-2.5 px-3">Distance</th>
+                            <th className="py-2.5 px-3">Estimated ETA</th>
+                            <th className="py-2.5 px-3">Debris Velocity</th>
+                            <th className="py-2.5 px-3">Impact Pressure</th>
+                            <th className="py-2.5 px-3">Hazard Classification</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-200/80 bg-white/80">
+                          {runoutData.affected_waypoints.map((wp, idx) => (
+                            <tr key={idx} className="hover:bg-zinc-50/80 transition-colors">
+                              <td className="py-2.5 px-3 font-semibold text-zinc-900 flex items-center gap-1.5">
+                                <span className="w-4 h-4 rounded-full bg-zinc-200 text-zinc-800 text-[10px] flex items-center justify-center font-bold">
+                                  {idx + 1}
+                                </span>
+                                {wp.name}
+                              </td>
+                              <td className="py-2.5 px-3 text-zinc-600">{wp.elevation_m} m</td>
+                              <td className="py-2.5 px-3 text-zinc-600">+{wp.distance_from_apex_km.toFixed(1)} km</td>
+                              <td className="py-2.5 px-3 text-zinc-900 font-bold">
+                                {wp.estimated_arrival_minutes === 0 ? "T = 0 (Failure)" : `T + ${wp.estimated_arrival_minutes.toFixed(1)} min`}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <span className="font-bold text-red-600">{wp.debris_velocity_ms.toFixed(1)} m/s</span>
+                                <span className="text-[10px] text-zinc-400 ml-1">({(wp.debris_velocity_ms * 3.6).toFixed(0)} km/h)</span>
+                              </td>
+                              <td className="py-2.5 px-3 font-bold text-zinc-800">
+                                {wp.impact_pressure_kpa.toFixed(0)} kPa
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <span
+                                  className={`text-[10px] px-2 py-0.5 rounded font-mono font-bold ${
+                                    wp.hazard_status === "IMMEDIATE_DEVASTATION"
+                                      ? "bg-red-100 text-red-800 border border-red-300"
+                                      : wp.hazard_status === "CRITICAL_RUNOUT"
+                                      ? "bg-orange-100 text-orange-800 border border-orange-300"
+                                      : wp.hazard_status === "ACTIVE_INUNDATION"
+                                      ? "bg-amber-100 text-amber-800 border border-amber-300"
+                                      : "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                                  }`}
+                                >
+                                  {wp.hazard_status.replace(/_/g, " ")}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
 
-                  {/* Geotechnical Scientific Advisory Callout */}
-                  <div className="p-4 rounded-lg bg-amber-50/70 border border-amber-200 text-xs font-sans leading-relaxed text-amber-950">
-                    <strong className="font-mono text-amber-900 font-bold uppercase tracking-wider block mb-1">
-                      Geotechnical Critical Finding:
-                    </strong>
-                    {runoutData.advisory}
+                    {/* Geotechnical Scientific Advisory Callout */}
+                    <div className="p-4 rounded-xl bg-amber-50/90 backdrop-blur-xs border border-amber-200/90 text-xs font-sans leading-relaxed text-amber-950 shadow-2xs">
+                      <strong className="font-mono text-amber-900 font-bold uppercase tracking-wider block mb-1">
+                        Geotechnical Critical Finding:
+                      </strong>
+                      {runoutData.advisory}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </section>
         )}
