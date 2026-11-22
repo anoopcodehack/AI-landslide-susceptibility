@@ -100,18 +100,18 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
 
   return (
     <footer className="mt-16 bg-black text-zinc-300 border-t border-zinc-800">
-      {/* 1. Cinematic GIS Command Console & Telemetry Dock - Medium Balanced Tone */}
-      <div className="relative overflow-hidden border-b border-zinc-800 bg-zinc-950 min-h-[480px] md:min-h-[560px] flex flex-col justify-between">
-        {/* Background Image: Satellite 3D Terrain Scanning Command Console - Balanced Medium Opacity */}
+      {/* 1. Cinematic GIS Command Console & Telemetry Dock - High Clarity & Brightness */}
+      <div className="relative overflow-hidden border-b border-zinc-800 bg-zinc-950 min-h-[480px] md:min-h-[580px] flex flex-col justify-between">
+        {/* Background Image: GIS Command Operations Center Wall & Telemetry Console - Bright and Vivid */}
         <div
-          className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-70"
+          className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform duration-1000 scale-100"
           style={{
             backgroundImage: "url('/images/tactical_dock_bg.jpg')",
           }}
         />
 
-        {/* Balanced Medium Overlay: Tones down the middle glare while keeping the full satellite, 3D mountain, and screens clearly visible */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/70 pointer-events-none" />
+        {/* Clear Natural Contrast: The entire command center wall screen and workstation remain bright and clear without heavy dark washes */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none" />
 
         {/* Top Floating Telemetry Status Bar */}
         <div className="relative z-10 max-w-[1440px] w-full mx-auto px-6 md:px-12 pt-6 flex flex-wrap items-center justify-between gap-3">
