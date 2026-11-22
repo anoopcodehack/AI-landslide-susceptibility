@@ -378,31 +378,67 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
           </ul>
         </div>
 
-        {/* Column 4: Governance & SDGs */}
+        {/* Column 4: Emergency Contacts & Helplines (Clean Enterprise Monochrome) */}
         <div>
           <h5 className="font-semibold text-white text-xs uppercase tracking-wider mb-4">
-            Governance & SDGs
+            {language === "kn" ? "ತುರ್ತು ಸಹಾಯವಾಣಿ" : "Emergency Helplines"}
           </h5>
-          <ul className="space-y-2.5 text-xs">
-            <li className="group cursor-default">
-              <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 group-hover:text-white">
-                <strong className="text-white">SDG 11</strong>: Resilient Cities
-              </span>
+          <ul className="space-y-2.5 text-xs text-zinc-400">
+            <li>
+              <a
+                href="tel:1077"
+                className="group flex items-center justify-between hover:text-white transition-colors cursor-pointer"
+                title="District Disaster Management Operations: 1077"
+              >
+                <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
+                  {language === "kn" ? "ಜಿಲ್ಲಾ ವಿಪತ್ತು ನಿರ್ವಹಣೆ" : "District Disaster Ops"}
+                </span>
+                <span className="font-mono text-zinc-300 font-bold text-[11px] group-hover:text-white">
+                  1077
+                </span>
+              </a>
             </li>
-            <li className="group cursor-default">
-              <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 group-hover:text-white">
-                <strong className="text-white">SDG 13</strong>: Climate Action
-              </span>
+            <li>
+              <a
+                href="tel:04936204151"
+                className="group flex items-center justify-between hover:text-white transition-colors cursor-pointer"
+                title="Wayanad Collectorate Control Room: 04936-204151"
+              >
+                <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 truncate pr-2">
+                  {language === "kn" ? "ಜಿಲ್ಲಾಧಿಕಾರಿ ಕಂಟ್ರೋಲ್" : "Collectorate Control"}
+                </span>
+                <span className="font-mono text-zinc-300 font-bold text-[10px] shrink-0 group-hover:text-white">
+                  04936-204151
+                </span>
+              </a>
             </li>
-            <li className="group cursor-default">
-              <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 group-hover:text-white">
-                <strong className="text-white">SDG 15</strong>: Mountain Ecosystems
-              </span>
+            <li>
+              <a
+                href="tel:112"
+                className="group flex items-center justify-between hover:text-white transition-colors cursor-pointer"
+                title="Police & Civil Rescue: 112"
+              >
+                <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
+                  {language === "kn" ? "ತುರ್ತು ರಕ್ಷಣಾ ಸೇವೆ" : "Police & Civil Rescue"}
+                </span>
+                <span className="font-mono text-zinc-300 font-bold text-[11px] group-hover:text-white">
+                  112
+                </span>
+              </a>
             </li>
-            <li className="group cursor-default">
-              <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 group-hover:text-white">
-                ISO 31000 Risk Management
-              </span>
+            <li>
+              <a
+                href="tel:1070"
+                className="group flex items-center justify-between hover:text-white transition-colors cursor-pointer"
+                title="State Disaster Authority (KSDMA): 1070"
+              >
+                <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
+                  {language === "kn" ? "ರಾಜ್ಯ ವಿಪತ್ತು ಪ್ರಾಧಿಕಾರ" : "State Disaster (KSDMA)"}
+                </span>
+                <span className="font-mono text-zinc-300 font-bold text-[11px] group-hover:text-white">
+                  1070
+                </span>
+              </a>
             </li>
           </ul>
         </div>
