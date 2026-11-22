@@ -327,6 +327,7 @@ def simulate(data: SimulationRequest):
 
 
 @app.get("/explain", response_model=ExplanationResponse)
+@app.get("/api/v1/explain", response_model=ExplanationResponse)
 def explain(data: PredictionRequest = Depends()):
     require_model()
 
