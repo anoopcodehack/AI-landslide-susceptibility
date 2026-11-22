@@ -49,11 +49,6 @@ export const LetterDropLoader: React.FC = () => {
             {letter}
           </span>
         ))}
-        {/* Terminal Block Cursor */}
-        <span
-          style={{ animationDelay: `${word.length * 0.08 + 0.1}s` }}
-          className="w-3 sm:w-4 h-8 sm:h-12 bg-white inline-block ml-1 drop-bounce-letter"
-        />
       </div>
 
       {/* Subtitle & Loading Status */}

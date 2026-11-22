@@ -8,6 +8,7 @@ import { HeroGaugeCard } from "@/components/HeroGaugeCard";
 import { StatsGrid } from "@/components/StatsGrid";
 import { TrendChart, TrendData } from "@/components/TrendChart";
 import { TacticalDock } from "@/components/TacticalDock";
+import { LetterDropLoader } from "@/components/LetterDropLoader";
 import { API_BASE_URL } from "@/lib/api";
 import {
   ArrowUpRight,
@@ -156,6 +157,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col justify-between w-full bg-zinc-50/60 relative text-zinc-900">
+      <LetterDropLoader />
       <Navbar backendOnline={backendOnline} />
 
       <main className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 md:px-12 py-6 flex-1 space-y-8">
