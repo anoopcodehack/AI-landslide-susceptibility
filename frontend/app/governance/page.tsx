@@ -13,389 +13,334 @@ import {
   Layers,
   Globe,
   CheckCircle2,
-  GitBranch,
-  Terminal,
-  Copy,
-  Check,
-  Code2,
-  Lock,
+  AlertTriangle,
+  MapPin,
+  Users,
+  Compass,
+  Send,
+  Building2,
+  Route,
+  Activity,
 } from "lucide-react";
 
 export default function GovernancePage() {
   const [backendOnline, setBackendOnline] = useState<boolean>(true);
-  const [apiTab, setApiTab] = useState<"curl" | "python" | "schema">("curl");
-  const [copiedCode, setCopiedCode] = useState<boolean>(false);
+  const [selectedSector, setSelectedSector] = useState<string>("chooralmala");
 
-  const curlExample = `curl -X POST "http://localhost:8000/api/v1/predict" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "slope": 38.5,
-    "rainfall": 372.0,
-    "elevation": 1150.0,
-    "soil": 0.78,
-    "ndvi": 0.22
-  }'`;
-
-  const pythonExample = `import requests
-
-payload = {
-    "slope": 38.5,
-    "rainfall": 372.0,
-    "elevation": 1150.0,
-    "soil": 0.78,
-    "ndvi": 0.22
-}
-
-res = requests.post("http://localhost:8000/api/v1/predict", json=payload)
-data = res.json()
-print(f"Risk Score: {data['susceptibility'] * 100:.1f}% [{data['zone']}]")`;
-
-  const schemaExample = `from pydantic import BaseModel, Field
-
-class PredictionRequest(BaseModel):
-    slope: float = Field(..., ge=0, le=90, description="Slope gradient in degrees")
-    rainfall: float = Field(..., ge=0, description="24h accumulated rainfall in mm")
-    elevation: float = Field(..., description="Topographic elevation in meters")
-    soil: float = Field(..., ge=0, le=1, description="Soil saturation index [0-1]")
-    ndvi: float = Field(..., ge=-1, le=1, description="Vegetative root cohesion index")
-
-class PredictionResponse(BaseModel):
-    susceptibility: float
-    zone: str
-    model_used: str
-    evacuation_alert: bool`;
-
-  const getActiveCode = () => {
-    if (apiTab === "curl") return curlExample;
-    if (apiTab === "python") return pythonExample;
-    return schemaExample;
-  };
-
-  const copyCode = () => {
-    navigator.clipboard.writeText(getActiveCode());
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
-
-  const complianceItems = [
+  const archSteps = [
     {
-      framework: "ISO 31000:2018",
-      clause: "Clause 6.4: Risk Analysis & Identification",
-      status: "Compliant & Validated",
-      desc: "Deterministic geotechnical modeling with quantitative factor of safety (FS) thresholding.",
+      step: "01",
+      title: "Geospatial Ingestion",
+      icon: Database,
+      items: ["SRTM 30m DEM (Slope)", "Sentinel-2 NDVI Cohesion", "Open-Meteo AWS #04 Telemetry"],
+      badge: "Raster / Synoptic",
     },
     {
-      framework: "Sendai Framework",
-      clause: "Priority 1: Understanding Disaster Risk",
-      status: "High Compliance",
-      desc: "Decoupled raster spatial data ingestion across 30m NASA DEM and IMD rainfall grids.",
+      step: "02",
+      title: "Feature Calibration",
+      icon: Layers,
+      items: ["1,500 Cell Spatial Matrix", "Pore Saturation Scaling", "Geotechnical Shear Vector"],
+      badge: "UTM 43N Reprojected",
     },
     {
-      framework: "Sendai Framework",
-      clause: "Priority 4: Preparedness for Effective Response",
-      status: "Operational",
-      desc: "Calibrated 0.25 decision threshold achieving >95% Recall for 6-hour advance warning.",
+      step: "03",
+      title: "AI Inference & XAI",
+      icon: Cpu,
+      items: ["XGBoost Classifier (94.0% AUC)", "0.35 Calibrated Threshold", "SHAP TreeExplainer Attributions"],
+      badge: "Sub-15ms Latency",
     },
     {
-      framework: "UN SDG 11.5",
-      clause: "Disaster Mortality Reduction in Human Settlements",
-      status: "Directly Aligned",
-      desc: "Instant civil protection directive generation with designated transit corridor routing.",
+      step: "04",
+      title: "Autonomous Warning",
+      icon: Send,
+      items: ["@GeoShield_Warning_Bot", "English + ಕನ್ನಡ Directives", "Interactive Tactical Cockpit"],
+      badge: "Zero-Click Trigger",
+    },
+  ];
+
+  const evacuationSectors = [
+    {
+      id: "chooralmala",
+      name: "Chooralmala Sector 04",
+      hazard: "CRITICAL RED (91%)",
+      hazardColor: "bg-red-50 text-red-700 border-red-200",
+      shelter: "Meppadi Higher Secondary School Relief Camp",
+      capacity: "1,500 persons",
+      corridor: "Route KSDMA-04B via Vellarmala Bypass",
+      buffer: "1,200m Evacuation Radius",
+      contact: "District Emergency Ops: 1077 / 04936-204151",
     },
     {
-      framework: "UN SDG 13.1",
-      clause: "Strengthen Resilience to Climate-Induced Hazards",
-      status: "Directly Aligned",
-      desc: "Transparent Explainable AI (SHAP) ensuring civil defense teams understand trigger factors.",
+      id: "mundakkai",
+      name: "Mundakkai Debris Basin",
+      hazard: "CRITICAL RED (94%)",
+      hazardColor: "bg-red-50 text-red-700 border-red-200",
+      shelter: "Vellarmala School Safe Ground & Community Hall",
+      capacity: "900 persons",
+      corridor: "Route KSDMA-02A via Plantation Ridge",
+      buffer: "1,500m Hazard Inundation Buffer",
+      contact: "Disaster Control Room: 04936-202234",
+    },
+    {
+      id: "vythiri",
+      name: "Vythiri Ghat Pass Corridor",
+      hazard: "WATCH ORANGE (74%)",
+      hazardColor: "bg-amber-50 text-amber-700 border-amber-200",
+      shelter: "Vythiri Taluk Hospital Relief Enclosure",
+      capacity: "1,200 persons",
+      corridor: "NH-766 Ghat Road Controlled Transit",
+      buffer: "600m Precautionary Buffer",
+      contact: "Traffic & Highway Patrol: 112",
+    },
+    {
+      id: "meppadi",
+      name: "Meppadi Valley Corridor",
+      hazard: "HIGH ORANGE (82%)",
+      hazardColor: "bg-amber-50 text-amber-700 border-amber-200",
+      shelter: "Govt Vocational Higher Secondary Camp",
+      capacity: "1,800 persons",
+      corridor: "State Highway 59 Relief Corridor",
+      buffer: "800m Buffer Zone",
+      contact: "Meppadi Fire & Rescue: 101",
+    },
+    {
+      id: "bathery",
+      name: "Sulthan Bathery Plateau",
+      hazard: "STABLE GREEN (19%)",
+      hazardColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      shelter: "Municipal Town Hall Primary Assembly Point",
+      capacity: "3,000 persons",
+      corridor: "NH-766 Plateau Transit Open",
+      buffer: "Baseline Normal Monitoring",
+      contact: "Revenue Divisional Office: 04936-220223",
+    },
+  ];
+
+  const sopProtocols = [
+    {
+      level: "GREEN (Advisory)",
+      threshold: "Susceptibility < 0.25",
+      action: "Routine 24h satellite & synoptic telemetry monitoring. Drainage clearways inspected.",
+      color: "border-emerald-300 bg-emerald-50/60 text-emerald-800",
+    },
+    {
+      level: "ORANGE (Warning)",
+      threshold: "Susceptibility 0.25 – 0.35",
+      action: "Pre-position NDRF / SDRF battalions. Evacuation camps opened. Telegram bot issues Stage-2 alert.",
+      color: "border-amber-300 bg-amber-50/60 text-amber-800",
+    },
+    {
+      level: "RED (Emergency Evacuation)",
+      threshold: "Susceptibility >= 0.35",
+      action: "Immediate mandatory evacuation along designated transit corridors. Autonomous bilingual Telegram alerts pushed to all relief officers.",
+      color: "border-red-300 bg-red-50/60 text-red-800",
+    },
+  ];
+
+  const sdgGoals = [
+    {
+      id: "SDG 11.5",
+      title: "Sustainable Cities & Communities",
+      target: "Disaster Mortality & Loss Reduction",
+      metric: "94.12% Disaster Recall",
+      color: "border-amber-200 bg-amber-50 text-amber-800",
+    },
+    {
+      id: "SDG 13.1",
+      title: "Climate Action",
+      target: "Strengthen Resilience to Orographic Cloudbursts",
+      metric: "Live Synoptic Telemetry",
+      color: "border-blue-200 bg-blue-50 text-blue-800",
+    },
+    {
+      id: "SDG 15.4",
+      title: "Life on Land",
+      target: "Mountain Ecosystem & Soil Conservation",
+      metric: "NDVI Canopy Tracking",
+      color: "border-emerald-200 bg-emerald-50 text-emerald-800",
     },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col justify-between w-full bg-white text-zinc-900">
-      {/* Sticky Coder Navbar */}
+    <div className="min-h-screen flex flex-col justify-between w-full bg-zinc-50/60 text-zinc-900">
       <Navbar backendOnline={backendOnline} />
 
-      {/* Main Full-Page Content */}
-      <main className="max-w-[1440px] mx-auto w-full px-6 md:px-12 py-8 flex-1">
+      <main className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 md:px-12 py-6 flex-1 space-y-8">
         {/* Breadcrumb Bar */}
-        <div className="flex items-center justify-between mb-6 pb-3 border-b border-zinc-100 text-xs font-mono text-zinc-500">
-          <div className="flex items-center gap-2.5">
-            <Link
-              href="/"
-              className="hover:text-black transition-colors flex items-center gap-1 font-medium"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> Overview
-            </Link>
-            <span>/</span>
-            <span className="text-zinc-900 font-semibold uppercase tracking-wider">
-              Governance, Architecture & SDGs
-            </span>
-          </div>
+        <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
+          <Link href="/" className="hover:text-black transition-colors flex items-center gap-1 font-semibold">
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+          </Link>
+          <span className="text-zinc-700">Standards: KSDMA Civil Defense / ISO 31000 / UN Sendai Framework</span>
+        </div>
 
-          <div className="hidden sm:flex items-center gap-4 text-[11px]">
-            <span>Standard: <strong className="text-black">ISO 31000 / Sendai</strong></span>
-            <span>Target: <strong className="text-black">UN SDG 11 & SDG 13</strong></span>
+        {/* Visual Header */}
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-mono font-semibold text-zinc-800">
+              <Shield className="w-3.5 h-3.5 text-black" />
+              <span>Civil Defense Governance & Disaster Evacuation Protocol</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-black tracking-tight">
+              Civil Protection Protocols & UN SDGs
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-600 font-sans">
+              Designated relief camps, transit corridors, and standard operating procedures for Wayanad District.
+            </p>
           </div>
         </div>
 
-        {/* Page Header Bar */}
-        <div className="pb-6 border-b border-zinc-200 mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-300 text-xs font-mono font-semibold text-zinc-800 mb-2.5">
-            <Shield className="w-3.5 h-3.5 text-black" />
-            <span>Infrastructure Governance & Civil Defense Standard</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse ml-1" />
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-black">
-            System Architecture & UN SDG 11
-          </h1>
-          <p className="text-sm sm:text-base text-zinc-600 max-w-3xl mt-2 font-normal leading-relaxed">
-            Enterprise 4-tier system architecture, REST API OpenAPI contracts, geotechnical mathematical
-            physics formulation, and verified compliance with the Sendai Framework for Disaster Risk Reduction 2015–2030.
-          </p>
-        </div>
-
-        {/* SECTION 1: 4-Layer Enterprise Architecture */}
-        <section className="mb-12">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-black mb-5 flex items-center gap-2">
-            <Server className="w-4 h-4 text-black" /> 4-Tier Enterprise Software Architecture
+        {/* 1. VISUAL 4-TIER PIPELINE FLOW */}
+        <section className="space-y-4">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-black flex items-center gap-2">
+            <Server className="w-4 h-4 text-black" />
+            <span>End-to-End Early Warning Architecture</span>
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {/* Layer 1 */}
-            <div className="p-5 bg-zinc-50 rounded-xl border border-zinc-200 shadow-2xs hover:border-black transition-all">
-              <div className="w-7 h-7 rounded-md bg-zinc-200 flex items-center justify-center font-mono font-bold text-xs text-black mb-3">
-                01
-              </div>
-              <h3 className="font-mono text-xs font-bold text-black uppercase mb-1">
-                Data Engineering
-              </h3>
-              <p className="text-[11px] text-zinc-500 font-sans mb-3">
-                Raw spatial data ingestion & coordinate normalization
-              </p>
-              <ul className="space-y-1.5 text-xs font-mono text-zinc-700">
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> NASA SRTM 30m DEM
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Sentinel-2 Surface Refl.
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> IMD Gridded Rainfall
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> GSI Failure Inventory
-                </li>
-              </ul>
-            </div>
-
-            {/* Layer 2 */}
-            <div className="p-5 bg-zinc-50 rounded-xl border border-zinc-200 shadow-2xs hover:border-black transition-all">
-              <div className="w-7 h-7 rounded-md bg-zinc-200 flex items-center justify-center font-mono font-bold text-xs text-black mb-3">
-                02
-              </div>
-              <h3 className="font-mono text-xs font-bold text-black uppercase mb-1">
-                Feature Engine
-              </h3>
-              <p className="text-[11px] text-zinc-500 font-sans mb-3">
-                Geospatial transformation & hydrological physics
-              </p>
-              <ul className="space-y-1.5 text-xs font-mono text-zinc-700">
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Topographic Wetness (TWI)
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Slope Gradient & Aspect
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Root Tensile NDVI
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Riparian Distance Buffers
-                </li>
-              </ul>
-            </div>
-
-            {/* Layer 3 */}
-            <div className="p-5 bg-zinc-50 rounded-xl border border-zinc-200 shadow-2xs hover:border-black transition-all">
-              <div className="w-7 h-7 rounded-md bg-zinc-200 flex items-center justify-center font-mono font-bold text-xs text-black mb-3">
-                03
-              </div>
-              <h3 className="font-mono text-xs font-bold text-black uppercase mb-1">
-                ML & XAI Core
-              </h3>
-              <p className="text-[11px] text-zinc-500 font-sans mb-3">
-                Ensemble prediction & Shapley attribution
-              </p>
-              <ul className="space-y-1.5 text-xs font-mono text-zinc-700">
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Soft-Voting Ensemble
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> XGBoost / LightGBM
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Threshold Tuner (0.25)
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> SHAP TreeExplainer
-                </li>
-              </ul>
-            </div>
-
-            {/* Layer 4 */}
-            <div className="p-5 bg-zinc-50 rounded-xl border border-zinc-200 shadow-2xs hover:border-black transition-all">
-              <div className="w-7 h-7 rounded-md bg-zinc-200 flex items-center justify-center font-mono font-bold text-xs text-black mb-3">
-                04
-              </div>
-              <h3 className="font-mono text-xs font-bold text-black uppercase mb-1">
-                Decision UI & API
-              </h3>
-              <p className="text-[11px] text-zinc-500 font-sans mb-3">
-                Real-time REST gateway & Coder cockpit
-              </p>
-              <ul className="space-y-1.5 text-xs font-mono text-zinc-700">
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> FastAPI Asynchronous REST
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Next.js 14 App Router
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> 72-Hour Timeline Replay
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-black rounded-full" /> Printable KSDMA Directive
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 2: Interactive API Contract Explorer */}
-        <section className="mb-12">
-          <div className="p-6 bg-zinc-900 rounded-2xl border border-zinc-800 text-white shadow-xl">
-            <div className="flex flex-wrap items-center justify-between pb-4 border-b border-zinc-800 gap-3">
-              <div className="flex items-center gap-2.5">
-                <Code2 className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-white">
-                  FastAPI Asynchronous Endpoint Contract // POST /api/v1/predict
-                </h3>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="flex items-center bg-zinc-800 rounded-md p-0.5 border border-zinc-700 text-[11px] font-mono">
-                  <button
-                    onClick={() => setApiTab("curl")}
-                    className={`px-2.5 py-1 rounded transition-colors ${
-                      apiTab === "curl" ? "bg-white text-black font-bold" : "text-zinc-400 hover:text-white"
-                    }`}
-                  >
-                    cURL
-                  </button>
-                  <button
-                    onClick={() => setApiTab("python")}
-                    className={`px-2.5 py-1 rounded transition-colors ${
-                      apiTab === "python" ? "bg-white text-black font-bold" : "text-zinc-400 hover:text-white"
-                    }`}
-                  >
-                    Python
-                  </button>
-                  <button
-                    onClick={() => setApiTab("schema")}
-                    className={`px-2.5 py-1 rounded transition-colors ${
-                      apiTab === "schema" ? "bg-white text-black font-bold" : "text-zinc-400 hover:text-white"
-                    }`}
-                  >
-                    Pydantic Schema
-                  </button>
-                </div>
-
-                <button
-                  onClick={copyCode}
-                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-mono flex items-center gap-1 text-zinc-300 transition-colors"
-                >
-                  {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedCode ? "Copied" : "Copy"}</span>
-                </button>
-              </div>
-            </div>
-
-            <pre className="mt-4 p-4 rounded-xl bg-black/60 border border-zinc-800 text-xs font-mono text-emerald-300 overflow-x-auto leading-relaxed">
-              <code>{getActiveCode()}</code>
-            </pre>
-          </div>
-        </section>
-
-        {/* SECTION 3: Geotechnical Mathematical Physics */}
-        <section className="mb-12">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-black mb-5 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-black" /> Geotechnical Physics & Formulations
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Formula 1 */}
-            <div className="p-6 bg-zinc-50 rounded-xl border border-zinc-200">
-              <h3 className="font-mono text-xs font-bold uppercase text-black mb-2">
-                1. Infinite Slope Stability Equation (Factor of Safety)
-              </h3>
-              <p className="text-xs text-zinc-600 mb-3 font-sans leading-relaxed">
-                Determines the mechanical ratio of resisting shear strength to driving gravitational force:
-              </p>
-              <div className="p-3.5 bg-white rounded-lg border border-zinc-300 font-mono text-xs text-center text-black font-bold overflow-x-auto">
-                FS = [ c&apos; + (γ - m·γ_w) · z · cos²(β) · tan(φ&apos;) ] / [ γ · z · sin(β) · cos(β) ]
-              </div>
-              <p className="text-[11px] text-zinc-500 mt-2.5 font-sans">
-                Where <strong>c&apos;</strong> is effective cohesion, <strong>γ</strong> is soil unit weight,
-                <strong>m</strong> is water table height ratio, <strong>β</strong> is slope angle, and
-                <strong>φ&apos;</strong> is internal friction angle. When pore pressure saturates, FS drops below 1.0 (failure).
-              </p>
-            </div>
-
-            {/* Formula 2 */}
-            <div className="p-6 bg-zinc-50 rounded-xl border border-zinc-200">
-              <h3 className="font-mono text-xs font-bold uppercase text-black mb-2">
-                2. Topographic Wetness Index (TWI) & Drainage Convergence
-              </h3>
-              <p className="text-xs text-zinc-600 mb-3 font-sans leading-relaxed">
-                Quantifies topographic control on hydrological moisture accumulation:
-              </p>
-              <div className="p-3.5 bg-white rounded-lg border border-zinc-300 font-mono text-xs text-center text-black font-bold overflow-x-auto">
-                TWI = ln( a / tan β )
-              </div>
-              <p className="text-[11px] text-zinc-500 mt-2.5 font-sans">
-                Where <strong>a</strong> is the upslope contributing area per unit contour width. High TWI gullies
-                in Chooralmala experience rapid subsurface water convergence during extreme monsoon bursts.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 4: UN SDGs & International Compliance Audit Matrix */}
-        <section className="mb-12">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-black mb-5 flex items-center gap-2">
-            <Globe className="w-4 h-4 text-black" /> UN SDGs & Sendai Framework Compliance Matrix
-          </h2>
-
-          <div className="border border-zinc-200 rounded-2xl overflow-hidden shadow-2xs divide-y divide-zinc-200">
-            {complianceItems.map((item, idx) => (
-              <div key={idx} className="p-4 sm:p-5 hover:bg-zinc-50 transition-colors flex flex-wrap items-center justify-between gap-4">
-                <div className="max-w-xl">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-black uppercase">
-                      {item.framework}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {archSteps.map((step, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-xs hover:border-black transition-all flex flex-col justify-between space-y-4"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center font-mono font-bold text-xs">
+                      {step.step}
                     </span>
-                    <span className="text-[10px] font-mono text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
-                      {item.clause}
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200 font-semibold">
+                      {step.badge}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-600 mt-1 font-sans">{item.desc}</p>
+
+                  <h3 className="font-mono text-xs font-bold text-black uppercase mb-2">
+                    {step.title}
+                  </h3>
+
+                  <ul className="space-y-1.5 text-xs font-mono text-zinc-600">
+                    {step.items.map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 2. REGIONAL EVACUATION NETWORK & RELIEF SHELTERS */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-black flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-black" />
+              <span>Designated Relief Shelters & Evacuation Corridors</span>
+            </h2>
+            <span className="text-xs font-mono text-zinc-500">KSDMA Pre-Configured Grid</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {evacuationSectors.map((sec) => (
+              <div
+                key={sec.id}
+                className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-xs flex flex-col justify-between space-y-4 hover:border-black transition-all"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-bold text-sm text-black">{sec.name}</h3>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${sec.hazardColor}`}>
+                      {sec.hazard}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-xs font-sans text-zinc-600 mt-3">
+                    <div className="flex items-start gap-2">
+                      <Building2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-black block font-semibold">{sec.shelter}</strong>
+                        <span className="text-[11px] text-zinc-500">Capacity: {sec.capacity}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-2">
+                      <Route className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="text-black font-semibold">Corridor: </span>
+                        <span>{sec.corridor}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-500">
+                      <Compass className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>{sec.buffer}</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded">
-                    {item.status}
+                <div className="pt-2 border-t border-zinc-100 text-[11px] font-mono text-zinc-500 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span>{sec.contact}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 3. STANDARD OPERATING PROCEDURE (SOP) PROTOCOL CARDS */}
+        <section className="space-y-4">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-black flex items-center gap-2">
+            <Activity className="w-4 h-4 text-black" />
+            <span>KSDMA Tri-Color Alert Response SOP</span>
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {sopProtocols.map((sop, idx) => (
+              <div
+                key={idx}
+                className={`p-5 rounded-2xl border shadow-xs flex flex-col justify-between space-y-3 ${sop.color}`}
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <strong className="text-sm font-black uppercase font-mono">{sop.level}</strong>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-white/80 rounded border">
+                      {sop.threshold}
+                    </span>
+                  </div>
+                  <p className="text-xs font-sans mt-2.5 leading-relaxed">{sop.action}</p>
+                </div>
+                <div className="text-[11px] font-mono font-bold opacity-80 pt-2 border-t border-black/10">
+                  Status: Operational Standard
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 4. UNITED NATIONS SDGs TARGETS (CLEAN CARDS) */}
+        <section className="space-y-4">
+          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-black flex items-center gap-2">
+            <Globe className="w-4 h-4 text-black" />
+            <span>UN Sustainable Development Goals (SDGs) Alignment</span>
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {sdgGoals.map((sdg, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-xs flex flex-col justify-between space-y-3 hover:border-black transition-colors"
+              >
+                <div>
+                  <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${sdg.color}`}>
+                    {sdg.id}
                   </span>
+                  <h3 className="font-bold text-sm text-black mt-2">{sdg.title}</h3>
+                  <p className="text-xs text-zinc-600 font-sans mt-1">{sdg.target}</p>
+                </div>
+                <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-xs font-mono">
+                  <span className="text-zinc-400">Project Metric:</span>
+                  <strong className="text-emerald-600 font-bold">{sdg.metric}</strong>
                 </div>
               </div>
             ))}
@@ -403,7 +348,6 @@ class PredictionResponse(BaseModel):
         </section>
       </main>
 
-      {/* Coder Corporate Footer */}
       <TacticalDock />
     </div>
   );
