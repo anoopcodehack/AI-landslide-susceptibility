@@ -174,19 +174,33 @@ export default function GovernancePage() {
           <span className="text-zinc-700">Standards: KSDMA Civil Defense / ISO 31000 / UN Sendai Framework</span>
         </div>
 
-        {/* Visual Header */}
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-mono font-semibold text-zinc-800">
-              <Shield className="w-3.5 h-3.5 text-black" />
-              <span>Civil Defense Governance & Disaster Evacuation Protocol</span>
+        {/* Visual Header with Authentic Landslide Terrain Background */}
+        <div className="relative p-6 sm:p-8 rounded-3xl border border-zinc-200/90 shadow-md overflow-hidden bg-slate-900 text-zinc-900">
+          {/* Authentic Landslide Debris Flow Terrain Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform duration-700 scale-105"
+            style={{
+              backgroundImage: "url('/images/landslide_hero_bg.jpg')",
+            }}
+          />
+
+          {/* Balanced Gradient Overlay: Subtle white wash on the left, fading to more transparent on the right so the mountain slope failure and valley debris are clearly visible */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/88 to-white/60 pointer-events-none" />
+
+          {/* Interactive Content Container */}
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs border border-zinc-200/90 text-xs font-mono font-semibold text-zinc-800 shadow-2xs">
+                <Shield className="w-3.5 h-3.5 text-black" />
+                <span>Civil Defense Governance &amp; Disaster Evacuation Protocol</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-black tracking-tight drop-shadow-2xs">
+                Civil Protection Protocols &amp; UN SDGs
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-700 font-sans font-medium drop-shadow-2xs max-w-2xl">
+                Designated relief camps, transit corridors, and standard operating procedures for Wayanad District.
+              </p>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-black tracking-tight">
-              Civil Protection Protocols & UN SDGs
-            </h1>
-            <p className="text-xs sm:text-sm text-zinc-600 font-sans">
-              Designated relief camps, transit corridors, and standard operating procedures for Wayanad District.
-            </p>
           </div>
         </div>
 

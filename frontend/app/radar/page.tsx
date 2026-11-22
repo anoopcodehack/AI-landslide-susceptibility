@@ -7,6 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import { TacticalDock } from "@/components/TacticalDock";
 import { API_BASE_URL } from "@/lib/api";
 import { useAlerts } from "@/components/AlertCenter";
+import { useLanguage } from "@/lib/LanguageContext";
 import {
   Map,
   Satellite,
@@ -29,7 +30,214 @@ import {
   Thermometer,
   Wind,
   RefreshCw,
+  ExternalLink,
+  Route,
+  CheckCircle2,
 } from "lucide-react";
+
+interface ReliefCorridorWaypoint {
+  name: string;
+  coords: [number, number];
+  note: string;
+}
+
+interface ReliefCorridorData {
+  sectorId: string;
+  name: string;
+  originName: string;
+  destinationName: string;
+  distanceKm: number;
+  estMinutes: number;
+  roadType: string;
+  status: "OPEN" | "NDRF_ESCORTED" | "CONVOY_ONLY" | "HIGHWAY_OPEN";
+  statusBadge: string;
+  protocol: string;
+  reliefCamp: string;
+  campCapacity: string;
+  campCoordinates: [number, number];
+  emergencyFreq: string;
+  leadAgency: string;
+  routeCoordinates: [number, number][];
+  waypoints: ReliefCorridorWaypoint[];
+}
+
+const RELIEF_CORRIDORS: Record<string, ReliefCorridorData> = {
+  chooralmala: {
+    sectorId: "chooralmala",
+    name: "Bailey Bridge Emergency Span -> Kalpetta HQ",
+    originName: "Chooralmala Sector Ground Zero",
+    destinationName: "District Emergency Operations Centre (DEOC), Kalpetta",
+    distanceKm: 14.2,
+    estMinutes: 28,
+    roadType: "State Highway 54 / Emergency Bailey Span",
+    status: "NDRF_ESCORTED",
+    statusBadge: "NDRF ESCORTED • 24-TON SPAN",
+    protocol: "Single-lane 24-ton Bailey Bridge priority transit; Indian Army & NDRF convoy coordination.",
+    reliefCamp: "St. Joseph's HSS Relief Shelter & Kalpetta Town Hall Camp",
+    campCapacity: "1,600 Beds / 2,400 Meals Daily",
+    campCoordinates: [11.6050, 76.0820],
+    emergencyFreq: "VHF 156.800 MHz (KSDMA Ch 4)",
+    leadAgency: "NDRF 04Bn & Kerala Police",
+    routeCoordinates: [
+      [11.5381, 76.1772], // Chooralmala Origin
+      [11.5398, 76.1685], // Bailey Bridge Rapid Deployment Span
+      [11.5432, 76.1550], // Vellarmala Junction
+      [11.5475, 76.1410], // Kalladi Checkpost
+      [11.5518, 76.1265], // Meppadi Police Transit Checkpost
+      [11.5645, 76.1130], // Nedumbala High Ridge Route
+      [11.5810, 76.0980], // Kottapadi Ring Road
+      [11.5950, 76.0890], // Kainatty Junction
+      [11.6050, 76.0820], // Kalpetta DEOC HQ
+    ],
+    waypoints: [
+      { name: "Bailey Bridge Anchor", coords: [11.5398, 76.1685], note: "Army 24-ton span across Iruvaipuzha" },
+      { name: "Meppadi Transit Post", coords: [11.5518, 76.1265], note: "Triage checkpost & ambulance staging" },
+      { name: "Nedumbala Ridge Spur", coords: [11.5645, 76.1130], note: "High ground bypass free of debris hazard" },
+      { name: "Kainatty Junction", coords: [11.5950, 76.0890], note: "Direct dual-lane connection to Kalpetta" },
+    ],
+  },
+  mundakkai: {
+    sectorId: "mundakkai",
+    name: "Route 1 -> Meppadi Relief Transit Hub",
+    originName: "Mundakkai Debris Flow Epicenter",
+    destinationName: "Meppadi Relief Transit Hub",
+    distanceKm: 6.4,
+    estMinutes: 18,
+    roadType: "Upper Valley Evacuation Track",
+    status: "CONVOY_ONLY",
+    statusBadge: "TACTICAL 4x4 & AMBULANCE SPUR",
+    protocol: "Tactical 4x4 ambulance & high-axle vehicle evacuation along elevated drainage ridge.",
+    reliefCamp: "Government Higher Secondary School Shelter, Meppadi",
+    campCapacity: "950 Beds / Mobile Triage Base",
+    campCoordinates: [11.5518, 76.1265],
+    emergencyFreq: "VHF 154.250 MHz (NDRF Tac 2)",
+    leadAgency: "NDRF & Fire Rescue Services",
+    routeCoordinates: [
+      [11.5300, 76.1820], // Mundakkai Origin
+      [11.5350, 76.1680], // Upper Plantation Spur
+      [11.5410, 76.1510], // Attamala Ridge Crossing
+      [11.5470, 76.1380], // Kalladi Approach
+      [11.5518, 76.1265], // Meppadi Transit Hub
+    ],
+    waypoints: [
+      { name: "Upper Plantation Ridge", coords: [11.5350, 76.1680], note: "Stabilized rocky ground clear of mudflows" },
+      { name: "Attamala Crossing", coords: [11.5410, 76.1510], note: "Emergency medical transport staging post" },
+    ],
+  },
+  meppadi: {
+    sectorId: "meppadi",
+    name: "Meppadi-Kalpetta Arterial Highway (Open)",
+    originName: "Meppadi Escarpment",
+    destinationName: "Kalpetta Civil Station Relief Base",
+    distanceKm: 11.5,
+    estMinutes: 16,
+    roadType: "Dual-Lane Asphalt Highway",
+    status: "HIGHWAY_OPEN",
+    statusBadge: "100% CLEAR • PRIORITY GREEN CORRIDOR",
+    protocol: "Paved dual-lane highway; continuous green corridor for emergency convoys.",
+    reliefCamp: "SKMJ Higher Secondary School Grounds, Kalpetta",
+    campCapacity: "1,200 Beds / Medical Logistics Center",
+    campCoordinates: [11.6050, 76.0820],
+    emergencyFreq: "VHF 162.400 MHz (Police Net)",
+    leadAgency: "Motor Vehicles Dept & Kerala Police",
+    routeCoordinates: [
+      [11.5518, 76.1265], // Meppadi Center
+      [11.5630, 76.1150], // Meppadi North
+      [11.5750, 76.1040], // Kottapadi Bypass
+      [11.5910, 76.0920], // Chuzhali Link
+      [11.6050, 76.0820], // Kalpetta Civil Station
+    ],
+    waypoints: [
+      { name: "Kottapadi Junction", coords: [11.5750, 76.1040], note: "Wide bypass lane for high-capacity flow" },
+      { name: "Chuzhali Access", coords: [11.5910, 76.0920], note: "Traffic police active signal override" },
+    ],
+  },
+  vythiri: {
+    sectorId: "vythiri",
+    name: "NH-766 Interstate Freight Corridor",
+    originName: "Vythiri Ghat Pass (NH-766)",
+    destinationName: "Adivaram Base Camp (NH-766)",
+    distanceKm: 18.2,
+    estMinutes: 35,
+    roadType: "National Highway Ghat Section",
+    status: "OPEN",
+    statusBadge: "CONTINUOUS RADAR SLOPE SURVEILLANCE",
+    protocol: "Interstate arterial monitored by automated rockfall acoustic sensors and heavy wreckers.",
+    reliefCamp: "Vythiri Community Hall & Lakkidi Evacuation Center",
+    campCapacity: "1,100 Beds / Medical Supply Staging",
+    campCoordinates: [11.4720, 75.9980],
+    emergencyFreq: "VHF 151.625 MHz (NHAI Highway Patrol)",
+    leadAgency: "NHAI Disaster Response & Highway Patrol",
+    routeCoordinates: [
+      [11.5524, 76.0425], // Vythiri Ghat Checkpoint
+      [11.5380, 76.0350], // Pookode Junction
+      [11.5240, 76.0290], // Old Vythiri Stretch
+      [11.5180, 76.0260], // Lakkidi Gateway Peak
+      [11.4980, 76.0150], // Hairpin Turn 9 Spur
+      [11.4820, 76.0060], // Hairpin Turn 4 Cut
+      [11.4720, 75.9980], // Adivaram Coastal Descent Base
+    ],
+    waypoints: [
+      { name: "Lakkidi Pass Summit", coords: [11.5180, 76.0260], note: "Highest elevation point; high fog surveillance" },
+      { name: "Hairpin Bend 9", coords: [11.4980, 76.0150], note: "Reinforced retaining wall; monitored slope sensors" },
+    ],
+  },
+  bathery: {
+    sectorId: "bathery",
+    name: "Primary Civil Evacuation Camp Base",
+    originName: "Sulthan Bathery Tableland",
+    destinationName: "Sulthan Bathery Mega Logistics Camp Base",
+    distanceKm: 24.5,
+    estMinutes: 40,
+    roadType: "Plateau Arterial Highway",
+    status: "OPEN",
+    statusBadge: "PRIMARY SECURE STRONGHOLD",
+    protocol: "Central safe haven with deep soil stability and gentle tableland topography.",
+    reliefCamp: "St. Mary's College Mega Relief Shelter & Food Processing Base",
+    campCapacity: "2,800 Beds / District Central Stockpile",
+    campCoordinates: [11.6628, 76.2570],
+    emergencyFreq: "VHF 155.000 MHz (Red Cross Net)",
+    leadAgency: "Kerala Civil Supplies & Indian Red Cross",
+    routeCoordinates: [
+      [11.6628, 76.2570], // Sulthan Bathery Tableland
+      [11.6510, 76.2280], // Kuppadi Road
+      [11.6390, 76.1980], // Kolagappara Ring
+      [11.6280, 76.1620], // Meenangadi Central Junction
+      [11.6210, 76.1320], // Muttil Civil Corridor
+      [11.6050, 76.0820], // Kalpetta EOC Link
+    ],
+    waypoints: [
+      { name: "Kolagappara Ring", coords: [11.6390, 76.1980], note: "Low-hazard junction connecting North Wayanad" },
+      { name: "Meenangadi Central", coords: [11.6280, 76.1620], note: "Emergency fuel and rations supply depot" },
+    ],
+  },
+  kalpetta: {
+    sectorId: "kalpetta",
+    name: "Emergency Operations Centre (EOC)",
+    originName: "Kalpetta District Core",
+    destinationName: "District Disaster Management Command Core",
+    distanceKm: 2.1,
+    estMinutes: 5,
+    roadType: "Administrative District Arterial",
+    status: "OPEN",
+    statusBadge: "CENTRAL DISASTER NERVE CENTER",
+    protocol: "Central unified disaster governance bunker; active satellite communication and helipad.",
+    reliefCamp: "District Collectorate Command Bunker & Cricket Stadium Helipad",
+    campCapacity: "Strategic Command Core (All Agencies)",
+    campCoordinates: [11.6050, 76.0820],
+    emergencyFreq: "VHF 156.025 MHz (DDMA Command Direct)",
+    leadAgency: "District Collector & DDMA",
+    routeCoordinates: [
+      [11.6050, 76.0820], // Kalpetta Collectorate
+      [11.6075, 76.0815], // DDMA Operations Bunker
+      [11.6110, 76.0790], // Wayanad Stadium Helipad
+    ],
+    waypoints: [
+      { name: "DDMA Bunker", coords: [11.6075, 76.0815], note: "Hardened disaster communications nerve center" },
+      { name: "Stadium Helipad", coords: [11.6110, 76.0790], note: "Indian Air Force helicopter extraction point" },
+    ],
+  },
+};
 
 interface LiveWeatherTelemetry {
   station_name: string;
@@ -67,16 +275,19 @@ export default function RadarPage() {
   const leafletMap = useRef<any>(null);
   const layersRef = useRef<{ satellite?: any; osm?: any }>({});
   const circlesRef = useRef<any[]>([]);
+  const corridorLayerRef = useRef<any>(null);
 
   const [activeLayer, setActiveLayer] = useState<"satellite" | "osm">("satellite");
   const [timelineStep, setTimelineStep] = useState<number>(2);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [backendOnline, setBackendOnline] = useState<boolean>(true);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
+  const [activeCorridor, setActiveCorridor] = useState<string | null>(null);
   const [cursorCoords, setCursorCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [hoveredWaypoint, setHoveredWaypoint] = useState<any | null>(null);
 
   const { triggerAlert } = useAlerts();
+  const { language } = useLanguage();
 
   // Live real-time AWS weather telemetry (Section 3 Future Flow of Research Poster)
   const [liveWeather, setLiveWeather] = useState<LiveWeatherTelemetry>({
@@ -605,6 +816,10 @@ export default function RadarPage() {
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
+      if (corridorLayerRef.current && leafletMap.current) {
+        leafletMap.current.removeLayer(corridorLayerRef.current);
+        corridorLayerRef.current = null;
+      }
       if (leafletMap.current) {
         leafletMap.current.remove();
         leafletMap.current = null;
@@ -714,6 +929,124 @@ export default function RadarPage() {
     }
   };
 
+  const showCorridorOnMap = async (sectorId: string) => {
+    const corridor = RELIEF_CORRIDORS[sectorId];
+    if (!corridor || !leafletMap.current) return;
+
+    const L = await import("leaflet");
+    const map = leafletMap.current;
+    if (!map) return;
+
+    // Clear previous corridor layer if exists
+    if (corridorLayerRef.current) {
+      map.removeLayer(corridorLayerRef.current);
+      corridorLayerRef.current = null;
+    }
+
+    const layerGroup = L.layerGroup();
+
+    // 1. Wide emerald glow line underneath for contrast against satellite imagery
+    const glowPolyline = L.polyline(corridor.routeCoordinates, {
+      color: "#059669",
+      weight: 10,
+      opacity: 0.45,
+      lineCap: "round",
+      lineJoin: "round",
+    });
+    layerGroup.addLayer(glowPolyline);
+
+    // 2. High-contrast crisp dashed tactical corridor polyline
+    const mainPolyline = L.polyline(corridor.routeCoordinates, {
+      color: "#10b981",
+      weight: 4.5,
+      opacity: 1.0,
+      dashArray: "10, 8",
+      lineCap: "round",
+    });
+    layerGroup.addLayer(mainPolyline);
+
+    // 3. Start Point Icon (Sector Origin)
+    const startIcon = L.divIcon({
+      className: "corridor-marker-icon",
+      html: `<div style="background: #09090b; color: #10b981; border: 2px solid #10b981; border-radius: 9999px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 15px; box-shadow: 0 4px 14px rgba(0,0,0,0.65);">🚩</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+    });
+    const startMarker = L.marker(corridor.routeCoordinates[0], { icon: startIcon });
+    startMarker.bindTooltip(
+      `<div style="font-family: monospace; font-size: 11px; padding: 4px; line-height: 1.4;">
+        <strong style="color: #10b981;">🚩 EVACUATION ORIGIN</strong><br/>
+        <span style="color: #ffffff; font-weight: bold;">${corridor.originName}</span>
+      </div>`,
+      { direction: "top", opacity: 0.98, className: "coder-map-tooltip" }
+    );
+    layerGroup.addLayer(startMarker);
+
+    // 4. Waypoints along the evacuation route
+    corridor.waypoints.forEach((wp, idx) => {
+      const wpMarker = L.circleMarker(wp.coords, {
+        radius: 5,
+        color: "#10b981",
+        fillColor: "#ffffff",
+        fillOpacity: 1.0,
+        weight: 2,
+      });
+      wpMarker.bindTooltip(
+        `<div style="font-family: monospace; font-size: 10px; line-height: 1.4;">
+          <strong style="color: #10b981;">Waypoint ${idx + 1}: ${wp.name}</strong><br/>
+          <span style="color: #cbd5e1;">${wp.note}</span>
+        </div>`,
+        { direction: "top", opacity: 0.98, className: "coder-map-tooltip" }
+      );
+      layerGroup.addLayer(wpMarker);
+    });
+
+    // 5. Safe Destination Marker (Relief Shelter / HQ)
+    const destIcon = L.divIcon({
+      className: "corridor-dest-icon",
+      html: `<div style="background: #059669; color: #ffffff; border: 2px solid #ffffff; border-radius: 9999px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 16px rgba(5,150,105,0.7);">🏥</div>`,
+      iconSize: [34, 34],
+      iconAnchor: [17, 34],
+    });
+    const destMarker = L.marker(corridor.routeCoordinates[corridor.routeCoordinates.length - 1], { icon: destIcon });
+    destMarker.bindTooltip(
+      `<div style="font-family: monospace; font-size: 11px; padding: 4px; line-height: 1.45;">
+        <strong style="color: #10b981;">🏥 SAFE EVACUATION HAVEN</strong><br/>
+        <span style="color: #ffffff; font-weight: bold;">${corridor.destinationName}</span><br/>
+        <span style="color: #94a3b8;">Shelter: ${corridor.reliefCamp}</span><br/>
+        <span style="color: #38bdf8;">Capacity: ${corridor.campCapacity}</span>
+      </div>`,
+      { direction: "top", opacity: 0.98, className: "coder-map-tooltip" }
+    );
+    layerGroup.addLayer(destMarker);
+
+    layerGroup.addTo(map);
+    corridorLayerRef.current = layerGroup;
+
+    // Zoom map smoothly to display the complete corridor path
+    map.fitBounds(mainPolyline.getBounds(), {
+      padding: [70, 70],
+      maxZoom: 13,
+    });
+
+    setActiveCorridor(sectorId);
+
+    triggerAlert({
+      level: "GREEN",
+      title: "🟢 Safe Relief Corridor Active",
+      message: `${corridor.name} (${corridor.distanceKm} km, ~${corridor.estMinutes}m). Destination: ${corridor.reliefCamp}`,
+      sector: corridor.originName,
+    });
+  };
+
+  const clearCorridorFromMap = () => {
+    if (corridorLayerRef.current && leafletMap.current) {
+      leafletMap.current.removeLayer(corridorLayerRef.current);
+      corridorLayerRef.current = null;
+    }
+    setActiveCorridor(null);
+  };
+
   const handleStepChange = (newStep: number) => {
     setIsPlaying(false);
     setTimelineStep(newStep);
@@ -761,6 +1094,8 @@ export default function RadarPage() {
   }, [isPlaying]);
 
   const currentMilestone = timelineMilestones[timelineStep];
+  const currentCorridorData = selectedHotspot ? RELIEF_CORRIDORS[selectedHotspot.id] : null;
+  const activeCorridorData = activeCorridor ? RELIEF_CORRIDORS[activeCorridor] : null;
 
   return (
     <div className="min-h-screen flex flex-col justify-between w-full bg-white text-zinc-900">
@@ -909,6 +1244,53 @@ export default function RadarPage() {
               )}
             </div>
 
+            {/* Floating Top Right Active Corridor HUD */}
+            {activeCorridor && activeCorridorData && (
+              <div className="absolute top-4 right-4 z-[400] bg-white/95 backdrop-blur-md border border-emerald-500/80 rounded-xl p-3.5 shadow-xl max-w-xs sm:max-w-sm text-xs font-mono animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center justify-between gap-3 border-b border-zinc-200 pb-2 mb-2">
+                  <span className="flex items-center gap-1.5 font-bold text-emerald-800 text-[11px]">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{language === "kn" ? "ಸುರಕ್ಷಿತ ಪರಿಹಾರ ಕಾರಿಡಾರ್" : "SAFE RELIEF CORRIDOR"}</span>
+                  </span>
+                  <button
+                    onClick={clearCorridorFromMap}
+                    className="text-zinc-400 hover:text-black font-bold text-base px-1 leading-none cursor-pointer"
+                    title="Clear corridor route"
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div className="font-bold text-zinc-900 text-xs">
+                  {activeCorridorData.name}
+                </div>
+                <div className="text-[10px] text-zinc-600 mt-1 flex flex-wrap items-center gap-2.5">
+                  <span>📏 <strong className="text-zinc-900">{activeCorridorData.distanceKm} km</strong></span>
+                  <span>⏱️ <strong className="text-zinc-900">~{activeCorridorData.estMinutes} mins</strong></span>
+                  <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[9px]">
+                    {activeCorridorData.statusBadge}
+                  </span>
+                </div>
+                <div className="mt-2 pt-2 border-t border-zinc-200/80 text-[10px] space-y-1">
+                  <div className="text-zinc-700">
+                    <span className="text-zinc-400 font-semibold uppercase block text-[9px]">Safe Haven Relief Base:</span>
+                    <strong className="text-zinc-900">{activeCorridorData.reliefCamp}</strong>
+                  </div>
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-zinc-500 text-[9px]">Cap: {activeCorridorData.campCapacity}</span>
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&origin=${activeCorridorData.routeCoordinates[0][0]},${activeCorridorData.routeCoordinates[0][1]}&destination=${activeCorridorData.campCoordinates[0]},${activeCorridorData.campCoordinates[1]}&travelmode=driving`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-[10px] font-bold flex items-center gap-1 transition-colors shadow-2xs"
+                    >
+                      <span>Open GPS</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Live Cursor Coordinate HUD Badge */}
             <div className="absolute bottom-3 left-3 bg-white/90 text-zinc-800 border border-zinc-200/90 px-3 py-1.5 rounded-lg text-[10px] font-mono flex items-center gap-2.5 backdrop-blur-md pointer-events-none shadow-xs z-[400]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -965,13 +1347,92 @@ export default function RadarPage() {
                   </div>
                 </div>
 
-                {/* Evacuation Route Pill */}
-                <div className="p-3 bg-white rounded-lg border border-zinc-200 text-xs font-mono">
-                  <span className="text-[10px] text-zinc-400 block uppercase">DESIGNATED RELIEF CORRIDOR</span>
-                  <div className="flex items-center gap-1.5 text-zinc-800 font-bold mt-1">
-                    <Navigation className="w-3.5 h-3.5 text-black shrink-0" />
+                {/* Interactive Designated Relief Corridor Card */}
+                <div
+                  onClick={() => showCorridorOnMap(selectedHotspot.id)}
+                  className={`p-3.5 rounded-xl border text-xs font-mono transition-all duration-200 cursor-pointer ${
+                    activeCorridor === selectedHotspot.id
+                      ? "bg-emerald-50/80 border-emerald-500 shadow-sm ring-1 ring-emerald-500/30"
+                      : "bg-white hover:bg-zinc-50 border-zinc-200 hover:border-zinc-400 shadow-2xs"
+                  }`}
+                  role="button"
+                  tabIndex={0}
+                  title="Click to trace safe evacuation route on Radar Map"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <Navigation className={`w-3.5 h-3.5 ${activeCorridor === selectedHotspot.id ? "text-emerald-600 animate-pulse" : "text-black"}`} />
+                      <span>{language === "kn" ? "ನಿಯೋಜಿತ ಪರಿಹಾರ ಕಾರಿಡಾರ್" : "DESIGNATED RELIEF CORRIDOR"}</span>
+                    </span>
+                    {activeCorridor === selectedHotspot.id ? (
+                      <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-600 text-white font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                        {language === "kn" ? "ಸಕ್ರಿಯ ಮಾರ್ಗ" : "ACTIVE ON RADAR"}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-zinc-500 font-semibold flex items-center gap-1 group-hover:text-black">
+                        <span>{language === "kn" ? "ಮಾರ್ಗ ವೀಕ್ಷಿಸಿ" : "Trace on Map"}</span>
+                        <span>&rarr;</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="text-xs font-bold text-zinc-900 mt-2 flex items-start gap-1.5">
                     <span>{selectedHotspot.corridor}</span>
                   </div>
+
+                  {/* Expanded Tactical Telemetry Details when active */}
+                  {activeCorridor === selectedHotspot.id && currentCorridorData && (
+                    <div className="mt-3 pt-3 border-t border-emerald-200/80 space-y-2.5">
+                      <div className="grid grid-cols-2 gap-2 text-[10px]">
+                        <div className="bg-white/90 p-2 rounded-lg border border-emerald-200">
+                          <span className="text-zinc-500 block uppercase font-medium">TOTAL DISTANCE</span>
+                          <strong className="text-emerald-800 text-xs font-bold">{currentCorridorData.distanceKm} km</strong>
+                        </div>
+                        <div className="bg-white/90 p-2 rounded-lg border border-emerald-200">
+                          <span className="text-zinc-500 block uppercase font-medium">EST. TRANSIT</span>
+                          <strong className="text-emerald-800 text-xs font-bold">~{currentCorridorData.estMinutes} mins</strong>
+                        </div>
+                      </div>
+
+                      <div className="text-[10px] text-zinc-700 bg-white/90 p-2.5 rounded-lg border border-emerald-200 leading-tight space-y-1">
+                        <div className="font-bold text-zinc-900 flex items-center gap-1">
+                          <span>🏥 {language === "kn" ? "ಪರಿಹಾರ ಕೇಂದ್ರ:" : "Safe Haven Shelter:"}</span>
+                          <span className="text-emerald-800">{currentCorridorData.reliefCamp}</span>
+                        </div>
+                        <div className="text-zinc-600 text-[10px]">
+                          Capacity: <strong className="text-zinc-800">{currentCorridorData.campCapacity}</strong> • Agency: <strong className="text-zinc-800">{currentCorridorData.leadAgency}</strong>
+                        </div>
+                        <div className="text-zinc-500 text-[9px] pt-0.5 border-t border-zinc-100">
+                          Radio: <span className="font-mono text-zinc-700 font-semibold">{currentCorridorData.emergencyFreq}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-0.5">
+                        <a
+                          href={`https://www.google.com/maps/dir/?api=1&origin=${currentCorridorData.routeCoordinates[0][0]},${currentCorridorData.routeCoordinates[0][1]}&destination=${currentCorridorData.campCoordinates[0]},${currentCorridorData.campCoordinates[1]}&travelmode=driving`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex-1 py-1.5 px-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[10px] font-bold flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
+                          title="Open real-time driving navigation in Google Maps"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>{language === "kn" ? "ಜಿಪಿಎಸ್ ನ್ಯಾವಿಗೇಷನ್" : "Open GPS Navigation"}</span>
+                        </a>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            clearCorridorFromMap();
+                          }}
+                          className="py-1.5 px-2.5 bg-zinc-200 hover:bg-zinc-300 text-zinc-800 rounded-lg text-[10px] font-bold transition-colors"
+                          title="Clear relief corridor overlay"
+                        >
+                          {language === "kn" ? "ತೆರವು" : "Clear"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Action Link to Simulation */}

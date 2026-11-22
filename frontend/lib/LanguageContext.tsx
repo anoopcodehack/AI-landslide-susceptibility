@@ -70,6 +70,12 @@ export const translations: Translations = {
   civil_directive_title: { en: "Civil Defense Evacuation Directive", kn: "ನಾಗರಿಕ ರಕ್ಷಣಾ ಸ್ಥಳಾಂತರ ನಿರ್ದೇಶನ" },
   shelter_camp: { en: "Designated Relief Shelter", kn: "ನಿಗದಿಪಡಿಸಿದ ಆಶ್ರಯ ಕೇಂದ್ರ" },
   evacuation_corridor: { en: "Safe Evacuation Corridor", kn: "ಸುರಕ್ಷಿತ ಸ್ಥಳಾಂತರ ಮಾರ್ಗ" },
+  designated_relief_corridor: { en: "Designated Relief Corridor", kn: "ನಿಯೋಜಿತ ಪರಿಹಾರ ಕಾರಿಡಾರ್" },
+  trace_route_on_radar: { en: "Trace Route on Radar", kn: "ರೇಡಾರ್‌ನಲ್ಲಿ ಮಾರ್ಗ ವೀಕ್ಷಿಸಿ" },
+  active_on_radar: { en: "ACTIVE ON RADAR", kn: "ರೇಡಾರ್‌ನಲ್ಲಿ ಸಕ್ರಿಯ" },
+  gps_navigation: { en: "Open GPS Navigation", kn: "ಜಿಪಿಎಸ್ ನ್ಯಾವಿಗೇಷನ್ ತೆರೆಯಿರಿ" },
+  safe_haven: { en: "Safe Evacuation Haven", kn: "ಸುರಕ್ಷಿತ ಆಶ್ರಯ ತಾಣ" },
+  clear_corridor: { en: "Clear Route", kn: "ಮಾರ್ಗ ತೆರವುಗೊಳಿಸಿ" },
 };
 
 interface LanguageContextType {

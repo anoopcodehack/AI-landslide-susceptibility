@@ -78,29 +78,43 @@ export default function DiagnosticsPage() {
           </div>
         </div>
 
-        {/* Visual Header */}
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-mono font-semibold text-zinc-800">
-              <Activity className="w-3.5 h-3.5 text-black" />
-              <span>Model Verification & Explainability (XAI)</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-black tracking-tight">
-              AI Diagnostics & Visual Verification
-            </h1>
-            <p className="text-xs sm:text-sm text-zinc-600 font-sans">
-              ROC curves, Precision-Recall curves, Cost-sensitive 0.35 threshold tuning, and SHAP TreeExplainer attributions.
-            </p>
-          </div>
+        {/* Visual Header with Authentic Landslide Terrain Background */}
+        <div className="relative p-6 sm:p-8 rounded-3xl border border-zinc-200/90 shadow-md overflow-hidden bg-slate-900 text-zinc-900">
+          {/* Authentic Landslide Debris Flow Terrain Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform duration-700 scale-105"
+            style={{
+              backgroundImage: "url('/images/landslide_hero_bg.jpg')",
+            }}
+          />
 
-          <a
-            href="/docs/model_benchmark_table.csv"
-            download
-            className="px-4 py-2 rounded-xl bg-black text-white text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-zinc-800 transition-colors shadow-xs"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export Benchmark CSV</span>
-          </a>
+          {/* Balanced Gradient Overlay: Subtle white wash on the left, fading to more transparent on the right so the mountain slope failure and valley debris are clearly visible */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/88 to-white/60 pointer-events-none" />
+
+          {/* Interactive Content Container */}
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs border border-zinc-200/90 text-xs font-mono font-semibold text-zinc-800 shadow-2xs">
+                <Activity className="w-3.5 h-3.5 text-black" />
+                <span>Model Verification &amp; Explainability (XAI)</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-black tracking-tight drop-shadow-2xs">
+                AI Diagnostics &amp; Visual Verification
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-700 font-sans font-medium drop-shadow-2xs max-w-2xl">
+                ROC curves, Precision-Recall curves, Cost-sensitive 0.35 threshold tuning, and SHAP TreeExplainer attributions.
+              </p>
+            </div>
+
+            <a
+              href="/docs/model_benchmark_table.csv"
+              download
+              className="px-4 py-2.5 rounded-xl bg-black text-white text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-zinc-800 transition-colors shadow-md active:scale-95"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export Benchmark CSV</span>
+            </a>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
