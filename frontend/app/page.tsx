@@ -163,30 +163,28 @@ export default function DashboardPage() {
       <main className="max-w-[1440px] mx-auto w-full px-4 sm:px-6 md:px-12 py-6 flex-1 space-y-8">
         
         {/* 1. VISUAL HERO COMMAND BANNER */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-10 border border-zinc-200/90 shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-100/40 via-sky-100/20 to-transparent rounded-full blur-3xl -z-10 pointer-events-none" />
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="relative rounded-3xl p-6 sm:p-8 md:p-10 border border-zinc-200/90 shadow-sm overflow-hidden text-zinc-900 bg-white">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
             {/* Left: Quick Summary & Action Launchers (7 cols) */}
             <div className="lg:col-span-7 space-y-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-mono font-semibold text-zinc-800">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-800 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Wayanad Monsoon Early Warning 2026 // AWS Live Feed</span>
+                <span>Wayanad Early Warning System • Open-Meteo AWS #04 Telemetry</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-black leading-tight">
-                GeoShield AI // Wayanad Landslide Early Warning
+                GeoShield AI: Wayanad Landslide Early Warning
               </h1>
 
               <p className="text-sm sm:text-base text-zinc-600 max-w-xl font-normal leading-relaxed">
-                Autonomous 30m terrain intelligence powered by <strong>XGBoost</strong>, <strong>SHAP TreeExplainer</strong>, and real-time synoptic weather telemetry from AWS #04.
+                Autonomous 30m terrain susceptibility intelligence powered by <strong>XGBoost</strong>, <strong>SHAP TreeExplainer</strong>, and real-time synoptic weather telemetry.
               </p>
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/radar"
-                  className="px-5 py-3 rounded-xl bg-black text-white text-xs font-mono font-bold flex items-center gap-2 hover:bg-zinc-800 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md"
+                  className="px-5 py-3 rounded-xl bg-black text-white text-xs font-semibold flex items-center gap-2 hover:bg-zinc-800 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-md"
                 >
                   <Compass className="w-4 h-4 text-emerald-400" />
                   <span>Launch GIS Tactical Radar</span>
@@ -195,7 +193,7 @@ export default function DashboardPage() {
 
                 <Link
                   href="/simulation"
-                  className="px-5 py-3 rounded-xl bg-white border border-zinc-300 text-zinc-800 text-xs font-mono font-bold flex items-center gap-2 hover:bg-zinc-50 hover:border-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xs"
+                  className="px-5 py-3 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-300 text-zinc-800 text-xs font-semibold flex items-center gap-2 hover:border-black hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xs"
                 >
                   <Sliders className="w-4 h-4 text-zinc-600" />
                   <span>What-If Simulator</span>
@@ -203,7 +201,7 @@ export default function DashboardPage() {
 
                 <Link
                   href="/diagnostics"
-                  className="px-5 py-3 rounded-xl bg-zinc-100 border border-zinc-200 text-zinc-700 text-xs font-mono font-bold flex items-center gap-2 hover:bg-zinc-200 transition-all"
+                  className="px-5 py-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 text-xs font-semibold flex items-center gap-2 transition-all"
                 >
                   <BarChart3 className="w-4 h-4 text-zinc-600" />
                   <span>AI Benchmarks</span>
@@ -211,82 +209,98 @@ export default function DashboardPage() {
               </div>
 
               {/* Metric Highlights Pill Bar */}
-              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-zinc-100 max-w-lg text-center">
-                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200/80">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase block">Model AUC</span>
-                  <strong className="text-sm sm:text-base font-mono font-black text-black">94.00%</strong>
+              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-zinc-200 max-w-lg text-center">
+                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200 shadow-2xs">
+                  <span className="text-[10px] text-zinc-500 uppercase font-semibold block">Model AUC</span>
+                  <strong className="text-sm sm:text-base font-black text-black">94.00%</strong>
                 </div>
-                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200/80">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase block">Disaster Recall</span>
-                  <strong className="text-sm sm:text-base font-mono font-black text-emerald-600">94.12%</strong>
+                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200 shadow-2xs">
+                  <span className="text-[10px] text-zinc-500 uppercase font-semibold block">Disaster Recall</span>
+                  <strong className="text-sm sm:text-base font-black text-emerald-600">94.12%</strong>
                 </div>
-                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200/80">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase block">Spatial Cells</span>
-                  <strong className="text-sm sm:text-base font-mono font-black text-blue-600">1,500 30m</strong>
+                <div className="bg-zinc-50 p-2.5 rounded-xl border border-zinc-200 shadow-2xs">
+                  <span className="text-[10px] text-zinc-500 uppercase font-semibold block">Spatial Cells</span>
+                  <strong className="text-sm sm:text-base font-black text-blue-600">1,500 30m</strong>
                 </div>
               </div>
             </div>
 
-            {/* Right: Interactive Topographic Radar Graphic (5 cols) */}
+            {/* Right: Clean Enterprise Sector Risk Status Card (5 cols) */}
             <div className="lg:col-span-5">
-              <Link
-                href="/radar"
-                className="bg-[#0b0f19] rounded-2xl p-5 border border-zinc-800 shadow-xl relative overflow-hidden group block hover:border-zinc-500 hover:-translate-y-1 transition-all duration-300"
-              >
-                <div className="flex items-center justify-between text-xs pb-3 border-b border-white/10 text-zinc-400">
+              <div className="bg-zinc-50/80 rounded-2xl p-5 border border-zinc-200 shadow-2xs flex flex-col justify-between space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                    <span className="font-mono text-[11px] text-zinc-200 font-semibold uppercase">
-                      Live Wayanad GIS Map
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-bold text-zinc-900 uppercase tracking-wide">
+                      Active Sector Risk Telemetry
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-emerald-400 font-bold">
-                    GPS: 11.55°N, 76.13°E
+                  <span className="text-[10px] font-mono text-zinc-500 bg-white border border-zinc-200 px-2 py-0.5 rounded-full font-semibold">
+                    SRTM 30m Mesh
                   </span>
                 </div>
 
-                {/* SVG Visual Graphic with Active Hazard Points */}
-                <div className="relative h-48 w-full my-3 rounded-xl overflow-hidden bg-black/70 border border-white/5 flex items-center justify-center">
-                  <svg className="w-full h-full" viewBox="0 0 400 200">
-                    <defs>
-                      <radialGradient id="radarScanHero" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
-                      </radialGradient>
-                    </defs>
+                {/* 3 Real Wayanad Sectors with actual project hazard telemetry */}
+                <div className="space-y-2.5">
+                  {/* Sector 1: Chooralmala */}
+                  <div className="p-3 rounded-xl bg-white border border-red-200 shadow-2xs flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-red-950">Chooralmala (Epicenter)</span>
+                        <span className="text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                          CRITICAL 91%
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 mt-1">
+                        Slope: 38.5° • Rain: 372 mm • Shear Saturation
+                      </p>
+                    </div>
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0" />
+                  </div>
 
-                    {/* Concentric Radar Rings */}
-                    <circle cx="200" cy="100" r="35" stroke="rgba(255,255,255,0.12)" strokeWidth="1" fill="none" />
-                    <circle cx="200" cy="100" r="70" stroke="rgba(255,255,255,0.08)" strokeWidth="1" fill="none" />
-                    <circle cx="200" cy="100" r="105" stroke="rgba(255,255,255,0.05)" strokeWidth="1" fill="url(#radarScanHero)" />
+                  {/* Sector 2: Vythiri Ghat */}
+                  <div className="p-3 rounded-xl bg-white border border-amber-200 shadow-2xs flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-amber-950">Vythiri Ghat Incline</span>
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                          ELEVATED 74%
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 mt-1">
+                        Slope: 31.0° • Rain: 210 mm • Pore Pressure Watch
+                      </p>
+                    </div>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+                  </div>
 
-                    {/* Topographic Contour Lines */}
-                    <path d="M 30,150 Q 120,70 200,110 T 370,80" fill="none" stroke="rgba(56,189,248,0.4)" strokeWidth="1.5" />
-                    <path d="M 20,170 Q 140,100 220,140 T 380,110" fill="none" stroke="rgba(56,189,248,0.2)" strokeWidth="1.5" />
-                    <path d="M 40,120 Q 160,40 240,80 T 360,50" fill="none" stroke="rgba(245,158,11,0.35)" strokeWidth="1.5" />
-
-                    {/* Active Hazard Markers */}
-                    <circle cx="165" cy="125" r="5" fill="#ef4444" />
-                    <circle cx="165" cy="125" r="14" fill="none" stroke="#ef4444" strokeWidth="1" className="animate-ping" />
-                    <text x="175" y="129" fill="#f87171" fontSize="10" fontFamily="monospace" fontWeight="bold">Chooralmala (91%)</text>
-
-                    <circle cx="120" cy="80" r="4" fill="#f59e0b" />
-                    <text x="130" y="84" fill="#fbbf24" fontSize="10" fontFamily="monospace">Vythiri Ghat (74%)</text>
-
-                    <circle cx="280" cy="65" r="4" fill="#10b981" />
-                    <text x="290" y="69" fill="#34d399" fontSize="10" fontFamily="monospace">S. Bathery (19%)</text>
-                  </svg>
-
-                  <div className="absolute bottom-2 right-2 bg-black/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-mono text-emerald-300 border border-emerald-500/30 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                    Click to Open Fullscreen &rarr;
+                  {/* Sector 3: Sulthan Bathery */}
+                  <div className="p-3 rounded-xl bg-white border border-emerald-200 shadow-2xs flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-emerald-950">Sulthan Bathery Plateau</span>
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                          NOMINAL 19%
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-zinc-500 mt-1">
+                        Slope: 14.2° • Rain: 45 mm • Stable Bedrock
+                      </p>
+                    </div>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
-                  <span>Terrain Grid: SRTM 30m</span>
-                  <span className="text-emerald-400 font-semibold">Live Telemetry: Active</span>
-                </div>
-              </Link>
+                {/* Direct Tactical Radar Link */}
+                <Link
+                  href="/radar"
+                  className="w-full py-2.5 px-4 rounded-xl bg-zinc-900 text-white hover:bg-black text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-all"
+                >
+                  <Compass className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Open Interactive GIS Tactical Radar</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-zinc-400" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -358,30 +372,30 @@ export default function DashboardPage() {
         </section>
 
         {/* 3. DUAL CIRCULAR GAUGES & REAL-TIME PRECIPITATION WAVEFORM */}
-        <section className="coder-dark-block p-6 sm:p-8 rounded-3xl">
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-zinc-800">
+        <section className="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200/90 shadow-xs space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-100">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                <Activity className="w-5 h-5 text-emerald-400" />
-                <span>Geotechnical Stress Telemetry & July 2024 Precipitation Waveform</span>
+              <h2 className="text-xl sm:text-2xl font-black text-black tracking-tight flex items-center gap-2">
+                <Activity className="w-5 h-5 text-emerald-600" />
+                <span>Geotechnical Slope Telemetry & Precipitation Waveform</span>
               </h2>
-              <p className="text-xs text-zinc-400 font-mono mt-1">
-                Sub-15ms inference latency • Wayanad West Basin Sensor Mesh
+              <p className="text-xs text-zinc-500 font-sans mt-0.5">
+                Live Open-Meteo AWS #04 Telemetry • XGBoost AI Inference • July 2024 Cloudburst Benchmark
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-mono text-zinc-300">Live Synoptic Monitoring</span>
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-mono text-emerald-700 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Live AWS Stream Active</span>
             </div>
           </div>
 
           {/* Circular Gauges */}
-          <div className="pt-6">
+          <div>
             <HeroGaugeCard overview={dashboardData?.overview} />
           </div>
 
           {/* Stats Grid + Interactive Waveform */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-5">
               <StatsGrid stats={dashboardData?.stats} />
             </div>

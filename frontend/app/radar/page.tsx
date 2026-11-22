@@ -910,15 +910,15 @@ export default function RadarPage() {
             </div>
 
             {/* Live Cursor Coordinate HUD Badge */}
-            <div className="absolute bottom-3 left-3 bg-zinc-950/85 text-white border border-zinc-700/80 px-3 py-1.5 rounded-lg text-[10px] font-mono flex items-center gap-2.5 backdrop-blur-md pointer-events-none shadow-md z-[400]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>
+            <div className="absolute bottom-3 left-3 bg-white/90 text-zinc-800 border border-zinc-200/90 px-3 py-1.5 rounded-lg text-[10px] font-mono flex items-center gap-2.5 backdrop-blur-md pointer-events-none shadow-xs z-[400]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-semibold text-zinc-900">
                 {cursorCoords
                   ? `LAT: ${cursorCoords.lat.toFixed(4)}° N • LON: ${cursorCoords.lon.toFixed(4)}° E`
-                  : "+ 11.5500° N • 76.1500° E"}
+                  : "11.5500° N • 76.1500° E"}
               </span>
-              <span className="text-zinc-500">•</span>
-              <span className="text-emerald-400 font-semibold">UTM Zone 43N</span>
+              <span className="text-zinc-300">•</span>
+              <span className="text-emerald-700 font-bold">UTM Zone 43N</span>
             </div>
           </div>
 
@@ -992,13 +992,13 @@ export default function RadarPage() {
         </div>
 
         {/* 72-Hour Monsoon Progression & Live AWS Telemetry Player */}
-        <div className="p-5 md:p-6 bg-zinc-50 rounded-2xl border border-zinc-200 mb-8 shadow-2xs">
+        <div className="p-5 md:p-6 bg-white rounded-2xl border border-zinc-200/90 mb-8 shadow-xs text-zinc-900">
           {/* Header row with playback controls, title, and active badge */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div className="flex flex-wrap items-center gap-2.5">
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="w-9 h-9 rounded-lg bg-black text-white hover:bg-zinc-800 flex items-center justify-center transition-colors shadow-xs"
+                className="w-9 h-9 rounded-lg bg-zinc-900 text-white hover:bg-black flex items-center justify-center transition-colors shadow-xs cursor-pointer"
                 title={isPlaying ? "Pause timeline playback" : "Play disaster event progression"}
               >
                 {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
@@ -1006,7 +1006,7 @@ export default function RadarPage() {
               <button
                 onClick={() => handleStepChange(Math.max(0, timelineStep - 1))}
                 disabled={timelineStep === 0}
-                className="w-9 h-9 rounded-lg bg-zinc-200 text-zinc-700 hover:bg-zinc-300 disabled:opacity-40 disabled:hover:bg-zinc-200 flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 disabled:opacity-40 disabled:hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
                 title="Previous milestone"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -1014,14 +1014,14 @@ export default function RadarPage() {
               <button
                 onClick={() => handleStepChange(Math.min(4, timelineStep + 1))}
                 disabled={timelineStep === 4}
-                className="w-9 h-9 rounded-lg bg-zinc-200 text-zinc-700 hover:bg-zinc-300 disabled:opacity-40 disabled:hover:bg-zinc-200 flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 disabled:opacity-40 disabled:hover:bg-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
                 title="Next milestone"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleStepChange(0)}
-                className="w-9 h-9 rounded-lg bg-zinc-200 text-zinc-700 hover:bg-zinc-300 flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-700 hover:bg-zinc-200 flex items-center justify-center transition-colors cursor-pointer"
                 title="Reset timeline to T - 48h baseline"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -1029,16 +1029,16 @@ export default function RadarPage() {
 
               <div className="ml-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-mono font-bold text-black uppercase tracking-wider">
+                  <span className="text-sm font-bold text-zinc-900 tracking-tight">
                     Temporal Failure Progression & Live Telemetry
                   </span>
                   {timelineStep === 4 ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 border border-purple-300 text-purple-900 text-[10px] font-mono font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-semibold">
                       <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-ping" />
                       LIVE STREAM ACTIVE
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-800 text-[10px] font-mono font-bold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-700 text-[10px] font-semibold">
                       HISTORICAL RECON
                     </span>
                   )}
@@ -1051,13 +1051,13 @@ export default function RadarPage() {
 
             {/* Active Milestone Status Box */}
             <div className="flex items-center gap-2">
-              <div className="text-xs font-mono text-zinc-700 bg-white px-3.5 py-2 rounded-lg border border-zinc-300 shadow-2xs flex items-center gap-2">
-                <span className="text-zinc-400 uppercase text-[10px] font-bold">Active Window:</span>
-                <strong className={timelineStep === 4 ? "text-purple-700 font-black" : "text-black"}>
+              <div className="text-xs text-zinc-700 bg-zinc-50 px-3.5 py-2 rounded-lg border border-zinc-200 shadow-2xs flex items-center gap-2">
+                <span className="text-zinc-500 uppercase text-[10px] font-semibold">Active Window:</span>
+                <strong className={timelineStep === 4 ? "text-purple-700 font-bold" : "text-zinc-900 font-bold"}>
                   {currentMilestone.label}
                 </strong>
                 <span className="text-zinc-300">|</span>
-                <span className="text-zinc-600 text-[11px]">{currentMilestone.date}</span>
+                <span className="text-zinc-600 text-[11px] font-medium">{currentMilestone.date}</span>
               </div>
             </div>
           </div>
@@ -1069,7 +1069,7 @@ export default function RadarPage() {
               <div className="w-full h-2.5 bg-zinc-200 rounded-full overflow-hidden">
                 {/* Dynamic Progress Fill Bar */}
                 <div
-                  className="h-full bg-gradient-to-r from-zinc-800 via-zinc-950 to-purple-600 rounded-full transition-all duration-300 ease-out"
+                  className="h-full bg-gradient-to-r from-zinc-700 via-zinc-900 to-purple-600 rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${(timelineStep / 4) * 100}%` }}
                 />
               </div>
@@ -1091,11 +1091,11 @@ export default function RadarPage() {
                         className={`w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center pointer-events-auto cursor-pointer focus:outline-none ${
                           isActive
                             ? isLive
-                              ? "bg-purple-600 border-white ring-4 ring-purple-300 shadow-md scale-125"
-                              : "bg-black border-white ring-4 ring-zinc-300 shadow-md scale-125"
+                              ? "bg-purple-600 border-white ring-4 ring-purple-200 shadow-md scale-125"
+                              : "bg-black border-white ring-4 ring-zinc-200 shadow-md scale-125"
                             : isPassed
-                            ? "bg-zinc-800 border-white shadow-2xs"
-                            : "bg-white border-zinc-400 hover:border-zinc-700"
+                            ? "bg-zinc-700 border-white shadow-2xs"
+                            : "bg-white border-zinc-300 hover:border-zinc-500"
                         }`}
                         title={`Jump to ${m.label}`}
                       >
@@ -1144,14 +1144,14 @@ export default function RadarPage() {
                 <button
                   key={idx}
                   onClick={() => handleStepChange(idx)}
-                  className={`p-3.5 rounded-xl border text-left transition-all relative flex flex-col justify-between ${
+                  className={`p-3.5 rounded-xl border text-left transition-all relative flex flex-col justify-between cursor-pointer ${
                     isSelected
                       ? isLive
-                        ? "bg-purple-50/70 border-purple-500 ring-2 ring-purple-500 shadow-md"
-                        : "bg-white border-black ring-2 ring-black shadow-md"
+                        ? "bg-purple-50/70 border-purple-500 ring-2 ring-purple-500/30 shadow-md text-zinc-900"
+                        : "bg-white border-black ring-2 ring-black/10 shadow-md text-zinc-900"
                       : isLive
                       ? "bg-purple-50/30 border-purple-200 hover:bg-purple-50/60 text-zinc-700"
-                      : "bg-white/70 border-zinc-200 hover:bg-white text-zinc-600"
+                      : "bg-zinc-50/60 border-zinc-200 hover:bg-zinc-100 text-zinc-700"
                   }`}
                 >
                   {isLive && (
@@ -1167,9 +1167,9 @@ export default function RadarPage() {
                         className={
                           isSelected
                             ? isLive
-                              ? "text-purple-900 text-sm font-black"
+                              ? "text-purple-700 text-sm font-black"
                               : "text-black text-sm font-black"
-                            : "text-zinc-800"
+                            : "text-zinc-700"
                         }
                       >
                         {m.label}
@@ -1177,30 +1177,30 @@ export default function RadarPage() {
                       <span
                         className={`text-xs px-2 py-0.5 rounded font-bold ${
                           isLive
-                            ? "bg-purple-100 text-purple-800"
+                            ? "bg-purple-100 text-purple-800 border border-purple-200"
                             : idx === 2
-                            ? "bg-red-100 text-red-800"
+                            ? "bg-red-50 text-red-700 border border-red-200"
                             : idx === 1
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-zinc-100 text-zinc-700"
+                            ? "bg-amber-50 text-amber-700 border border-amber-200"
+                            : "bg-zinc-100 text-zinc-700 border border-zinc-200"
                         }`}
                       >
                         {m.rain}
                       </span>
                     </div>
 
-                    <div className="text-xs text-zinc-800 font-sans font-semibold line-clamp-1 mt-1">
+                    <div className="text-xs text-zinc-900 font-semibold line-clamp-1 mt-1">
                       {m.status}
                     </div>
 
-                    <div className="text-[10px] text-zinc-500 font-sans line-clamp-2 mt-1.5 leading-snug">
+                    <div className="text-[11px] text-zinc-500 line-clamp-2 mt-1 leading-snug">
                       {m.summary}
                     </div>
                   </div>
 
-                  <div className="text-[10px] text-zinc-400 font-mono mt-3 pt-2 border-t border-zinc-100 flex items-center justify-between">
+                  <div className="text-[10px] text-zinc-400 font-mono mt-3 pt-2 border-t border-zinc-200/80 flex items-center justify-between">
                     <span>{m.date}</span>
-                    <span className="font-semibold text-zinc-500">{m.badge}</span>
+                    <span className="font-semibold text-zinc-600">{m.badge}</span>
                   </div>
                 </button>
               );
@@ -1209,13 +1209,13 @@ export default function RadarPage() {
 
           {/* Live Telemetry Status Callout Bar when Step === 4 */}
           {timelineStep === 4 && (
-            <div className="mt-4 p-3.5 bg-gradient-to-r from-purple-50 via-white to-purple-50 border border-purple-200 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs font-mono animate-fadeIn">
+            <div className="mt-4 p-3.5 bg-purple-50/80 border border-purple-200 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs font-mono animate-fadeIn">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
                 <span className="text-purple-950 font-bold uppercase">
                   LIVE AWS STREAM:
                 </span>
-                <span className="text-purple-800 font-semibold">
+                <span className="text-purple-900 font-semibold">
                   {liveWeather.station_name}
                 </span>
                 <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-300">
@@ -1239,7 +1239,7 @@ export default function RadarPage() {
                   <Wind className="w-3.5 h-3.5 text-purple-600" />
                   <span>Wind: <strong className="text-black">{liveWeather.wind_speed_kmh} km/h</strong></span>
                 </div>
-                <div className="hidden lg:flex items-center gap-1 text-zinc-600 bg-white/80 px-2 py-0.5 rounded border border-purple-100">
+                <div className="hidden lg:flex items-center gap-1 text-zinc-700 bg-white px-2 py-0.5 rounded border border-purple-200">
                   <span>Sky: <strong className="text-purple-900">{liveWeather.weather_condition}</strong></span>
                 </div>
                 <button
@@ -1258,132 +1258,132 @@ export default function RadarPage() {
         </div>
 
         {/* Topographic Elevation Profile & Kinetic Energy Corridor Card */}
-        <section className="mb-8 p-6 md:p-8 bg-zinc-950 text-white rounded-2xl border border-zinc-800 shadow-xl">
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-zinc-800">
+        <section className="mb-8 p-6 md:p-8 bg-white text-zinc-900 rounded-2xl border border-zinc-200/90 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-zinc-200">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                <h3 className="text-base font-black font-mono uppercase tracking-wider text-white">
+                <h3 className="text-base font-bold text-zinc-900 tracking-tight">
                   Topographic Elevation Cross-Section & Hydraulic Momentum Profile
                 </h3>
-                <span className="px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800 text-[10px] font-mono font-bold">
+                <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200 text-xs font-semibold">
                   Vellarimala &rarr; Chooralmala Corridor
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 font-sans max-w-2xl">
+              <p className="text-xs text-zinc-500 font-sans max-w-2xl">
                 Hydraulic momentum trace of the 30 July 2024 cloudburst channel. Shows how 1.85M m³ of boulder slurry accelerated down an 800m vertical drop, inundating the 9° valley floor settlements.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 font-mono text-xs">
-              <div className="bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-800 text-center">
-                <span className="text-[9px] text-zinc-500 block uppercase">TOTAL DROP (H)</span>
-                <strong className="text-red-400 text-sm">800 m</strong>
+            <div className="flex items-center gap-3 text-xs">
+              <div className="bg-zinc-50 px-3 py-1.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
+                <span className="text-[10px] text-zinc-500 block uppercase font-semibold">TOTAL DROP (H)</span>
+                <strong className="text-red-600 text-sm font-bold">800 m</strong>
               </div>
-              <div className="bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-800 text-center">
-                <span className="text-[9px] text-zinc-500 block uppercase">RUNOUT REACH (L)</span>
-                <strong className="text-white text-sm">6.1 km</strong>
+              <div className="bg-zinc-50 px-3 py-1.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
+                <span className="text-[10px] text-zinc-500 block uppercase font-semibold">RUNOUT REACH (L)</span>
+                <strong className="text-zinc-900 text-sm font-bold">6.1 km</strong>
               </div>
-              <div className="bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-800 text-center">
-                <span className="text-[9px] text-zinc-500 block uppercase">LEAD TIME</span>
-                <strong className="text-amber-400 text-sm">14.2 min</strong>
+              <div className="bg-zinc-50 px-3 py-1.5 rounded-xl border border-zinc-200 text-center shadow-2xs">
+                <span className="text-[10px] text-zinc-500 block uppercase font-semibold">LEAD TIME</span>
+                <strong className="text-amber-600 text-sm font-bold">14.2 min</strong>
               </div>
             </div>
           </div>
 
           {/* SVG Elevation Profile Waveform */}
           <div className="pt-6 pb-4">
-            <div className="w-full h-32 relative overflow-hidden">
+            <div className="w-full h-32 relative overflow-hidden bg-slate-50/70 rounded-xl border border-zinc-200 p-2">
               <svg className="w-full h-full" viewBox="0 0 1000 120" preserveAspectRatio="none">
                 <defs>
-                  <linearGradient id="elevationGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#ef4444" stopOpacity="0.4" />
-                    <stop offset="50%" stopColor="#f97316" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.05" />
+                  <linearGradient id="elevationGradClean" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#fecaca" stopOpacity="0.7" />
+                    <stop offset="50%" stopColor="#fed7aa" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.2" />
                   </linearGradient>
                 </defs>
                 {/* Cross section fill */}
                 <path
                   d="M 50 15 Q 200 35 380 62 T 680 92 L 950 105 L 950 120 L 50 120 Z"
-                  fill="url(#elevationGrad)"
+                  fill="url(#elevationGradClean)"
                 />
                 {/* Terrain surface contour line */}
                 <path
                   d="M 50 15 Q 200 35 380 62 T 680 92 L 950 105"
                   fill="none"
-                  stroke="#ef4444"
-                  strokeWidth="3"
+                  stroke="#dc2626"
+                  strokeWidth="2.5"
                 />
                 {/* Waypoint nodes on curve */}
-                <circle cx="50" cy="15" r="5" fill="#ef4444" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="250" cy="45" r="5" fill="#ef4444" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="450" cy="72" r="5" fill="#f97316" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="700" cy="94" r="5" fill="#eab308" stroke="#ffffff" strokeWidth="2" />
-                <circle cx="950" cy="105" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="50" cy="15" r="5" fill="#dc2626" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="250" cy="45" r="5" fill="#dc2626" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="450" cy="72" r="5" fill="#ea580c" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="700" cy="94" r="5" fill="#ca8a04" stroke="#ffffff" strokeWidth="2" />
+                <circle cx="950" cy="105" r="5" fill="#16a34a" stroke="#ffffff" strokeWidth="2" />
               </svg>
 
               {/* Station elevation callouts */}
-              <div className="absolute top-1 left-2 font-mono text-[10px] text-red-400 font-bold">
+              <div className="absolute top-2 left-4 font-mono text-[11px] text-red-700 font-bold bg-white/90 px-1.5 py-0.5 rounded border border-red-200 shadow-2xs">
                 Apex: 1480m (42°)
               </div>
-              <div className="absolute top-8 left-[23%] font-mono text-[10px] text-red-400 font-semibold">
+              <div className="absolute top-9 left-[23%] font-mono text-[10px] text-red-700 font-semibold bg-white/80 px-1 rounded">
                 Punchirimattam: 1220m
               </div>
-              <div className="absolute top-16 left-[43%] font-mono text-[10px] text-orange-400 font-semibold">
+              <div className="absolute top-16 left-[43%] font-mono text-[10px] text-amber-700 font-semibold bg-white/80 px-1 rounded">
                 Mundakkai: 980m
               </div>
-              <div className="absolute bottom-6 left-[68%] font-mono text-[10px] text-yellow-400 font-bold">
+              <div className="absolute bottom-6 left-[68%] font-mono text-[11px] text-yellow-800 font-bold bg-white/90 px-1.5 py-0.5 rounded border border-yellow-200 shadow-2xs">
                 Chooralmala: 790m (9° Valley)
               </div>
-              <div className="absolute bottom-2 right-2 font-mono text-[10px] text-emerald-400 font-bold">
+              <div className="absolute bottom-3 right-4 font-mono text-[11px] text-emerald-700 font-bold bg-white/90 px-1.5 py-0.5 rounded border border-emerald-200 shadow-2xs">
                 Attamala: 680m
               </div>
             </div>
           </div>
 
           {/* 5-Station Kinematics Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-4 border-t border-zinc-800 text-xs font-mono">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-4 border-t border-zinc-200 text-xs font-mono">
             {channelWaypoints.map((wp, idx) => (
               <div
                 key={idx}
-                className="bg-zinc-900/90 p-3 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors"
+                className="bg-zinc-50/70 p-3.5 rounded-xl border border-zinc-200/90 hover:border-zinc-300 transition-colors"
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold text-zinc-400">WP #{idx + 1}</span>
+                  <span className="text-[10px] font-bold text-zinc-500">WP #{idx + 1}</span>
                   <span
-                    className="text-[9px] px-1.5 py-0.2 rounded font-bold"
-                    style={{ backgroundColor: `${wp.statusColor}22`, color: wp.statusColor }}
+                    className="text-[9px] px-2 py-0.5 rounded-full font-bold"
+                    style={{ backgroundColor: `${wp.statusColor}18`, color: wp.statusColor }}
                   >
                     {wp.status.split(" ")[0]}
                   </span>
                 </div>
-                <div className="font-bold text-white text-xs truncate mb-1" title={wp.name}>
+                <div className="font-bold text-zinc-900 text-xs truncate mb-2" title={wp.name}>
                   {wp.name.split(". ")[1]}
                 </div>
-                <div className="text-[10px] text-zinc-400 space-y-0.5">
+                <div className="text-[11px] text-zinc-500 space-y-1">
                   <div className="flex justify-between">
                     <span>Elevation:</span>
-                    <strong className="text-zinc-200">{wp.elevation} m</strong>
+                    <strong className="text-zinc-800">{wp.elevation} m</strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Arrival ETA:</span>
-                    <strong className="text-white">{wp.etaMinutes === 0 ? "T = 0" : `+${wp.etaMinutes}m`}</strong>
+                    <strong className="text-zinc-900">{wp.etaMinutes === 0 ? "T = 0" : `+${wp.etaMinutes}m`}</strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Flow Velocity:</span>
-                    <strong className="text-red-400">{wp.velocityMs} m/s</strong>
+                    <strong className="text-red-600 font-bold">{wp.velocityMs} m/s</strong>
                   </div>
                   <div className="flex justify-between">
                     <span>Impact Press:</span>
-                    <strong className="text-zinc-200">{wp.pressureKPa} kPa</strong>
+                    <strong className="text-zinc-800">{wp.pressureKPa} kPa</strong>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 p-3 bg-zinc-900 rounded-lg border border-zinc-800 text-xs text-zinc-400 font-sans leading-relaxed">
-            <strong className="text-white font-mono font-bold">Scientific Finding: </strong>
+          <div className="mt-4 p-3.5 bg-blue-50/70 rounded-xl border border-blue-200/80 text-xs text-blue-950 font-sans leading-relaxed">
+            <strong className="text-blue-900 font-semibold">Scientific Finding: </strong>
             Chooralmala settlement sits on a gentle 9° valley floor. Conventional susceptibility mapping classifies it as &quot;Low Slope / Moderate Risk&quot;. GeoShield integrates upstream momentum routing to detect long-runout hydraulic debris flows across the Western Ghats.
           </div>
         </section>

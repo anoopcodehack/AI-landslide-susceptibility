@@ -32,16 +32,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="coder-white-header sticky top-0 z-40 px-6 md:px-12 py-3.5 flex items-center justify-between border-b border-zinc-200/80 bg-white/95 backdrop-blur-md">
-      {/* Brand: GEOSHIELD█ */}
+      {/* Brand: GEOSHIELD */}
       <div className="flex items-center gap-8">
         <Link
           href="/"
-          className="flex items-center gap-1.5 cursor-pointer select-none group"
+          className="flex items-center gap-2 cursor-pointer select-none group"
         >
-          <span className="text-xl font-black tracking-tighter text-black uppercase font-mono group-hover:opacity-85 transition-opacity">
-            GEOSHIELD
+          <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs shadow-xs">
+            GS
+          </div>
+          <span className="text-lg font-black tracking-tight text-black uppercase font-sans group-hover:opacity-85 transition-opacity">
+            GeoShield
           </span>
-          <span className="w-2.5 h-3.5 bg-black inline-block ml-0.5" />
         </Link>
 
         {/* Center Product Links (Real Next.js Full Pages) */}
@@ -59,11 +61,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }`}
               >
                 <span>{item.name}</span>
-                {item.shortcut && (
-                  <kbd className="hidden xl:inline-block text-[9px] font-mono px-1 py-0.2 bg-zinc-100 border border-zinc-300 rounded text-zinc-500 font-semibold">
-                    {item.shortcut}
-                  </kbd>
-                )}
                 {isActive && (
                   <span className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-black rounded-full" />
                 )}
@@ -82,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 text-xs font-medium text-zinc-700 border border-zinc-200 shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="font-mono text-[11px]">
-            {backendOnline ? "Cluster Online // 12ms" : "Telemetry Active"}
+            {backendOnline ? "Cluster Online • 12ms" : "Telemetry Active"}
           </span>
         </div>
 

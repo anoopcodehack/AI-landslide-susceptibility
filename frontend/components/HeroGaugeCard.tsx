@@ -35,8 +35,8 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
 }) => {
   const stability = terrainStability ?? overview?.terrain_stability_index ?? 74.8;
   const pore = porePressure ?? overview?.pore_pressure_index ?? 68.2;
-  const model = modelName ?? overview?.model_name ?? "Ensemble (RF+XGB+LGBM)";
-  const auc = rocAuc ?? overview?.model_confidence ?? "0.9472";
+  const model = modelName ?? overview?.model_name ?? "XGBoost Classifier";
+  const auc = rocAuc ?? overview?.model_confidence ?? "0.9400";
   const slope = slopeStress ?? overview?.slope_stress_pct ?? "78.4%";
   const rain = rainfallSaturation ?? overview?.rainfall_saturation_pct ?? "82.1%";
   const ndvi = ndviCohesion ?? overview?.ndvi_cohesion_pct ?? "64.5%";
@@ -46,58 +46,54 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
 
   const stabilityStatus =
     stability >= 75
-      ? { text: "Nominal Stable Incline", color: "text-emerald-400" }
+      ? { text: "Nominal Stable Incline", color: "text-emerald-700 font-semibold" }
       : stability >= 50
-      ? { text: "Marginal Incline Watch", color: "text-amber-400" }
-      : { text: "Critical Incline Shear", color: "text-rose-400" };
+      ? { text: "Marginal Incline Watch", color: "text-amber-700 font-semibold" }
+      : { text: "Critical Incline Shear", color: "text-red-700 font-semibold" };
 
   const poreStatus =
     pore >= 75
-      ? { text: "Elevated Shear Saturation", color: "text-amber-400" }
+      ? { text: "Elevated Shear Saturation", color: "text-amber-700 font-semibold" }
       : pore >= 50
-      ? { text: "Moderate Pore Saturation", color: "text-amber-300" }
-      : { text: "Nominal Hydrostatic Baseline", color: "text-emerald-400" };
+      ? { text: "Moderate Pore Saturation", color: "text-amber-700 font-semibold" }
+      : { text: "Nominal Hydrostatic Baseline", color: "text-emerald-700 font-semibold" };
 
   return (
-    <div className="coder-dark-card p-6 flex flex-col justify-between min-h-[420px]">
+    <div className="bg-zinc-50/70 p-6 rounded-2xl border border-zinc-200 shadow-2xs flex flex-col justify-between space-y-5">
       {/* Top Telemetry Header */}
-      <div className="border-b border-white/10 pb-4">
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">
-            Sensor Cluster: Western Ghats Sector 01
-          </span>
-          <span className="text-[11px] font-mono text-zinc-400">
-            Node Sync: Active
-          </span>
+      <div className="border-b border-zinc-200/80 pb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-base sm:text-lg font-black text-black tracking-tight">
+            Geotechnical Stability & Pore Saturation Gauges
+          </h3>
+          <p className="text-xs text-zinc-500 font-sans mt-0.5">
+            Real-time mechanical factor of safety analysis for Wayanad District
+          </p>
         </div>
-        <h3 className="text-xl font-bold text-white tracking-tight mt-2">
-          Terrain Stability & Pore-Pressure Telemetry
-        </h3>
-        <p className="text-xs text-zinc-400 mt-0.5">
-          Dynamic geotechnical assessment for Wayanad District (Vythiri, Meppadi, Chooralmala)
-        </p>
+        <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-bold">
+          Sector: Wayanad Ridge 01
+        </span>
       </div>
 
       {/* Dual Circular Gauges */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Gauge 1: Stability Index */}
-        <div className="bg-white/[0.03] p-4 rounded-xl border border-white/10 flex items-center gap-4 group hover:border-white/20 transition-all duration-200">
-          <div className="relative w-18 h-18 flex-shrink-0 flex items-center justify-center transition-transform group-hover:scale-105 duration-200">
-            <svg className="w-18 h-18 -rotate-90 transform" viewBox="0 0 100 100">
+        <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-2xs flex items-center gap-4 hover:border-black transition-colors">
+          <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
+            <svg className="w-16 h-16 -rotate-90 transform" viewBox="0 0 100 100">
               <circle
                 cx="50"
                 cy="50"
                 r="40"
-                className="text-zinc-800"
-                strokeWidth="7"
-                stroke="currentColor"
+                stroke="#e4e4e7"
+                strokeWidth="8"
                 fill="transparent"
               />
               <circle
                 cx="50"
                 cy="50"
                 r="40"
-                strokeWidth="7"
+                strokeWidth="8"
                 strokeDasharray={251.2}
                 strokeDashoffset={251.2 - (251.2 * stabilityPct) / 100}
                 strokeLinecap="round"
@@ -105,41 +101,40 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
                 fill="transparent"
               />
             </svg>
-            <div className="absolute font-mono text-xs font-bold text-white">
+            <div className="absolute font-mono text-xs font-black text-black">
               {stabilityPct.toFixed(0)}%
             </div>
           </div>
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
-              Stability Index
+            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold block">
+              Slope Stability Index
             </span>
-            <div className="text-2xl font-bold font-mono text-white mt-0.5">
-              {stability.toFixed(1)}<span className="text-xs text-zinc-500 font-sans ml-1">/100</span>
+            <div className="text-xl sm:text-2xl font-black font-mono text-black mt-0.5">
+              {stability.toFixed(1)}<span className="text-xs text-zinc-400 font-sans ml-1">/100</span>
             </div>
-            <span className={`text-[11px] font-medium ${stabilityStatus.color}`}>
+            <span className={`text-[11px] block mt-0.5 ${stabilityStatus.color}`}>
               {stabilityStatus.text}
             </span>
           </div>
         </div>
 
         {/* Gauge 2: Pore-Water Pressure */}
-        <div className="bg-white/[0.03] p-4 rounded-xl border border-white/10 flex items-center gap-4 group hover:border-white/20 transition-all duration-200">
-          <div className="relative w-18 h-18 flex-shrink-0 flex items-center justify-center transition-transform group-hover:scale-105 duration-200">
-            <svg className="w-18 h-18 -rotate-90 transform" viewBox="0 0 100 100">
+        <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-2xs flex items-center gap-4 hover:border-black transition-colors">
+          <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
+            <svg className="w-16 h-16 -rotate-90 transform" viewBox="0 0 100 100">
               <circle
                 cx="50"
                 cy="50"
                 r="40"
-                className="text-zinc-800"
-                strokeWidth="7"
-                stroke="currentColor"
+                stroke="#e4e4e7"
+                strokeWidth="8"
                 fill="transparent"
               />
               <circle
                 cx="50"
                 cy="50"
                 r="40"
-                strokeWidth="7"
+                strokeWidth="8"
                 strokeDasharray={251.2}
                 strokeDashoffset={251.2 - (251.2 * porePressurePct) / 100}
                 strokeLinecap="round"
@@ -147,84 +142,62 @@ export const HeroGaugeCard: React.FC<HeroGaugeCardProps> = ({
                 fill="transparent"
               />
             </svg>
-            <div className="absolute font-mono text-xs font-bold text-white">
+            <div className="absolute font-mono text-xs font-black text-black">
               {porePressurePct.toFixed(0)}%
             </div>
           </div>
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
-              Pore-Water Pressure
+            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold block">
+              Pore-Water Saturation
             </span>
-            <div className="text-2xl font-bold font-mono text-white mt-0.5">
-              {pore.toFixed(1)}<span className="text-xs text-zinc-500 font-sans ml-1">/100</span>
+            <div className="text-xl sm:text-2xl font-black font-mono text-black mt-0.5">
+              {pore.toFixed(1)}<span className="text-xs text-zinc-400 font-sans ml-1">/100</span>
             </div>
-            <span className={`text-[11px] font-medium ${poreStatus.color}`}>
+            <span className={`text-[11px] block mt-0.5 ${poreStatus.color}`}>
               {poreStatus.text}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Model Benchmark Meta Card */}
-      <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/10 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          </div>
-          <div>
-            <div className="text-xs font-bold text-white">
-              {model}
-            </div>
-            <p className="text-[11px] text-zinc-400">
-              Gradient Boosted Decision Trees // 30m SRTM DEM Resolution
-            </p>
-          </div>
-        </div>
-        <div className="text-right">
-          <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">
-            ROC-AUC: {auc}
-          </span>
-        </div>
-      </div>
-
       {/* Conditioning Factors Telemetry Breakdown */}
-      <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/10 mt-2">
-        <div className="bg-white/[0.03] p-2.5 rounded-lg border border-white/10">
-          <div className="flex items-center gap-1.5 text-zinc-400 text-[11px]">
-            <Mountain className="w-3.5 h-3.5 text-zinc-400" />
+      <div className="grid grid-cols-3 gap-3 pt-2">
+        <div className="bg-white p-3 rounded-xl border border-zinc-200">
+          <div className="flex items-center gap-1.5 text-zinc-500 text-[11px] font-medium">
+            <Mountain className="w-3.5 h-3.5 text-zinc-700" />
             <span>Slope Angle</span>
           </div>
-          <div className="font-mono text-sm font-bold text-white mt-1">
+          <div className="font-mono text-sm font-black text-black mt-1">
             {slope}
           </div>
-          <div className="w-full bg-zinc-800 h-1 rounded-full mt-1.5 overflow-hidden">
-            <div className="bg-amber-400 h-full rounded-full transition-all duration-300" style={{ width: slope }} />
+          <div className="w-full bg-zinc-100 h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <div className="bg-amber-500 h-full rounded-full transition-all duration-300" style={{ width: slope }} />
           </div>
         </div>
 
-        <div className="bg-white/[0.03] p-2.5 rounded-lg border border-white/10">
-          <div className="flex items-center gap-1.5 text-zinc-400 text-[11px]">
-            <CloudRain className="w-3.5 h-3.5 text-zinc-400" />
+        <div className="bg-white p-3 rounded-xl border border-zinc-200">
+          <div className="flex items-center gap-1.5 text-zinc-500 text-[11px] font-medium">
+            <CloudRain className="w-3.5 h-3.5 text-zinc-700" />
             <span>24h Rainfall</span>
           </div>
-          <div className="font-mono text-sm font-bold text-white mt-1">
+          <div className="font-mono text-sm font-black text-black mt-1">
             {rain}
           </div>
-          <div className="w-full bg-zinc-800 h-1 rounded-full mt-1.5 overflow-hidden">
-            <div className="bg-sky-400 h-full rounded-full transition-all duration-300" style={{ width: rain }} />
+          <div className="w-full bg-zinc-100 h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <div className="bg-blue-500 h-full rounded-full transition-all duration-300" style={{ width: rain }} />
           </div>
         </div>
 
-        <div className="bg-white/[0.03] p-2.5 rounded-lg border border-white/10">
-          <div className="flex items-center gap-1.5 text-zinc-400 text-[11px]">
-            <Trees className="w-3.5 h-3.5 text-zinc-400" />
+        <div className="bg-white p-3 rounded-xl border border-zinc-200">
+          <div className="flex items-center gap-1.5 text-zinc-500 text-[11px] font-medium">
+            <Trees className="w-3.5 h-3.5 text-zinc-700" />
             <span>NDVI Canopy</span>
           </div>
-          <div className="font-mono text-sm font-bold text-white mt-1">
+          <div className="font-mono text-sm font-black text-black mt-1">
             {ndvi}
           </div>
-          <div className="w-full bg-zinc-800 h-1 rounded-full mt-1.5 overflow-hidden">
-            <div className="bg-emerald-400 h-full rounded-full transition-all duration-300" style={{ width: ndvi }} />
+          <div className="w-full bg-zinc-100 h-1.5 rounded-full mt-1.5 overflow-hidden">
+            <div className="bg-emerald-500 h-full rounded-full transition-all duration-300" style={{ width: ndvi }} />
           </div>
         </div>
       </div>

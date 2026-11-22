@@ -96,8 +96,8 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
   const maxScaleVal = isMonthly ? 1600 : 400;
   const thresholdVal = isMonthly ? 1000 : 200;
   const thresholdText = isMonthly
-    ? "Severe Saturation Threshold (1,000mm)"
-    : "Critical Trigger Threshold (200mm)";
+    ? "Severe Saturation (1,000mm)"
+    : "Critical Trigger (200mm)";
   const yAxisTicks = isMonthly
     ? [
         { label: "1600mm", y: 20 },
@@ -162,24 +162,25 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
     if (hoveredIdx !== null && points[hoveredIdx]) {
       return points[hoveredIdx];
     }
-    return points.find((p) => p.highlight) || points[points.length - 1];
+    const apex = points.find((p) => p.highlight);
+    return apex || points[points.length - 1] || null;
   }, [hoveredIdx, points]);
 
   return (
-    <div className="coder-dark-card p-5 md:p-6 mt-4">
-      {/* Header Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <div className="bg-zinc-50/70 p-6 rounded-2xl border border-zinc-200 shadow-2xs flex flex-col justify-between space-y-4">
+      {/* Header bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200/80 pb-3">
         <div>
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-emerald-400" />
-            <h3 className="text-sm font-bold text-white tracking-tight">
+            <Activity className="w-4 h-4 text-emerald-600" />
+            <h3 className="font-bold text-base text-black">
               Precipitation & Hazard Trigger Waveform
             </h3>
-            <span className="text-[10px] font-mono text-emerald-400/90 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded ml-1">
-              IMD Live Hydro-Telemetry
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+              IMD Benchmark
             </span>
           </div>
-          <p className="text-[11px] text-zinc-400 mt-0.5">
+          <p className="text-xs text-zinc-500 font-sans mt-0.5">
             {timeframe === "Weekly" && "Historical disaster week progression: 25 Jul – 31 Jul 2024 (Wayanad / Chooralmala)"}
             {timeframe === "Daily" && "Diurnal cloudburst timeline: 30 Jul 2024 failure event progression"}
             {timeframe === "Monthly" && "Southwest Monsoon cumulative catchment records: June – October 2024"}
@@ -187,7 +188,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
         </div>
 
         {/* Timeframe pill tabs */}
-        <div className="flex bg-white/5 p-1 rounded-lg border border-white/10">
+        <div className="flex bg-white p-1 rounded-xl border border-zinc-200 shadow-2xs">
           {(["Daily", "Weekly", "Monthly"] as const).map((t) => (
             <button
               key={t}
@@ -195,10 +196,10 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
                 setTimeframe(t);
                 setHoveredIdx(null);
               }}
-              className={`px-3 py-1 rounded text-[11px] font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-3 py-1 rounded-lg text-xs font-mono transition-all duration-150 cursor-pointer ${
                 timeframe === t
-                  ? "bg-white/20 text-white font-bold shadow-sm border border-white/20"
-                  : "text-zinc-400 hover:text-white"
+                  ? "bg-black text-white font-bold shadow-xs"
+                  : "text-zinc-600 hover:text-black font-medium"
               }`}
             >
               {t}
@@ -207,32 +208,32 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
         </div>
       </div>
 
-      {/* Selected Point Telemetry HUD Strip */}
+      {/* Selected Point Telemetry Strip */}
       {activePoint && (
-        <div className="flex items-center justify-between bg-white/[0.03] border border-white/10 rounded-lg px-3 py-1.5 mb-3 text-xs font-mono">
+        <div className="flex flex-wrap items-center justify-between bg-white border border-zinc-200 rounded-xl px-4 py-2 text-xs font-mono shadow-2xs gap-2">
           <div className="flex items-center gap-3">
-            <span className="text-zinc-300 font-semibold flex items-center gap-1.5">
+            <span className="text-black font-bold flex items-center gap-1.5">
               {timeframe === "Daily" ? (
-                <Clock className="w-3.5 h-3.5 text-sky-400" />
+                <Clock className="w-3.5 h-3.5 text-blue-600" />
               ) : (
-                <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                <Calendar className="w-3.5 h-3.5 text-emerald-600" />
               )}
               {activePoint.label}
             </span>
-            <span className="text-zinc-400">•</span>
-            <span className="text-zinc-300 flex items-center gap-1">
-              <Droplets className="w-3.5 h-3.5 text-sky-400" />
-              <strong className="text-white">{activePoint.rainfall.toFixed(1)} mm</strong>
-              <span className="text-[10px] text-zinc-400">rainfall</span>
+            <span className="text-zinc-300">•</span>
+            <span className="text-zinc-700 flex items-center gap-1">
+              <Droplets className="w-3.5 h-3.5 text-blue-600" />
+              <strong className="text-black">{activePoint.rainfall.toFixed(1)} mm</strong>
+              <span className="text-[10px] text-zinc-500">rainfall</span>
             </span>
-            <span className="text-zinc-400">•</span>
+            <span className="text-zinc-300">•</span>
             <span
-              className={`flex items-center gap-1 ${
+              className={`flex items-center gap-1 font-bold ${
                 activePoint.hazard >= 75
-                  ? "text-rose-400 font-bold"
+                  ? "text-red-600"
                   : activePoint.hazard >= 50
-                  ? "text-amber-400"
-                  : "text-emerald-400"
+                  ? "text-amber-600"
+                  : "text-emerald-600"
               }`}
             >
               {activePoint.hazard >= 75 && <AlertTriangle className="w-3.5 h-3.5" />}
@@ -240,14 +241,14 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
             </span>
           </div>
 
-          <div className="text-[11px] text-zinc-400 hidden sm:block">
+          <div className="text-[11px] text-zinc-500 hidden sm:block font-sans">
             {activePoint.annotation}
           </div>
         </div>
       )}
 
       {/* Dynamic High-Resolution SVG Area Waveform */}
-      <div className="w-full h-40 relative">
+      <div className="w-full h-40 relative bg-white rounded-xl border border-zinc-100 p-2">
         <svg
           width="100%"
           height="100%"
@@ -256,22 +257,17 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
           className="overflow-visible"
         >
           <defs>
-            <linearGradient id="coderAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10b981" stopOpacity="0.32" />
-              <stop offset="70%" stopColor="#10b981" stopOpacity="0.08" />
+            <linearGradient id="cleanAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+              <stop offset="80%" stopColor="#10b981" stopOpacity="0.04" />
               <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
-            </linearGradient>
-
-            <linearGradient id="apexGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ef4444" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#ef4444" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
-          {/* Grid lines */}
-          <line x1="45" y1="20" x2="525" y2="20" stroke="rgba(255,255,255,0.06)" strokeDasharray="3,3" />
-          <line x1="45" y1="65" x2="525" y2="65" stroke="rgba(255,255,255,0.06)" strokeDasharray="3,3" />
-          <line x1="45" y1="110" x2="525" y2="110" stroke="rgba(255,255,255,0.08)" />
+          {/* Clean Light Grid lines */}
+          <line x1="45" y1="20" x2="525" y2="20" stroke="#f4f4f5" strokeDasharray="3,3" />
+          <line x1="45" y1="65" x2="525" y2="65" stroke="#f4f4f5" strokeDasharray="3,3" />
+          <line x1="45" y1="110" x2="525" y2="110" stroke="#e4e4e7" />
 
           {/* Dynamic Y Axis Text */}
           {yAxisTicks.map((tick, i) => (
@@ -282,12 +278,13 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
               fontSize="10"
               fill="#71717a"
               fontFamily="monospace"
+              fontWeight="bold"
             >
               {tick.label}
             </text>
           ))}
 
-          {/* Dynamic Secondary Threshold Line */}
+          {/* Critical Threshold Line */}
           <line
             x1="45"
             y1={thresholdY}
@@ -301,27 +298,27 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
             x="320"
             y={thresholdY - 5}
             fontSize="9"
-            fill="#f87171"
+            fill="#dc2626"
             fontFamily="monospace"
-            fontWeight="600"
+            fontWeight="700"
           >
             {thresholdText}
           </text>
 
-          {/* Dynamic Area Fill Gradient */}
-          <path d={areaPath} fill="url(#coderAreaGrad)" />
+          {/* Gradient Area Fill */}
+          <path d={areaPath} fill="url(#cleanAreaGrad)" />
 
-          {/* Dynamic Solid Line Path */}
+          {/* Smooth Solid Line Path */}
           <path
             d={curvePath}
             fill="none"
-            stroke="#10b981"
+            stroke="#059669"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
 
-          {/* Interactive Node Anchors for every data point */}
+          {/* Interactive Node Anchors */}
           {points.map((pt) => {
             const isHovered = hoveredIdx === pt.index;
             const isApex = pt.highlight;
@@ -350,8 +347,8 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
                   cx={pt.x}
                   cy={pt.y}
                   r={isHovered ? 7 : isApex ? 5.5 : 4}
-                  fill={isApex ? "#ef4444" : isHovered ? "#34d399" : "#10b981"}
-                  stroke="#0b0f19"
+                  fill={isApex ? "#ef4444" : isHovered ? "#059669" : "#10b981"}
+                  stroke="#ffffff"
                   strokeWidth="2"
                 />
 
@@ -368,8 +365,8 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
         </svg>
       </div>
 
-      {/* Dynamic X-Axis Date / Time Labels */}
-      <div className="flex justify-between px-2 sm:px-4 text-[11px] font-mono text-zinc-400 mt-2 border-t border-white/5 pt-2">
+      {/* X-Axis Date / Time Labels */}
+      <div className="flex justify-between px-2 sm:px-4 text-[11px] font-mono text-zinc-500 mt-2 border-t border-zinc-200/80 pt-2">
         {points.map((pt) => {
           const isSelected = activePoint?.label === pt.label;
           return (
@@ -379,14 +376,14 @@ export const TrendChart: React.FC<TrendChartProps> = ({ trendData }) => {
               onMouseEnter={() => setHoveredIdx(pt.index)}
               className={`transition-all duration-150 cursor-pointer uppercase ${
                 isSelected
-                  ? "text-white font-bold scale-105"
+                  ? "text-black font-bold scale-105"
                   : pt.highlight
-                  ? "text-rose-400 font-semibold"
-                  : "hover:text-zinc-200 text-zinc-400"
+                  ? "text-red-600 font-bold"
+                  : "hover:text-black text-zinc-500"
               }`}
             >
               {pt.label}
-              {pt.highlight && <span className="hidden sm:inline text-[9px] text-rose-400 ml-0.5 font-sans">★</span>}
+              {pt.highlight && <span className="hidden sm:inline text-[9px] text-red-600 ml-0.5 font-sans">★</span>}
             </button>
           );
         })}
