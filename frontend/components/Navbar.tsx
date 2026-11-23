@@ -58,12 +58,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="flex items-center gap-8">
         <Link
           href="/"
-          className="flex items-center gap-2 cursor-pointer select-none group"
+          className="flex items-center cursor-pointer select-none group"
         >
-          <div className="w-7 h-7 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs shadow-xs group-hover:scale-105 transition-transform">
-            GS
-          </div>
-          <span className="text-xl font-black tracking-tight text-black uppercase font-mono flex items-center">
+          <span className="text-2xl font-black tracking-tight text-black uppercase font-mono flex items-center">
             {brandLetters.map((char, index) => {
               const isD = char === "D" || index === brandLetters.length - 1;
               const isJumping = jumpingLetter === index;

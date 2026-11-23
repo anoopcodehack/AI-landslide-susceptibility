@@ -240,14 +240,11 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
       </div>
 
       {/* 2. Multi-Column Footer with Sliding Hover Links */}
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-14 grid grid-cols-2 md:grid-cols-5 gap-8 text-sm text-zinc-400">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-14 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 text-sm text-zinc-400">
         {/* Brand Block */}
         <div className="col-span-2 md:col-span-1">
-          <div className="flex items-center gap-2 select-none">
-            <div className="w-7 h-7 rounded-lg bg-white text-black flex items-center justify-center font-bold text-xs shadow-xs">
-              GS
-            </div>
-            <span className="text-lg font-black tracking-tight text-white uppercase font-sans">
+          <div className="flex items-center select-none">
+            <span className="text-xl font-black tracking-tight text-white uppercase font-sans">
               GeoShield
             </span>
           </div>
@@ -349,36 +346,7 @@ export const TacticalDock: React.FC<TacticalDockProps> = ({
           </ul>
         </div>
 
-        {/* Column 3: Technology */}
-        <div>
-          <h5 className="font-semibold text-white text-xs uppercase tracking-wider mb-4">
-            Technology
-          </h5>
-          <ul className="space-y-2.5 text-xs">
-            <li className="group cursor-default">
-              <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 group-hover:text-white">
-                Gradient Boosted Trees (XGBoost)
-              </span>
-            </li>
-            <li className="group cursor-default">
-              <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 group-hover:text-white">
-                Random Forest Bagging
-              </span>
-            </li>
-            <li className="group cursor-default">
-              <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 group-hover:text-white">
-                SHAP TreeExplainer
-              </span>
-            </li>
-            <li className="group cursor-default">
-              <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5 group-hover:text-white">
-                FastAPI Asynchronous Engine
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Column 4: Emergency Contacts & Helplines (Clean Enterprise Monochrome) */}
+        {/* Column 3: Emergency Contacts & Helplines (Clean Enterprise Monochrome) */}
         <div>
           <h5 className="font-semibold text-white text-xs uppercase tracking-wider mb-4">
             {language === "kn" ? "ತುರ್ತು ಸಹಾಯವಾಣಿ" : "Emergency Helplines"}
